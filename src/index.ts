@@ -534,10 +534,15 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
 // Implementation functions
 
+// Target average words per sentence for optimal coherence
+const OPTIMAL_WORDS_PER_SENTENCE = 20;
+
 function analyzeWave(input: string) {
   // Wave analysis implementation
-  const wordCount = input.split(/\s+/).length;
-  const sentenceCount = input.split(/[.!?]+/).filter(s => s.trim()).length;
+  const wordCount = input.split(/\s+/).filter(w => w.trim()).length;
+  // Count sentences by splitting on sentence terminators and filtering non-empty ones
+  const sentences = input.split(/[.!?]+/).filter(s => s.trim().length > 0);
+  const sentenceCount = sentences.length;
   const avgWordsPerSentence = sentenceCount > 0 ? wordCount / sentenceCount : 0;
   
   return {
@@ -548,7 +553,7 @@ function analyzeWave(input: string) {
       sentenceCount,
       avgWordsPerSentence: Math.round(avgWordsPerSentence * 100) / 100,
     },
-    coherenceScore: Math.min(100, Math.round((avgWordsPerSentence / 20) * 100)),
+    coherenceScore: Math.min(100, Math.round((avgWordsPerSentence / OPTIMAL_WORDS_PER_SENTENCE) * 100)),
     timestamp: new Date().toISOString(),
   };
 }
@@ -678,8 +683,16 @@ function deployOps(env: string, dryRun: boolean) {
     throw new Error(`Invalid environment: ${env}. Must be one of: ${validEnvs.join(", ")}`);
   }
   
+  // Production deployments are guarded: they must be explicitly run as dry-run first for safety
+  // In a real implementation, this could check a confirmation token or require 2FA
   if (env === "production" && !dryRun) {
-    throw new Error("Production deployment requires explicit confirmation. Use dryRun=true first.");
+    return {
+      environment: env,
+      dryRun: false,
+      status: "blocked",
+      message: "Production deployment requires dry-run validation first. Run with dryRun=true to preview changes.",
+      timestamp: new Date().toISOString(),
+    };
   }
   
   return {
