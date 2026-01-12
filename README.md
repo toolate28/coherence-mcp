@@ -1,81 +1,223 @@
-# Coherence Governor MCP
+# coherence-mcp
 
-SpiralSafe-aligned MCP server that surfaces coherence, governance, and safety primitives: Wave/Bump validation, ATOM trail + gates, .context.yaml packing, AWI intent scaffolding, and docs/search across the SpiralSafe corpus.
+MCP server that surfaces coherence, governance, and safety primitives: Wave/Bump validation, ATOM trail + gates, .context.yaml packing, AWI intent scaffolding, and docs/search across the SpiralSafe corpus.
 
-## Why this exists
-- Existing "safety" MCP servers focus on filters or audits. This server exposes *process integrity* (gates, ATOM decisions, handoffs) plus coherence analytics (Wave) and context handoff correctness (Bump/context spec).
-- Serves both humans and agents with dual-format resources (prose + structured) so clients can reason and act with the same ground truth.
+## Features
 
-## Capabilities (intended v0.1 surface)
-- Resources (read-only): foundation/methodology/protocol/interface/ops docs; AWI intents; .context.yaml schema; ATOM schema; playbooks (BattleMedic); health endpoint map.
-- Tools:
-  - `wave.analyze(text|docRef)`
-  - `bump.validate(handoff)`
-  - `context.pack(docPaths, meta)`
-  - `atom.track(decision, files, tags)`
-  - `gate.intention_to_execution()` / `gate.execution_to_learning()`
-  - `docs.search(query, layer?, kind?)`
-  - `ops.health()` / `ops.status()` via SpiralSafe API; guarded `ops.deploy(env, dryRun?)`
-  - `scripts.run(name, args)` (strict allow-list)
-  - `awi.intent_request(scope, justification)`
-  - `discord.post`, `mc.execCommand/query`, `media.email`, `media.x.post`, `media.reddit.post` (all scope + env guarded; allow-lists supported for email addresses and subreddits)
-- Prompts/templates: atom commit message, wave review summary, AWI intent request, handoff note.
+This MCP server provides the following tools:
 
-Notes:
-- `wave.analyze` calls `WAVE_TOOLKIT_BIN` (CLI), optionally bounded by configured timeout and max-bytes limits (set via the wave adapter/config in `src/config.ts` / `src/adapters/`), and falls back to a lightweight heuristic if those limits are not configured.
-- `context.pack` writes a .context.yaml with doc hashes and validates against schema; `bump.validate` checks schema plus hash integrity.
-- Auth: bearer/HMAC tokens (`ATOM_AUTH_TOKEN` / `ATOM_AUTH_HMAC_SECRET`) gate scope propagation; every call includes a requestId in audit.
+### Core Analysis & Validation
+- **`wave_analyze`** - Analyze text or document reference for coherence patterns and wave analysis
+- **`bump_validate`** - Validate a handoff for bump compatibility and safety checks
 
-## Layout
-- `src/server.ts` — MCP server bootstrap (register resources + tools).
-  - `src/config.ts`    — configuration for mount paths, allow-lists, scopes.
-  - `src/configEnv.ts` — env overrides and allow-list loading (dotenv-aware).
-  - `src/resources/`   — resource registry and loaders.
-  - `src/tools/`       — tool implementations (wave, bump, context, atom, gates, ops, search, awi).
-  - `src/adapters/`    — host integrations (wave-toolkit, bump/context validators, ATOM FS/git, script runner).
-  - `src/auth/`        — scope model and enforcement.
-  - `src/logging/`     — audit logging for all tool invocations.
-  - `docs/`            — publishing pipeline sketches for Discord/peer-review/blog/social.
-  - `.env.example`     — required env vars for integrations.
+### Context & Tracking
+- **`context_pack`** - Pack document paths and metadata into a .context.yaml structure
+- **`atom_track`** - Track decisions in the ATOM trail with associated files and tags
 
-## Defaults (can be overridden)
-- SpiralSafe checkout mounted at `../SpiralSafe` relative to repo root.
-- Writes restricted to `.atom-trail/` within that checkout.
-- Script allow-list: `scripts/verify-environment.sh`, `scripts/scan-secrets.sh`, `scripts/test-scripts.sh` (plus PowerShell equivalents if present).
-- Deploy tool disabled by default; enable via config flag and scope.
+### Gate Transitions
+- **`gate_intention_to_execution`** - Gate transition from intention phase to execution phase
+- **`gate_execution_to_learning`** - Gate transition from execution phase to learning phase
 
-## Getting started
+### Documentation & Search
+- **`docs_search`** - Search across the SpiralSafe corpus with optional layer and kind filters
+
+### Operations
+- **`ops_health`** - Check operational health status via SpiralSafe API
+- **`ops_status`** - Get operational status via SpiralSafe API
+- **`ops_deploy`** - Deploy to environment with optional dry-run (guarded operation)
+
+### Scripts & Automation
+- **`scripts_run`** - Run a script from the strict allow-list with arguments
+  - Allowed scripts: `backup`, `validate`, `sync`, `report`, `cleanup`
+
+### Intent Management
+- **`awi_intent_request`** - Request AWI (Autonomous Work Initiation) intent scaffolding
+
+### Media Pipelines
+- **`discord_post`** - Post a message to Discord media pipeline
+- **`mc_execCommand`** - Execute a command in Minecraft media pipeline
+- **`mc_query`** - Query information from Minecraft media pipeline
+
+## Installation
+
 ```bash
-# Install deps (after reviewing package.json)
 npm install
-
-# Dev (ts-node)
-npm run dev
-
-# Build
-npm run build
-
-# Smoke (post-build)
-node scripts/smoke.mjs
 ```
 
-## Diagnostics
-- Type-check/build: `npm run build`
-- Unit tests: `npm test`
-- Post-build sanity: `node scripts/smoke.mjs` (lists resources/tools and runs a sample `bump.validate`)
-- Request flow reference: see [docs/flow.md](docs/flow.md) for stdio path and handlers.
+## Building
 
-## Next steps
-- Implement real adapters:
-  - Wave: use the wave-toolkit CLI (`WAVE_TOOLKIT_BIN`) as the primary integration for `wave.analyze`, consistent with the CLI-only behavior described above; optionally add an SDK-based wrapper later as a fallback when the CLI is not available.
-  - Bump/context: validate against `protocol/bump-spec.md` and `.context.yaml` schema.
-  - ATOM/gates: call existing SpiralSafe scripts; log audit.
-  - Docs/search: index key docs with fast-glob; optional embeddings later.
-- Add MCP conformance tests.
-- Wire auth scopes and rate limits.
-- Publish manifest via `publish-server v0.1` after the adapters above are implemented, auth scopes and rate limits are wired, and MCP conformance and smoke tests are passing.
+```bash
+npm run build
+```
 
-## Security posture
-- Scoped tokens; per-tool allow-lists; audit log of every call.
-- Mutating tools (atom.track, gates, deploy, scripts.run) require explicit scopes; deploy off by default.
-- All inputs validated and bounded; no arbitrary command execution.
+## Usage
+
+### Running the Server
+
+```bash
+npx coherence-mcp
+```
+
+Or in your MCP client configuration:
+
+```json
+{
+  "mcpServers": {
+    "coherence": {
+      "command": "npx",
+      "args": ["-y", "coherence-mcp"]
+    }
+  }
+}
+```
+
+### Example Tool Calls
+
+#### Wave Analysis
+```typescript
+{
+  "name": "wave_analyze",
+  "arguments": {
+    "input": "This is a sample text to analyze for coherence patterns."
+  }
+}
+```
+
+#### Bump Validation
+```typescript
+{
+  "name": "bump_validate",
+  "arguments": {
+    "handoff": {
+      "source": "module-a",
+      "target": "module-b",
+      "payload": { "data": "value" }
+    }
+  }
+}
+```
+
+#### Context Packing
+```typescript
+{
+  "name": "context_pack",
+  "arguments": {
+    "docPaths": ["./docs/design.md", "./docs/api.md"],
+    "meta": {
+      "project": "coherence-mcp",
+      "version": "0.1.0"
+    }
+  }
+}
+```
+
+#### ATOM Tracking
+```typescript
+{
+  "name": "atom_track",
+  "arguments": {
+    "decision": "Implement new validation layer",
+    "files": ["src/validation.ts", "tests/validation.test.ts"],
+    "tags": ["validation", "security", "v0.1.0"]
+  }
+}
+```
+
+#### Gate Transitions
+```typescript
+{
+  "name": "gate_intention_to_execution",
+  "arguments": {
+    "context": {
+      "phase": "planning",
+      "readiness": "complete"
+    }
+  }
+}
+```
+
+#### Documentation Search
+```typescript
+{
+  "name": "docs_search",
+  "arguments": {
+    "query": "authentication patterns",
+    "layer": "security",
+    "kind": "guide"
+  }
+}
+```
+
+#### Operations Health Check
+```typescript
+{
+  "name": "ops_health",
+  "arguments": {}
+}
+```
+
+#### Deployment (with guards)
+```typescript
+{
+  "name": "ops_deploy",
+  "arguments": {
+    "env": "staging",
+    "dryRun": true
+  }
+}
+```
+
+#### Script Execution (allow-listed)
+```typescript
+{
+  "name": "scripts_run",
+  "arguments": {
+    "name": "validate",
+    "args": ["--strict", "--verbose"]
+  }
+}
+```
+
+#### AWI Intent Request
+```typescript
+{
+  "name": "awi_intent_request",
+  "arguments": {
+    "scope": "feature/new-validation",
+    "justification": "Required for enhanced security compliance"
+  }
+}
+```
+
+#### Discord Integration
+```typescript
+{
+  "name": "discord_post",
+  "arguments": {
+    "channel": "notifications",
+    "message": "Deployment completed successfully"
+  }
+}
+```
+
+#### Minecraft Integration
+```typescript
+{
+  "name": "mc_execCommand",
+  "arguments": {
+    "command": "/time set day"
+  }
+}
+```
+
+## Safety & Governance Features
+
+- **Guarded Deployments**: Production deployments require explicit confirmation
+- **Script Allow-listing**: Only pre-approved scripts can be executed
+- **AWI Intent Scaffolding**: Structured intent requests with justification
+- **ATOM Trail**: Comprehensive decision tracking with file associations
+- **Gate Transitions**: Validated phase transitions with precondition checks
+
+## License
+
+MIT
