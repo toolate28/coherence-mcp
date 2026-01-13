@@ -23,8 +23,9 @@ This MCP server provides the following tools:
 ### Context & Tracking
 - **`context_pack`** - Pack document paths and metadata into a .context.yaml structure
 - **`atom_track`** - Track decisions in the ATOM trail with associated files and tags
-<img width="1355" height="930" alt="image" src="https://github.com/user-attachments/assets/01e83678-0636-4219-b302-6b5e0e171a37" />
-<img width="444" height="412" alt="image" src="https://github.com/user-attachments/assets/44039eb8-ad2b-4d78-bb89-c5324166d0fb" />
+<img width="815" height="564" alt="image" src="https://github.com/user-attachments/assets/ef7c6fcb-6364-4d8e-aea6-f379e5a02672" />
+<img width="873" height="861" alt="image" src="https://github.com/user-attachments/assets/fb2065aa-646b-44fb-a24d-5298d44d1cc3" />
+
 
 ### Gate Transitions
 - **`gate_intention_to_execution`** - Gate transition from intention phase to execution phase
@@ -34,9 +35,6 @@ This MCP server provides the following tools:
 - **`docs_search`** - Search across the SpiralSafe corpus with optional layer and kind filters
 
 ### Operations
-<img width="784" height="753" alt="image" src="https://github.com/user-attachments/assets/e90a21e3-b7c9-408c-ac1f-f2347401f895" />
-<img width="658" height="926" alt="image" src="https://github.com/user-attachments/assets/b5ee1b15-9fed-49a9-b964-2bf8a2e6dbf8" />
-
 - **`ops_health`** - Check operational health status via SpiralSafe API
 - **`ops_status`** - Get operational status via SpiralSafe API
 - **`ops_deploy`** - Deploy to environment with optional dry-run (guarded operation)
