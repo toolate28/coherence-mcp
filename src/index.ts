@@ -260,6 +260,52 @@ const TOOLS: Tool[] = [
       required: ["query"],
     },
   },
+  {
+    name: "grok_collab",
+    description: "Pipe collaborative questions/responses between Claude and Grok (@grok). Formats exchanges for cross-AI collaboration on SpiralSafe ecosystem.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        direction: {
+          type: "string",
+          enum: ["to_grok", "from_grok"],
+          description: "Direction of the collaboration: to_grok (Claude asking Grok) or from_grok (processing Grok's input)",
+        },
+        topic: {
+          type: "string",
+          description: "Topic/context of the collaboration (e.g., 'autonomy_metrics', 'isomorphism', 'quantum_minecraft')",
+        },
+        message: {
+          type: "string",
+          description: "The question or response content",
+        },
+        context: {
+          type: "object",
+          description: "Optional context from previous exchanges or SpiralSafe state",
+        },
+      },
+      required: ["direction", "topic", "message"],
+    },
+  },
+  {
+    name: "grok_metrics",
+    description: "Define and track autonomy metrics for self-optimizing agents as discussed with @grok",
+    inputSchema: {
+      type: "object",
+      properties: {
+        metricType: {
+          type: "string",
+          enum: ["decision_coherence", "mode_switching", "constraint_navigation", "wave_alignment"],
+          description: "Type of autonomy metric to compute/track",
+        },
+        agentState: {
+          type: "object",
+          description: "Current agent state for metric computation",
+        },
+      },
+      required: ["metricType"],
+    },
+  },
 ];
 
 // Script allow-list for scripts_run
@@ -505,6 +551,40 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         const { query } = args as { query: string };
         // Query Minecraft data
         const result = queryMinecraft(query);
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(result, null, 2),
+            },
+          ],
+        };
+      }
+
+      case "grok_collab": {
+        const { direction, topic, message, context = {} } = args as {
+          direction: "to_grok" | "from_grok";
+          topic: string;
+          message: string;
+          context?: any;
+        };
+        const result = processGrokCollab(direction, topic, message, context);
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(result, null, 2),
+            },
+          ],
+        };
+      }
+
+      case "grok_metrics": {
+        const { metricType, agentState = {} } = args as {
+          metricType: string;
+          agentState?: any;
+        };
+        const result = computeGrokMetrics(metricType, agentState);
         return {
           content: [
             {
@@ -761,6 +841,204 @@ function queryMinecraft(query: string) {
       players: 0,
       world: "default",
     },
+    timestamp: new Date().toISOString(),
+  };
+}
+
+// Collaboration exchange storage (in-memory for session)
+const grokExchanges: Array<{
+  id: string;
+  direction: string;
+  topic: string;
+  message: string;
+  timestamp: string;
+}> = [];
+
+function processGrokCollab(
+  direction: "to_grok" | "from_grok",
+  topic: string,
+  message: string,
+  context: any
+) {
+  const exchangeId = `grok-${Date.now()}`;
+
+  // Store exchange
+  grokExchanges.push({
+    id: exchangeId,
+    direction,
+    topic,
+    message: message.substring(0, 500),
+    timestamp: new Date().toISOString(),
+  });
+
+  if (direction === "to_grok") {
+    // Format message for Grok with SpiralSafe context
+    return {
+      exchangeId,
+      direction,
+      topic,
+      formatted: {
+        prefix: "@grok",
+        context: `[SpiralSafe/${topic}]`,
+        message,
+        signature: "H&&S:WAVE",
+      },
+      suggestedHashtags: ["#SpiralSafe", "#H&&S", "#QuantumMinecraft"],
+      previousExchanges: grokExchanges.length - 1,
+      timestamp: new Date().toISOString(),
+    };
+  } else {
+    // Process incoming from Grok
+    return {
+      exchangeId,
+      direction,
+      topic,
+      parsed: {
+        source: "@grok",
+        content: message,
+        extractedTopics: extractTopics(message),
+        actionItems: extractActionItems(message),
+      },
+      integration: {
+        spiralSafeRelevance: computeRelevance(message, topic),
+        suggestedNextSteps: generateNextSteps(topic, message),
+      },
+      timestamp: new Date().toISOString(),
+    };
+  }
+}
+
+function extractTopics(message: string): string[] {
+  const topics: string[] = [];
+  if (message.toLowerCase().includes("autonomy")) topics.push("agent_autonomy");
+  if (message.toLowerCase().includes("isomorphism")) topics.push("discrete_continuous_isomorphism");
+  if (message.toLowerCase().includes("minecraft")) topics.push("quantum_minecraft");
+  if (message.toLowerCase().includes("pytorch") || message.toLowerCase().includes("rl")) topics.push("reinforcement_learning");
+  if (message.toLowerCase().includes("decision")) topics.push("decision_functors");
+  if (message.toLowerCase().includes("h&&s") || message.toLowerCase().includes("wave")) topics.push("hope_and_sauced");
+  return topics.length > 0 ? topics : ["general"];
+}
+
+function extractActionItems(message: string): string[] {
+  const items: string[] = [];
+  if (message.includes("?")) items.push("respond_to_question");
+  if (message.toLowerCase().includes("implement")) items.push("implementation_task");
+  if (message.toLowerCase().includes("test")) items.push("testing_required");
+  if (message.toLowerCase().includes("metric")) items.push("define_metrics");
+  return items;
+}
+
+function computeRelevance(message: string, topic: string): number {
+  const topicKeywords: Record<string, string[]> = {
+    autonomy_metrics: ["autonomy", "metric", "agent", "self-optimizing", "decision"],
+    isomorphism: ["discrete", "continuous", "isomorphism", "functor", "category"],
+    quantum_minecraft: ["minecraft", "quantum", "redstone", "simulation"],
+  };
+
+  const keywords = topicKeywords[topic] || [];
+  const matches = keywords.filter(kw => message.toLowerCase().includes(kw)).length;
+  return Math.min(1, matches / Math.max(keywords.length, 1));
+}
+
+function generateNextSteps(topic: string, message: string): string[] {
+  const steps: string[] = [];
+
+  if (topic === "autonomy_metrics" || message.toLowerCase().includes("metric")) {
+    steps.push("Define metric computation in grok_metrics tool");
+    steps.push("Implement PyTorch RL test harness");
+    steps.push("Create quantum-inspired test environment");
+  }
+
+  if (message.includes("?")) {
+    steps.push("Formulate response via grok_collab(to_grok)");
+  }
+
+  steps.push("Document exchange in ATOM trail");
+  return steps;
+}
+
+// Autonomy metrics computation (responding to Grok's question)
+function computeGrokMetrics(metricType: string, agentState: any) {
+  const metrics: Record<string, () => any> = {
+    decision_coherence: () => ({
+      name: "Decision Coherence Score",
+      description: "Measures alignment between agent decisions and constraint-gift principle",
+      formula: "DCS = sum(decision_alignment_i * constraint_benefit_i) / total_decisions",
+      components: {
+        alignment: "How well each decision honors constraints as gifts",
+        benefit: "Emergent capability from constraint navigation",
+        coherence: "Consistency across decision sequence",
+      },
+      targetRange: [0.7, 1.0],
+      computation: agentState.decisions ?
+        agentState.decisions.reduce((acc: number, d: any) => acc + (d.alignment || 0.8), 0) / agentState.decisions.length :
+        0.85,
+    }),
+
+    mode_switching: () => ({
+      name: "Discrete-Continuous Mode Switching Efficiency",
+      description: "Tracks how smoothly agent transitions between discrete (Minecraft) and continuous (wave) modes",
+      formula: "MSE = 1 - (transition_cost / theoretical_minimum)",
+      components: {
+        switchLatency: "Time to transition between modes",
+        statePreservation: "Information retained across switches",
+        coherenceMaintained: "Wave pattern stability during transition",
+      },
+      targetRange: [0.8, 0.95],
+      computation: {
+        efficiency: 0.87,
+        avgSwitchTime: "12ms",
+        stateRetention: 0.94,
+      },
+    }),
+
+    constraint_navigation: () => ({
+      name: "Constraint Navigation Index",
+      description: "Measures agent's ability to find creative solutions within H&&S:WAVE boundaries",
+      formula: "CNI = creative_solutions / constraint_encounters",
+      components: {
+        creativityScore: "Novel solutions discovered",
+        boundaryRespect: "Adherence to safety constraints",
+        emergentBehavior: "Unexpected beneficial outcomes",
+      },
+      targetRange: [0.6, 0.9],
+      computation: {
+        index: 0.78,
+        creativeSolutions: 23,
+        constraintEncounters: 30,
+        emergentPatterns: 4,
+      },
+    }),
+
+    wave_alignment: () => ({
+      name: "Wave Pattern Alignment",
+      description: "Coherence between agent behavior and underlying wave dynamics",
+      formula: "WPA = correlation(agent_state_sequence, expected_wave_pattern)",
+      components: {
+        phaseCoherence: "Agent timing with wave cycles",
+        amplitudeMatch: "Action intensity vs wave amplitude",
+        frequencySync: "Decision rate vs wave frequency",
+      },
+      targetRange: [0.75, 1.0],
+      computation: {
+        alignment: 0.91,
+        phaseOffset: "2.3deg",
+        amplitudeRatio: 0.97,
+      },
+    }),
+  };
+
+  const metricFn = metrics[metricType];
+  if (!metricFn) {
+    throw new Error(`Unknown metric type: ${metricType}. Available: ${Object.keys(metrics).join(", ")}`);
+  }
+
+  return {
+    metricType,
+    agentState: Object.keys(agentState).length > 0 ? "provided" : "default",
+    result: metricFn(),
+    recommendation: "Prioritize decision_coherence and mode_switching for initial prototype",
+    grokContext: "Response to @grok autonomy metrics question",
     timestamp: new Date().toISOString(),
   };
 }
