@@ -1,41 +1,10 @@
 # coherence-mcp
 
 MCP server that surfaces coherence, governance, and safety primitives: Wave/Bump validation, ATOM trail + gates, .context.yaml packing, AWI intent scaffolding, and docs/search across the SpiralSafe corpus.
-```
-graph TD
-  A[Client (MCP-capable)] -->|stdio| B[MCP Server]
-  B --> C[Auth + Scope Check (bearer/HMAC)]
-  C --> D[Audit + RequestId + Rate Limit]
-  D --> E{Tool Router}
+<img width="1304" height="930" alt="image" src="https://github.com/user-attachments/assets/0e737068-51ba-4517-ad5d-e23f0d62af14" />
 
-  E -->|wave.analyze| F[Wave Adapter]
-  F -->|if WAVE_TOOLKIT_BIN| G[wave-toolkit CLI]
-  F -->|fallback| H[Heuristic Analyzer]
-
-  E -->|bump.validate| I[Ajv Schema + Hash]
-  E -->|context.pack| J[Context Builder + Hash]
-
-  E -->|ops.health/status/deploy| K[SpiralSafe API Client]
-  E -->|scripts.run| L[Allow-Listed Scripts]
-  E -->|atom/gate/awi| M[ATOM Trail + Gates (fs under mount)]
-  E -->|comm/media| N[Adapters]
-  N --> N1[Discord Webhook]
-  N --> N2[Minecraft RCON (stub)]
-  N --> N3[Email/X/Reddit (stubs + allow-lists)]
-
-  G --> D1[Audit Result]
-  H --> D1
-  I --> D1
-  J --> D1
-  K --> D1
-  L --> D1
-  M --> D1
-  N1 --> D1
-  N2 --> D1
-  N3 --> D1
-
-  D1[[Audit Log + Response]] --> A
-```
+<img width="914" height="784" alt="image" src="https://github.com/user-attachments/assets/98ec591c-7728-436b-ad78-6bdd98774fcb" />
+<img width="691" height="941" alt="image" src="https://github.com/user-attachments/assets/b02dc9bb-ee6a-43b6-b7d0-31c9ac01695c" />
 
 Legend
 - Auth/safety: scopes, allow-lists, bearer/HMAC verification, requestId, rate limits.
@@ -49,10 +18,13 @@ This MCP server provides the following tools:
 ### Core Analysis & Validation
 - **`wave_analyze`** - Analyze text or document reference for coherence patterns and wave analysis
 - **`bump_validate`** - Validate a handoff for bump compatibility and safety checks
+<img width="1304" height="930" alt="image" src="https://github.com/user-attachments/assets/272db657-4364-4c3b-a808-eea437aa3a17" />
 
 ### Context & Tracking
 - **`context_pack`** - Pack document paths and metadata into a .context.yaml structure
 - **`atom_track`** - Track decisions in the ATOM trail with associated files and tags
+<img width="1355" height="930" alt="image" src="https://github.com/user-attachments/assets/01e83678-0636-4219-b302-6b5e0e171a37" />
+<img width="444" height="412" alt="image" src="https://github.com/user-attachments/assets/44039eb8-ad2b-4d78-bb89-c5324166d0fb" />
 
 ### Gate Transitions
 - **`gate_intention_to_execution`** - Gate transition from intention phase to execution phase
@@ -62,6 +34,9 @@ This MCP server provides the following tools:
 - **`docs_search`** - Search across the SpiralSafe corpus with optional layer and kind filters
 
 ### Operations
+<img width="784" height="753" alt="image" src="https://github.com/user-attachments/assets/e90a21e3-b7c9-408c-ac1f-f2347401f895" />
+<img width="658" height="926" alt="image" src="https://github.com/user-attachments/assets/b5ee1b15-9fed-49a9-b964-2bf8a2e6dbf8" />
+
 - **`ops_health`** - Check operational health status via SpiralSafe API
 - **`ops_status`** - Get operational status via SpiralSafe API
 - **`ops_deploy`** - Deploy to environment with optional dry-run (guarded operation)
