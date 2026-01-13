@@ -29,7 +29,7 @@ flowchart TD
   subgraph routing[" Tool Routing & Security "]
     G[Tool router]
     H{Rate limit}
-    I[Auth context<br/>bearer/HMAC → scopes]
+    I[Auth context<br/>bearer/HMAC to scopes]
     J[Lookup tool]
   end
   

@@ -74,8 +74,8 @@ graph TD
   classDef securityStyle fill:#BD10E0,stroke:#8B0AA8,stroke-width:2px,color:#fff
   classDef routerStyle fill:#F5A623,stroke:#D68910,stroke-width:3px,color:#000
   classDef waveStyle fill:#FFD700,stroke:#DAA520,stroke-width:2px,color:#000
-  classDef validationStyle fill:#9013FE,stroke:#6A0DAD,stroke-width:2px,color:#fff
-  classDef opsStyle fill:#FF6B6B,stroke:#C92A2A,stroke-width:2px,color:#fff
+  classDef validationStyle fill:#7B2CBF,stroke:#5A189A,stroke-width:2px,color:#fff
+  classDef opsStyle fill:#D62828,stroke:#9D0208,stroke-width:2px,color:#fff
   classDef commStyle fill:#20C997,stroke:#15A37B,stroke-width:2px,color:#000
   classDef auditStyle fill:#7ED321,stroke:#5FA319,stroke-width:2px,color:#000
   
