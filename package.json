@@ -18,6 +18,8 @@
     "build": "tsc",
     "prepare": "npm run build",
     "watch": "tsc --watch",
+    "bench": "python3 scripts/benchmark.py",
+    "bench:chaos": "python3 scripts/benchmark.py --iterations 10 --chaos-mode",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
