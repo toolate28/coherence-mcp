@@ -1,10 +1,52 @@
 # coherence-mcp
 
 MCP server that surfaces coherence, governance, and safety primitives: Wave/Bump validation, ATOM trail + gates, .context.yaml packing, AWI intent scaffolding, and docs/search across the SpiralSafe corpus.
-<img width="1304" height="930" alt="image" src="https://github.com/user-attachments/assets/0e737068-51ba-4517-ad5d-e23f0d62af14" />
 
-<img width="914" height="784" alt="image" src="https://github.com/user-attachments/assets/98ec591c-7728-436b-ad78-6bdd98774fcb" />
-<img width="691" height="941" alt="image" src="https://github.com/user-attachments/assets/b02dc9bb-ee6a-43b6-b7d0-31c9ac01695c" />
+```mermaid
+sequenceDiagram
+    participant User
+    participant Frontend as Login UI
+    participant Backend as ATOM-AUTH API
+    participant LED as LED Display
+    participant Projector as Projector Display
+    participant AI as Claude Vision AI
+
+    User->>Frontend: Visit console.spiralsafe.org/login
+    Frontend->>Backend: Request ATOM challenge
+    Backend->>Frontend: "What did we discover about constraints?"
+
+    Note over User,Frontend: 🧠 FACTOR 1: Conversational Coherence
+    User->>Frontend: "From constraints, gifts. From spiral, safety."
+    Frontend->>Backend: Submit response
+    Backend->>Backend: Analyze WAVE coherence
+    Backend->>Frontend: ✅ Score: 0.91 (PASS)
+
+    Note over User,LED: 💡 FACTOR 2: Physical Presence (LED)
+    Backend->>LED: Display code "7392"
+    LED->>User: Shows scrolling digits
+    User->>Frontend: Enters "7392"
+    Frontend->>Backend: Verify LED code
+    Backend->>Frontend: ✅ Code verified (PASS)
+
+    Note over User,Projector: 🎬 FACTOR 3: Visual Challenge
+    Backend->>Projector: Display quantum circuit image
+    Projector->>User: Projects full-screen image
+    Backend->>Frontend: "How many quantum gates?"
+    User->>Frontend: Answers "12"
+    Frontend->>Backend: Submit answer
+    Backend->>AI: Validate answer with vision model
+    AI->>Backend: ✅ Correct
+    Backend->>Frontend: ✅ Visual verified (PASS)
+
+    Note over Backend: 🎉 All 3 factors passed
+    Backend->>Backend: Generate ATOM token (24h expiry)
+    Backend->>Frontend: Return token + session
+    Frontend->>User: Redirect to /admin/dashboard
+
+    rect rgb(34, 197, 94, 0.2)
+        Note over User: 🌀 ULTRA-SECURE AUTHENTICATION COMPLETE
+    end
+```
 
 Legend
 - Auth/safety: scopes, allow-lists, bearer/HMAC verification, requestId, rate limits.
@@ -19,13 +61,36 @@ This MCP server provides the following tools:
 - **`wave_analyze`** - Analyze text or document reference for coherence patterns and wave analysis
 - **`bump_validate`** - Validate a handoff for bump compatibility and safety checks
 <img width="1304" height="930" alt="image" src="https://github.com/user-attachments/assets/272db657-4364-4c3b-a808-eea437aa3a17" />
+```mermaid
+graph TD
+    A[User Authentication Request] --> B{Factor 1:<br/>Conversational<br/>Coherence}
 
+    B -->|Pass| C{Factor 2:<br/>LED Keycode<br/>Physical Presence}
+    B -->|Fail| X1[❌ Deny Access]
+
+    C -->|Pass| D{Factor 3:<br/>Projector CAPTCHA<br/>Visual Verification}
+    C -->|Fail| X2[❌ Deny Access]
+
+    D -->|Pass| E[✅ Generate ATOM Token]
+    D -->|Fail| X3[❌ Deny Access]
+
+    E --> F[Grant Console Access]
+
+    style A fill:#60a5fa,stroke:#3b82f6,stroke-width:2px
+    style B fill:#a78bfa,stroke:#8b5cf6,stroke-width:3px
+    style C fill:#fbbf24,stroke:#f59e0b,stroke-width:3px
+    style D fill:#f472b6,stroke:#ec4899,stroke-width:3px
+    style E fill:#4ade80,stroke:#22c55e,stroke-width:3px
+    style F fill:#34d399,stroke:#10b981,stroke-width:3px
+    style X1 fill:#ef4444,stroke:#dc2626,stroke-width:2px
+    style X2 fill:#ef4444,stroke:#dc2626,stroke-width:2px
+    style X3 fill:#ef4444,stroke:#dc2626,stroke-width:2px
+```
 ### Context & Tracking
 - **`context_pack`** - Pack document paths and metadata into a .context.yaml structure
 - **`atom_track`** - Track decisions in the ATOM trail with associated files and tags
 <img width="815" height="564" alt="image" src="https://github.com/user-attachments/assets/ef7c6fcb-6364-4d8e-aea6-f379e5a02672" />
 <img width="873" height="861" alt="image" src="https://github.com/user-attachments/assets/fb2065aa-646b-44fb-a24d-5298d44d1cc3" />
-
 
 ### Gate Transitions
 - **`gate_intention_to_execution`** - Gate transition from intention phase to execution phase
@@ -38,6 +103,8 @@ This MCP server provides the following tools:
 - **`ops_health`** - Check operational health status via SpiralSafe API
 - **`ops_status`** - Get operational status via SpiralSafe API
 - **`ops_deploy`** - Deploy to environment with optional dry-run (guarded operation)
+
+<img width="730" height="618" alt="image" src="https://github.com/user-attachments/assets/feb717f7-3159-4ceb-bac7-8323dd5c8595" />
 
 ### Scripts & Automation
 - **`scripts_run`** - Run a script from the strict allow-list with arguments
