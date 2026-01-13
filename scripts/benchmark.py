@@ -80,6 +80,9 @@ def grok_benchmark(iterations=5, chaos_mode=False):
     Args:
         iterations: Number of benchmark iterations
         chaos_mode: Enable fractal noise injection
+
+    Returns:
+        float: The total Fibonacci-weighted score across all iterations.
     """
     print(f"Starting benchmark with {iterations} iterations (chaos={chaos_mode})")
     
@@ -109,6 +112,10 @@ def grok_benchmark(iterations=5, chaos_mode=False):
             emit_osc_633("P", f"ChaosLevel={chaos_level}")
         else:
             actual_time = base_time
+
+        # Prevent division by zero or negative times due to noise extremes
+        if actual_time <= 0:
+            actual_time = 1e-6
         
         # Simulate work
         time.sleep(0.1)
@@ -159,6 +166,12 @@ def grok_benchmark(iterations=5, chaos_mode=False):
 
 
 def main():
+    """
+    Main entry point for the benchmark script.
+
+    Parses command-line arguments and runs the benchmark.
+    Handles keyboard interrupts and general exceptions with appropriate exit codes.
+    """
     parser = argparse.ArgumentParser(
         description="Chaos-enabled benchmark with Fibonacci scoring"
     )
