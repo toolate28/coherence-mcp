@@ -14,8 +14,11 @@ import random
 import math
 import argparse
 
-# Golden ratio for fractal noise
-PHI = 1.618033988749895
+# Golden ratio for fractal noise (φ = (1 + √5) / 2)
+PHI = (1 + math.sqrt(5)) / 2
+
+# Exit codes
+EXIT_SIGINT = 130  # 128 + SIGINT(2)
 
 # Benchmark configuration constants
 BASE_TIME = 1.0
@@ -162,7 +165,7 @@ def main():
     parser.add_argument(
         "--chaos-mode",
         action="store_true",
-        help="Enable fractal noise injection (10 iterations)"
+        help="Enable fractal noise injection (overrides iterations to 10 unless specified)"
     )
     parser.add_argument(
         "--iterations",
@@ -173,16 +176,19 @@ def main():
     
     args = parser.parse_args()
     
-    # Override iterations if chaos mode is enabled
-    iterations = 10 if args.chaos_mode else args.iterations
+    # Use 10 iterations for chaos mode by default, but allow user override
+    if args.chaos_mode and args.iterations == 5:  # 5 is the default
+        iterations = 10
+    else:
+        iterations = args.iterations
     
     try:
         score = grok_benchmark(iterations=iterations, chaos_mode=args.chaos_mode)
         sys.exit(0)
     except KeyboardInterrupt:
         print("\nBenchmark interrupted")
-        emit_osc_633("D", "130")  # 128 + SIGINT
-        sys.exit(130)
+        emit_osc_633("D", str(EXIT_SIGINT))
+        sys.exit(EXIT_SIGINT)
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
         emit_osc_633("D", "1")
