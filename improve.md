@@ -102,7 +102,7 @@ When running benchmarks with chaos mode enabled, VS Code will display visual ind
 The benchmark script emits several OSC 633 codes:
 
 | Code | Purpose | Example |
-|------|---------|---------|
+| ---- | ------- | ------- |
 | `OSC 633 ; A` | Mark prompt start | Automated run begins |
 | `OSC 633 ; B` | Mark prompt end | Automated run ready |
 | `OSC 633 ; P ; Property=Value` | Set metadata property | `ChaosMode=enabled` |
