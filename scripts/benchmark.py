@@ -175,11 +175,13 @@ def main():
     parser = argparse.ArgumentParser(
         description="Chaos-enabled benchmark with Fibonacci scoring"
     )
+
     parser.add_argument(
         "--chaos-mode",
         action="store_true",
         help="Enable fractal noise injection (overrides iterations to 10 unless specified)"
     )
+
     parser.add_argument(
         "--iterations",
         type=int,
