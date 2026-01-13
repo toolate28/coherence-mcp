@@ -1,27 +1,45 @@
 {
-  "name": "coherence-mcp",
-  "version": "0.1.0",
-  "description": "MCP server that surfaces coherence, governance, and safety primitives: Wave/Bump validation, ATOM trail + gates, .context.yaml packing, AWI intent scaffolding, and docs/search across the SpiralSafe corpus.",
+  "name": "@spiralsafe/coherence-mcp",
+  "version": "0.2.0",
+  "description": "MCP server that surfaces coherence, governance, and safety primitives: Wave/Bump validation, ATOM trail + gates, .context.yaml packing, AWI intent scaffolding, cross-AI collaboration (@grok), and docs/search across the SpiralSafe corpus.",
   "type": "module",
   "bin": {
-    "coherence-mcp": "./build/index.js"
+    "coherence-mcp": "build/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/toolate28/coherence-mcp.git"
+  },
+  "homepage": "https://spiralsafe.org",
+  "bugs": {
+    "url": "https://github.com/toolate28/coherence-mcp/issues"
   },
   "scripts": {
     "build": "tsc",
     "prepare": "npm run build",
-    "watch": "tsc --watch"
+    "watch": "tsc --watch",
+    "bench": "python3 scripts/benchmark.py",
+    "bench:chaos": "python3 scripts/benchmark.py --iterations 10 --chaos-mode",
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "mcp",
     "coherence",
     "governance",
-    "safety"
+    "safety",
+    "spiralsafe",
+    "grok",
+    "multi-agent",
+    "wave-protocol"
   ],
-  "author": "",
+  "author": "Hope&&Sauced <toolated@pm.me>",
   "license": "MIT",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.0.4",
-    "yaml": "^2.3.4"
+    "@modelcontextprotocol/sdk": "^1.25.2",
+    "ajv": "^8.12.0",
+    "fast-glob": "^3.3.2",
+    "yaml": "^2.3.4",
+    "dotenv": "^16.4.5"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
