@@ -17,6 +17,13 @@ import argparse
 # Golden ratio for fractal noise
 PHI = 1.618033988749895
 
+# Benchmark configuration constants
+BASE_TIME = 1.0
+TIME_VARIANCE = 0.1
+CHAOS_AMPLITUDE = 0.3
+CHAOS_LEVEL_SCALE = 100
+STABLE_THRESHOLD = 0.15
+
 
 def emit_osc_633(code, params=""):
     """
@@ -86,15 +93,16 @@ def grok_benchmark(iterations=5, chaos_mode=False):
         fib_weight = calculate_fibonacci_score(i)
         
         # Base performance metric (simulated)
-        base_time = 1.0 + random.uniform(-0.1, 0.1)
+        base_time = BASE_TIME + random.uniform(-TIME_VARIANCE, TIME_VARIANCE)
         
+        noise = 0.0
         if chaos_mode:
             # Inject fractal noise
-            noise = fractal_noise(i, amplitude=0.3)
+            noise = fractal_noise(i, amplitude=CHAOS_AMPLITUDE)
             actual_time = base_time + noise
             
             # Signal chaos level to terminal
-            chaos_level = int(abs(noise) * 100)
+            chaos_level = int(abs(noise) * CHAOS_LEVEL_SCALE)
             emit_osc_633("P", f"ChaosLevel={chaos_level}")
         else:
             actual_time = base_time
@@ -108,14 +116,15 @@ def grok_benchmark(iterations=5, chaos_mode=False):
             "iteration": i,
             "weight": fib_weight,
             "time": actual_time,
-            "score": score
+            "score": score,
+            "noise": noise
         })
         
         # Mark prompt end
         emit_osc_633("B")
         
         # Print result
-        status = "🔵" if not chaos_mode or abs(fractal_noise(i, 0.3)) < 0.15 else "🔴"
+        status = "🔵" if not chaos_mode or abs(noise) < STABLE_THRESHOLD else "🔴"
         print(f"  [{i+1}/{iterations}] {status} Weight={fib_weight}, Time={actual_time:.3f}s, Score={score:.2f}")
         
         # Mark command finished with success
@@ -130,10 +139,10 @@ def grok_benchmark(iterations=5, chaos_mode=False):
     print(f"Average time: {avg_time:.3f}s")
     
     if chaos_mode:
-        entropy = sum(abs(fractal_noise(i, 0.3)) for i in range(iterations)) / iterations
+        entropy = sum(abs(r["noise"]) for r in results) / len(results)
         print(f"Average entropy: {entropy:.3f}")
         
-        if entropy < 0.15:
+        if entropy < STABLE_THRESHOLD:
             emit_osc_633("P", "EntropyState=stable")
             print("📘 Entropy: STABLE (Blue Dot)")
         else:
