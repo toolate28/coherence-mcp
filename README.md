@@ -1,6 +1,103 @@
-# coherence-mcp
+🏗️ Overall System Architecture # coherence-mcp
 
 MCP server that surfaces coherence, governance, and safety primitives: Wave/Bump validation, ATOM trail + gates, .context.yaml packing, AWI intent scaffolding, and docs/search across the SpiralSafe corpus.
+
+### Multi-Subdomain Platform
+
+```mermaid
+graph TB
+    subgraph "Public Layer"
+        A[spiralsafe.org<br/>Public Landing]
+    end
+
+    subgraph "Core Services"
+        B[api.spiralsafe.org<br/>REST API + D1 + KV + R2]
+        C[console.spiralsafe.org<br/>Admin Dashboard + ATOM-AUTH]
+    end
+
+    subgraph "Future Services"
+        D[quantum.spiralsafe.org<br/>Quantum Playground]
+        E[help.spiralsafe.org<br/>Support & Helpdesk]
+        F[docs.spiralsafe.org<br/>Documentation]
+        G[status.spiralsafe.org<br/>System Status]
+    end
+
+    subgraph "Infrastructure"
+        H[Cloudflare Workers<br/>Edge Computing]
+        I[Cloudflare D1<br/>SQLite Database]
+        J[Cloudflare KV<br/>Key-Value Store]
+        K[Cloudflare R2<br/>Object Storage]
+    end
+
+    A --> B
+    C --> B
+    D --> B
+    E --> B
+
+    B --> H
+    H --> I
+    H --> J
+    H --> K
+
+    style A fill:#4ade80,stroke:#22c55e,stroke-width:3px,color:#000
+    style B fill:#60a5fa,stroke:#3b82f6,stroke-width:3px,color:#000
+    style C fill:#a78bfa,stroke:#8b5cf6,stroke-width:3px,color:#000
+    style H fill:#f472b6,stroke:#ec4899,stroke-width:3px,color:#000
+    style I fill:#fb923c,stroke:#f97316,stroke-width:3px,color:#000
+    style J fill:#fb923c,stroke:#f97316,stroke-width:3px,color:#000
+    style K fill:#fb923c,stroke:#f97316,stroke-width:3px,color:#000
+```
+
+### Technology Stack
+
+```mermaid
+graph LR
+    subgraph "Frontend"
+        A[HTML5 + Tailwind CSS]
+        B[Vanilla JavaScript]
+        C[Responsive Design]
+    end
+
+    subgraph "Backend"
+        D[TypeScript]
+        E[Cloudflare Workers]
+        F[Hono Framework]
+    end
+
+    subgraph "Storage"
+        G[D1 SQLite<br/>7 Tables]
+        H[KV Store<br/>Cache + Sessions]
+        I[R2 Bucket<br/>Context Storage]
+    end
+
+    subgraph "Security"
+        J[API Key Auth]
+        K[Rate Limiting]
+        L[ATOM-AUTH]
+    end
+
+    A --> D
+    B --> E
+    D --> G
+    E --> H
+    E --> I
+
+    J --> E
+    K --> E
+    L --> E
+
+    style A fill:#38bdf8,stroke:#0ea5e9,stroke-width:2px
+    style D fill:#a78bfa,stroke:#8b5cf6,stroke-width:2px
+    style E fill:#f472b6,stroke:#ec4899,stroke-width:2px
+    style G fill:#fb923c,stroke:#f97316,stroke-width:2px
+    style J fill:#ef4444,stroke:#dc2626,stroke-width:2px
+```
+
+---
+
+## 🔐 ATOM-AUTH 3-Factor Authentication
+
+### Complete Authentication Flow
 
 ```mermaid
 sequenceDiagram
@@ -48,6 +145,34 @@ sequenceDiagram
     end
 ```
 
+### Authentication Factors Breakdown
+
+```mermaid
+graph TD
+    A[User Authentication Request] --> B{Factor 1:<br/>Conversational<br/>Coherence}
+
+    B -->|Pass| C{Factor 2:<br/>LED Keycode<br/>Physical Presence}
+    B -->|Fail| X1[❌ Deny Access]
+
+    C -->|Pass| D{Factor 3:<br/>Projector CAPTCHA<br/>Visual Verification}
+    C -->|Fail| X2[❌ Deny Access]
+
+    D -->|Pass| E[✅ Generate ATOM Token]
+    D -->|Fail| X3[❌ Deny Access]
+
+    E --> F[Grant Console Access]
+
+    style A fill:#60a5fa,stroke:#3b82f6,stroke-width:2px
+    style B fill:#a78bfa,stroke:#8b5cf6,stroke-width:3px
+    style C fill:#fbbf24,stroke:#f59e0b,stroke-width:3px
+    style D fill:#f472b6,stroke:#ec4899,stroke-width:3px
+    style E fill:#4ade80,stroke:#22c55e,stroke-width:3px
+    style F fill:#34d399,stroke:#10b981,stroke-width:3px
+    style X1 fill:#ef4444,stroke:#dc2626,stroke-width:2px
+    style X2 fill:#ef4444,stroke:#dc2626,stroke-width:2px
+    style X3 fill:#ef4444,stroke:#dc2626,stroke-width:2px
+```
+
 Legend
 - Auth/safety: scopes, allow-lists, bearer/HMAC verification, requestId, rate limits.
 - Validation: Ajv schemas + SHA256 hashes for bump/context; size/timeout bounds for wave CLI.
@@ -60,7 +185,6 @@ This MCP server provides the following tools:
 ### Core Analysis & Validation
 - **`wave_analyze`** - Analyze text or document reference for coherence patterns and wave analysis
 - **`bump_validate`** - Validate a handoff for bump compatibility and safety checks
-
 
 ## 🌊 H&&S:WAVE Protocol Flow
 
@@ -188,6 +312,55 @@ stateDiagram-v2
 ### Gate Transitions
 - **`gate_intention_to_execution`** - Gate transition from intention phase to execution phase
 - **`gate_execution_to_learning`** - Gate transition from execution phase to learning phase
+
+### Quantum Gate Application Flow
+
+```mermaid
+flowchart TD
+    A[QASm Program Input] --> B[Parse Instruction]
+
+    B --> C{Gate Type}
+
+    C -->|Single-Qubit| D[H, X, Y, Z, Phase]
+    C -->|Two-Qubit| E[CNOT, SWAP]
+    C -->|Three-Qubit| F[Toffoli, Fredkin]
+
+    D --> G[Fetch Qubit State]
+    E --> H[Fetch Two Qubit States]
+    F --> I[Fetch Three Qubit States]
+
+    G --> J[Apply Gate Matrix]
+    H --> K[Apply CNOT/SWAP Matrix]
+    I --> L[Apply Toffoli/Fredkin Matrix]
+
+    J --> M[Update Qubit State]
+    K --> N[Update Entangled States]
+    L --> O[Update Three Qubits]
+
+    M --> P{Entangled?}
+    N --> Q[Propagate Entanglement]
+    O --> Q
+
+    P -->|Yes| Q
+    P -->|No| R[Next Instruction]
+
+    Q --> R
+
+    R --> S{More Instructions?}
+    S -->|Yes| B
+    S -->|No| T[Measurement Phase]
+
+    T --> U[Collapse Superposition]
+    U --> V[Return Classical Bits]
+
+    style A fill:#60a5fa,stroke:#3b82f6,stroke-width:2px
+    style J fill:#a78bfa,stroke:#8b5cf6,stroke-width:2px
+    style K fill:#a78bfa,stroke:#8b5cf6,stroke-width:2px
+    style L fill:#a78bfa,stroke:#8b5cf6,stroke-width:2px
+    style V fill:#4ade80,stroke:#22c55e,stroke-width:3px
+```
+
+---
 
 ## 🛡️ API Security Architecture
 
@@ -353,16 +526,16 @@ graph TD
         │  Color changes = Data transmission           │
         └─────────────┬──────────────┬─────────────────┘
                       │              │
-           ┌──────────┴────┐    ┌───┴─────────┐
-           │               │    │             │
-           ▼               ▼    ▼             ▼
-    ┌──────────┐    ┌──────────┐      ┌──────────┐
-    │ Qubit 0  │    │ Qubit 1  │ ...  │ Qubit 71 │
-    │  α|0⟩+   │    │  α|0⟩+    │      │  α|0⟩+   │
-    │  β|1⟩    │    │  β|1⟩         │      │  β|1⟩    │
-    └────┬─────┘    └────┬─────┘      └────┬─────┘
-         │               │                   │
-         └───────┬───────┴───────────────────┘
+           ┌──────────┴────┐     ┌───┴─────────┐
+           │               │     │             │
+           ▼               ▼     ▼             ▼
+    ┌──────────┐     ┌──────────┐      ┌──────────┐
+    │ Qubit 0  │     │ Qubit 1  │ ...  │ Qubit 71 │
+    │  α|0⟩+   │      │  α|0⟩+   │      │  α|0⟩+   │
+    │  β|1⟩    │      │  β|1⟩    |      │  β|1⟩    │
+    └────┬─────┘     └────┬─────┘      └────┬─────┘
+         │                │                 │
+         └───────┬────────┴─────────────────┘
                  │
                  ▼
         ┌─────────────────┐
@@ -391,66 +564,17 @@ graph TD
         │  (Redstone)     │
         └─────────────────┘
 
-┌────────────────────────────────────────────────────────────────────┐
+┌───────────────────────────────────────────────────┐
 │  Performance Specifications                                        
-├────────────────────────────────────────────────────────────────────┤
+├───────────────────────────────────────────────────┤
 │  • Qubits: 72 (9×8 grid)                                          
 │  • Gate Operations: 20/second                                      
 │  • Coherence Time: 10 seconds                                      
 │  • Memory: 17 kB RAM + SpiralSafe cloud storage                   
 │  • Optical Channels: 64 (beacon-based)                            
 │  • Response Time: ~118ms average                                   
-└────────────────────────────────────────────────────────────────────┘
+└───────────────────────────────────────────────────┘
 ```
-
-### Quantum Gate Application Flow
-
-```mermaid
-flowchart TD
-    A[QASm Program Input] --> B[Parse Instruction]
-
-    B --> C{Gate Type}
-
-    C -->|Single-Qubit| D[H, X, Y, Z, Phase]
-    C -->|Two-Qubit| E[CNOT, SWAP]
-    C -->|Three-Qubit| F[Toffoli, Fredkin]
-
-    D --> G[Fetch Qubit State]
-    E --> H[Fetch Two Qubit States]
-    F --> I[Fetch Three Qubit States]
-
-    G --> J[Apply Gate Matrix]
-    H --> K[Apply CNOT/SWAP Matrix]
-    I --> L[Apply Toffoli/Fredkin Matrix]
-
-    J --> M[Update Qubit State]
-    K --> N[Update Entangled States]
-    L --> O[Update Three Qubits]
-
-    M --> P{Entangled?}
-    N --> Q[Propagate Entanglement]
-    O --> Q
-
-    P -->|Yes| Q
-    P -->|No| R[Next Instruction]
-
-    Q --> R
-
-    R --> S{More Instructions?}
-    S -->|Yes| B
-    S -->|No| T[Measurement Phase]
-
-    T --> U[Collapse Superposition]
-    U --> V[Return Classical Bits]
-
-    style A fill:#60a5fa,stroke:#3b82f6,stroke-width:2px
-    style J fill:#a78bfa,stroke:#8b5cf6,stroke-width:2px
-    style K fill:#a78bfa,stroke:#8b5cf6,stroke-width:2px
-    style L fill:#a78bfa,stroke:#8b5cf6,stroke-width:2px
-    style V fill:#4ade80,stroke:#22c55e,stroke-width:3px
-```
-
----
 
 ### Multi-Region Performance
 
