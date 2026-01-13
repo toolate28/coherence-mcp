@@ -9,7 +9,9 @@
   "scripts": {
     "build": "tsc",
     "prepare": "npm run build",
-    "watch": "tsc --watch"
+    "watch": "tsc --watch",
+    "bench": "python3 scripts/benchmark.py",
+    "bench:chaos": "python3 scripts/benchmark.py --chaos-mode"
   },
   "keywords": [
     "mcp",
