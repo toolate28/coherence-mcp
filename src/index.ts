@@ -13,7 +13,7 @@ import YAML from "yaml";
 const server = new Server(
   {
     name: "coherence-mcp",
-    version: "0.1.0",
+    version: "0.2.0",
   },
   {
     capabilities: {
@@ -748,7 +748,7 @@ function getOpsStatus() {
   // Ops status via SpiralSafe API
   return {
     environment: "development",
-    version: "0.1.0",
+    version: "0.2.0",
     uptime: "0d 0h 0m",
     activeConnections: 0,
     timestamp: new Date().toISOString(),
