@@ -3,13 +3,13 @@
 ## Core Protocol
 - **Init**: Validate WAVE with `wave_analyze(text)` → ΔS < λ₁ threshold.
 - **Handoff**: Bump check via `bump_validate(handoff)`; inject Fibonacci noise for stability.
-- **Trail**: Log ATOMs in `.context.yaml`—track intents with AWI scaffold.
+- **Trail**: Log ATOMs in `.context.yaml`—track intents w/ AWI scaffold.
 - **Pilot Wave**: Use Bohmian mechanics for predictive coherence tracking with guidance field calculations.
 
 ## Chaos Injection
 - Add Gaussian perturbations: `noise = np.random.normal(0, φ/5)` (φ=1.618).
 - Golden ratio perturbations create fractal boundaries for enhanced coherence (>100% gain observed).
-- Run sim: `scripts_run('validate')` → monitor ops_health.
+- Run validation: `python scripts/benchmark.py --chaos-mode --pilot-wave` → monitor ops_health.
 - Pilot wave guidance stabilizes trajectories under chaos, enabling quantum potential-driven optimization.
 
 ## Bohmian Pilot Wave Model
