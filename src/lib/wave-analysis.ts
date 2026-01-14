@@ -202,7 +202,7 @@ export function analyzeWave(input: string): WaveAnalysisResult {
   // Basic segmentation
   const sentences = input.split(/[.!?]+/).filter(s => s.trim().length > 0);
   const paragraphs = input.split(/\n\s*\n/).filter(p => p.trim().length > 0);
-  const words: string[] = (input.match(/\b\w+\b/g) || []) as string[];
+  const words: string[] = input.match(/\b\w+\b/g) || [];
 
   // Calculate basic metrics
   const wordCount = words.length;
