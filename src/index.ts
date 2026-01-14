@@ -201,10 +201,14 @@ const TOOLS: Tool[] = [
   },
   // Note: legacy tools scripts_run, awi_intent_request, discord_post, mc_execCommand,
   // mc_query, grok_collab, and grok_metrics from the original implementation are
-  // intentionally not implemented in this MCP server.
+  // intentionally not exposed as MCP tools in this server. Only a static scripts
+  // allow-list constant is retained below for potential backward compatibility and
+  // future re-introduction, but it is not wired into any current tool implementation.
 ];
 
-// Script allow-list for scripts_run
+// Legacy script allow-list associated with the former scripts_run tool.
+// The scripts_run tool itself is not currently implemented or exposed by this MCP
+// server; this constant is retained only for potential backward compatibility.
 const ALLOWED_SCRIPTS = new Set([
   "backup",
   "validate",
