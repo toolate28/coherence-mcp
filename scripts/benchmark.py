@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
 scripts/benchmark.py
-====================
 
 Chaos-aware benchmark harness for Coherence MCP with Bohmian Pilot Wave modeling.
 Integrates "fractal noise" (Golden Ratio perturbations) and Fibonacci-weighted scoring.
@@ -24,12 +23,6 @@ Protocol
 4.  **Score**: Weighted avg using Fib(n) + Bohmian trajectory evolution
 """
 
-import argparse
-import json
-import logging
-import math
-import random
-import statistics
 import sys
 import time
 from dataclasses import dataclass
@@ -79,9 +72,6 @@ def emit_status_dot(color: str):
     sys.stdout.write(colors.get(color, "."))
     sys.stdout.flush()
 
-# =============================================================================
-# CORE LOGIC
-# =============================================================================
 
 @dataclass
 class BenchmarkRun:
@@ -102,10 +92,11 @@ class PilotWaveState:
     wave_amplitude: float  # |ψ|²
     phase: float  # Wave phase S
 
-def fractal_noise() -> float:
+
+def calculate_fibonacci_score(run_index):
     """
-    Generate fractal noise using Golden Ratio perturbation.
-    Returns value from Normal distribution N(0, phi/5).
+    Calculate Fibonacci-weighted score for a given run.
+    More recent runs get higher weight (1,1,2,3,5,8,13...)
     """
     # Phi/5 ensures we stay within "safe" chaos bounds typically
     sigma = PHI / 5.0
@@ -260,34 +251,98 @@ def run_mock_op(query: str, chaos: bool = False, pilot_wave_state: Optional[Pilo
         trajectory_prediction=trajectory_prediction
     ), new_pilot_state
 
-def fibonacci_sequence(n: int) -> List[int]:
-    """Generate first n Fibonacci numbers."""
-    if n <= 0: return []
-    if n == 1: return [1]
-    fib = [1, 1]
-    while len(fib) < n:
-        fib.append(fib[-1] + fib[-2])
-    return fib
 
-def calculate_fibonacci_score(latencies: List[float]) -> float:
+def grok_benchmark(iterations=5, chaos_mode=False):
     """
-    Calculate weighted average of latencies using Fibonacci weights.
-    Later runs (more recent) get higher weights.
-    """
-    if not latencies:
-        return 0.0
+    Run the benchmark with optional chaos injection.
     
-    n = len(latencies)
-    weights = fibonacci_sequence(n)
-    
-    weighted_sum = sum(l * w for l, w in zip(latencies, weights))
-    total_weight = sum(weights)
-    
-    return weighted_sum / total_weight
+    Args:
+        iterations: Number of benchmark iterations
+        chaos_mode: Enable fractal noise injection
 
-# =============================================================================
-# REPL / MAIN
-# =============================================================================
+    Returns:
+        float: The total Fibonacci-weighted score across all iterations.
+    """
+    print(f"Starting benchmark with {iterations} iterations (chaos={chaos_mode})")
+    
+    if chaos_mode:
+        emit_osc_633("P", "ChaosMode=enabled")
+    
+    results = []
+    
+    for i in range(iterations):
+        # Mark prompt boundaries for automated runs
+        emit_osc_633("A")
+        
+        # Calculate Fibonacci weight for this iteration
+        fib_weight = calculate_fibonacci_score(i)
+        
+        # Base performance metric (simulated)
+        base_time = BASE_TIME + random.uniform(-TIME_VARIANCE, TIME_VARIANCE)
+        
+        noise = 0.0
+        if chaos_mode:
+            # Inject fractal noise
+            noise = fractal_noise(i, amplitude=CHAOS_AMPLITUDE)
+            actual_time = base_time + noise
+            
+            # Signal chaos level to terminal
+            chaos_level = int(abs(noise) * CHAOS_LEVEL_SCALE)
+            emit_osc_633("P", f"ChaosLevel={chaos_level}")
+        else:
+            actual_time = base_time
+
+        # Prevent division by zero or negative times due to noise extremes
+        if actual_time <= 0:
+            actual_time = 1e-6
+        
+        # Simulate work
+        time.sleep(0.1)
+        
+        # Calculate weighted score
+        score = fib_weight / actual_time
+        results.append({
+            "iteration": i,
+            "weight": fib_weight,
+            "time": actual_time,
+            "score": score,
+            "noise": noise
+        })
+        
+        # Mark prompt end
+        emit_osc_633("B")
+        
+        # Print result
+        status = "🔵" if not chaos_mode or abs(noise) < STABLE_THRESHOLD else "🔴"
+        print(f"  [{i+1}/{iterations}] {status} Weight={fib_weight}, Time={actual_time:.3f}s, Score={score:.2f}")
+        
+        # Mark command finished with success
+        emit_osc_633("D", "0")
+    
+    # Calculate aggregate metrics
+    total_score = sum(r["score"] for r in results)
+    avg_time = sum(r["time"] for r in results) / len(results)
+    
+    print(f"\n{'='*60}")
+    print(f"Total Fibonacci-weighted score: {total_score:.2f}")
+    print(f"Average time: {avg_time:.3f}s")
+    
+    if chaos_mode:
+        entropy = sum(abs(r["noise"]) for r in results) / len(results)
+        print(f"Average entropy: {entropy:.3f}")
+        
+        if entropy < STABLE_THRESHOLD:
+            emit_osc_633("P", "EntropyState=stable")
+            print("📘 Entropy: STABLE (Blue Dot)")
+        else:
+            emit_osc_633("P", "EntropyState=warning")
+            print("📕 Entropy: WARNING (Red Dot)")
+    
+    emit_osc_633("P", f"BenchmarkComplete=true")
+    print(f"{'='*60}\n")
+    
+    return total_score
+
 
 def main():
     parser = argparse.ArgumentParser(description="Chaos Benchmark Harness with Bohmian Pilot Wave")

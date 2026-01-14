@@ -19,8 +19,12 @@
     "prepare": "npm run build",
     "watch": "tsc --watch",
     "bench": "python3 scripts/benchmark.py",
+<<<<<<< HEAD
     "bench:chaos": "python3 scripts/benchmark.py --iterations 10 --chaos-mode",
     "prepublishOnly": "npm run build"
+=======
+    "bench:chaos": "python3 scripts/benchmark.py --chaos-mode"
+>>>>>>> b391123a8740dbb4860d209e5a965dd030df00d5
   },
   "keywords": [
     "mcp",
