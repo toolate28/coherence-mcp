@@ -206,7 +206,7 @@ export function analyzeWave(input: string): WaveAnalysisResult {
   const lexicalDiversity = calculateLexicalDiversity(input);
 
   // Estimate syllables for readability
-  const totalSyllables: number = words.reduce((sum: number, word: string) => sum + estimateSyllables(word), 0);
+  const totalSyllables: number = words.reduce((sum, word) => sum + estimateSyllables(word), 0);
   const avgSyllablesPerWord = wordCount > 0 ? totalSyllables / wordCount : 1;
   const readabilityScore = calculateReadability(avgWordsPerSentence, avgSyllablesPerWord);
 
