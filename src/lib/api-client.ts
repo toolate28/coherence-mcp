@@ -153,7 +153,7 @@ export async function getOpsStatus(
  */
 export async function deployOps(
   env: string,
-  dryRun: boolean,
+  dryRun: boolean = true,
   baseUrl: string = DEFAULT_API_BASE_URL
 ): Promise<OpsDeployResponse> {
   const validEnvs = ['development', 'staging', 'production'];
