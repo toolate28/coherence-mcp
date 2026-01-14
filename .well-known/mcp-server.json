@@ -1,0 +1,26 @@
+{
+  "name": "spiralsafe-coherence",
+  "version": "0.2.0",
+  "description": "Coherence verification engine for human-AI collaboration. Implements wave.md pattern detection, AWI permission scaffolding, ATOM task decomposition, and SAIF systematic analysis.",
+  "homepage": "https://spiralsafe.org",
+  "repository": "https://github.com/toolate28/coherence-mcp",
+  "capabilities": {
+    "tools": true,
+    "resources": true,
+    "prompts": true,
+    "async": false
+  },
+  "protocols": ["wave.md", "bump.md", "AWI", "ATOM", "SAIF"],
+  "maintainer": {
+    "name": "Hope&&Sauced",
+    "email": "toolated@pm.me"
+  },
+  "keywords": [
+    "coherence",
+    "mcp",
+    "human-ai-collaboration",
+    "wave-protocol",
+    "verification"
+  ],
+  "license": "MIT"
+}
