@@ -9,8 +9,13 @@
  * Default API base URL for SpiralSafe operations
  * Can be overridden via environment variables or function parameters
  */
-export const DEFAULT_API_BASE_URL = 'https://api.spiralsafe.org';
+const ENV_API_BASE_URL =
+  typeof process !== 'undefined' && (process as any).env
+    ? (process as any).env.SPIRALSAFE_API_BASE_URL
+    : undefined;
 
+export const DEFAULT_API_BASE_URL =
+  ENV_API_BASE_URL || 'https://api.spiralsafe.org';
 export interface OpsHealthResponse {
   status: 'healthy' | 'degraded' | 'down';
   components: {
