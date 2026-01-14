@@ -41,13 +41,6 @@ export interface WaveAnalysisResult {
   timestamp: string;
 }
 
-// Threshold constants for wave analysis warnings
-const CURL_CRITICAL_THRESHOLD = 0.6;
-const CURL_WARNING_THRESHOLD = 0.3;
-const DIVERGENCE_CRITICAL_THRESHOLD = 0.7;
-const DIVERGENCE_WARNING_THRESHOLD = 0.4;
-const POTENTIAL_HIGH_THRESHOLD = 0.7;
-
 /**
  * Calculate lexical diversity (Type-Token Ratio)
  */
@@ -202,7 +195,7 @@ export function analyzeWave(input: string): WaveAnalysisResult {
   // Basic segmentation
   const sentences = input.split(/[.!?]+/).filter(s => s.trim().length > 0);
   const paragraphs = input.split(/\n\s*\n/).filter(p => p.trim().length > 0);
-  const words: string[] = input.match(/\b\w+\b/g) || [];
+  const words: string[] = (input.match(/\b\w+\b/g) || []) as string[];
 
   // Calculate basic metrics
   const wordCount = words.length;
@@ -213,7 +206,7 @@ export function analyzeWave(input: string): WaveAnalysisResult {
   const lexicalDiversity = calculateLexicalDiversity(input);
 
   // Estimate syllables for readability
-  const totalSyllables: number = words.reduce((sum, word) => sum + estimateSyllables(word), 0);
+  const totalSyllables: number = words.reduce((sum: number, word: string) => sum + estimateSyllables(word), 0);
   const avgSyllablesPerWord = wordCount > 0 ? totalSyllables / wordCount : 1;
   const readabilityScore = calculateReadability(avgWordsPerSentence, avgSyllablesPerWord);
 
@@ -241,19 +234,19 @@ export function analyzeWave(input: string): WaveAnalysisResult {
   };
 
   // Generate warnings based on thresholds (from wave-spec.md)
-  if (curl > CURL_CRITICAL_THRESHOLD) {
+  if (curl > 0.6) {
     warnings.push('CRITICAL: High curl detected (circular reasoning)');
-  } else if (curl > CURL_WARNING_THRESHOLD) {
+  } else if (curl > 0.3) {
     warnings.push('WARNING: Moderate curl detected');
   }
 
-  if (divergence > DIVERGENCE_CRITICAL_THRESHOLD) {
+  if (divergence > 0.7) {
     warnings.push('CRITICAL: High positive divergence (unresolved expansion)');
-  } else if (divergence > DIVERGENCE_WARNING_THRESHOLD) {
+  } else if (divergence > 0.4) {
     warnings.push('WARNING: Moderate positive divergence');
   }
 
-  if (potential > POTENTIAL_HIGH_THRESHOLD) {
+  if (potential > 0.7) {
     warnings.push('NOTE: High potential region (consider development)');
   }
 

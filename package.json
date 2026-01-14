@@ -4,7 +4,7 @@
   "description": "MCP server that surfaces coherence, governance, and safety primitives: Wave/Bump validation, ATOM trail + gates, .context.yaml packing, AWI intent scaffolding, cross-AI collaboration (@grok), and docs/search across the SpiralSafe corpus.",
   "type": "module",
   "bin": {
-    "coherence-mcp": "./build/index.js"
+    "coherence-mcp": "build/index.js"
   },
   "repository": {
     "type": "git",

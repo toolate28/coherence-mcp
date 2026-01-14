@@ -133,7 +133,7 @@ export function validateBump(handoff: any): BumpValidationResult {
           errors.push('PASS marker must specify target (to:)');
         }
         if (!marker.state) {
-          errors.push('PASS marker must specify completion state');
+          errors.push('PASS marker should specify completion state');
         }
         break;
 

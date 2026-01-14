@@ -46,7 +46,6 @@ async function hashFile(filePath: string): Promise<string | undefined> {
     const content = await fs.readFile(filePath);
     return crypto.createHash('sha256').update(content).digest('hex');
   } catch (error) {
-    console.error(`Failed to hash file "${filePath}":`, error);
     return undefined;
   }
 }

@@ -72,7 +72,7 @@ async function fetchWithTimeout(
  * Check operational health
  */
 export async function checkOpsHealth(
-  baseUrl: string = DEFAULT_API_BASE_URL
+  baseUrl: string = 'https://api.spiralsafe.org'
 ): Promise<OpsHealthResponse> {
   const startTime = Date.now();
 
@@ -117,7 +117,7 @@ export async function checkOpsHealth(
  * Get operational status
  */
 export async function getOpsStatus(
-  baseUrl: string = DEFAULT_API_BASE_URL
+  baseUrl: string = 'https://api.spiralsafe.org'
 ): Promise<OpsStatusResponse> {
   try {
     const response = await fetchWithTimeout(`${baseUrl}/status`, {}, 5000);

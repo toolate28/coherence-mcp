@@ -38,6 +38,18 @@ export interface GateResult {
 }
 
 /**
+ * Run a shell command test condition
+ */
+async function runTestCondition(condition: string): Promise<boolean> {
+  try {
+    await execAsync(condition, { timeout: 5000 });
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+/**
  * Write gate transition to jsonl log
  */
 async function logGateTransition(
@@ -82,7 +94,7 @@ export async function gateKnowledgeToIntention(
 
   checks.kenlPatternsAvailable = kenlPatternsDir || kenlPatternsDoc;
   if (!checks.kenlPatternsAvailable) {
-    failedChecks.push('KENL patterns directory or KENL_PATTERNS.md documentation file not found');
+    failedChecks.push('[ -d \'.atom-trail/patterns\' ] || [ -f \'docs/KENL_PATTERNS.md\' ]');
   }
 
   // Check 2: Intent is well-formed (has scope and justification)
@@ -125,7 +137,7 @@ export async function gateIntentionToExecution(
   const checks: Record<string, boolean> = {};
   const failedChecks: string[] = [];
 
-  // Check 1: No date placeholders in bump.md (prevents accidental commits of templates)
+  // Check 1: No YYYYMMDD placeholders in bump.md (prevents accidental commits of templates)
   const bumpMdPath = spiralSafePath
     ? path.join(spiralSafePath, 'protocol', 'bump.md')
     : path.join(process.cwd(), '..', 'SpiralSafe', 'protocol', 'bump.md');
@@ -133,11 +145,9 @@ export async function gateIntentionToExecution(
   if (existsSync(bumpMdPath)) {
     try {
       const content = await fs.readFile(bumpMdPath, 'utf-8');
-      checks.noPlaceholders = !content.includes(DATE_PLACEHOLDER);
+      checks.noPlaceholders = !content.includes('YYYYMMDD');
       if (!checks.noPlaceholders) {
-        failedChecks.push(
-          `bump.md contains date placeholder '${DATE_PLACEHOLDER}' - replace with actual date before committing`
-        );
+        failedChecks.push('! grep -q \'YYYYMMDD\' bump.md');
       }
     } catch (error) {
       checks.noPlaceholders = true; // If file doesn't exist, pass
@@ -259,7 +269,7 @@ export async function gateLearningToRegeneration(
 
   if (!checks.learningDocumented) {
     failedChecks.push(
-      'Learning must be documented in either docs/COHERENCE_REPORT.md or .atom-trail/learning-extracted.json'
+      '[ -f \'docs/COHERENCE_REPORT.md\' ] || [ -f \'.atom-trail/learning-extracted.json\' ]'
     );
   }
 

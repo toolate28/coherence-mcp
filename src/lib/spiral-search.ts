@@ -59,11 +59,6 @@ const KIND_PATTERNS: Record<string, string[]> = {
 };
 
 /**
- * Maximum number of files to search for performance optimization
- */
-const MAX_FILES_TO_SEARCH = 100;
-
-/**
  * Determine layer from file path
  */
 function getLayerFromPath(filePath: string): string {
@@ -212,8 +207,8 @@ export async function searchSpiralSafe(
     // Search file contents
     const results: SearchResult[] = [];
 
-    for (const file of files.slice(0, MAX_FILES_TO_SEARCH)) {
-      // Limit to first MAX_FILES_TO_SEARCH files for performance
+    for (const file of files.slice(0, 100)) {
+      // Limit to first 100 files for performance
       const fullPath = path.join(basePath, file);
 
       try {

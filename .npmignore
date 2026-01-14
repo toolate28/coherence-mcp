@@ -1,0 +1,30 @@
+# Source files (build output is published)
+src/
+*.ts
+!*.d.ts
+
+# Dev/test
+__tests__/
+*.test.*
+jest.config.*
+coverage/
+
+# Temp files
+tmpclaude-*
+*.log
+
+# IDE/editor
+.idea/
+.vscode/
+*.swp
+
+# Git
+.git/
+.gitignore
+
+# CI
+.github/
+
+# Misc
+*.md
+!README.md
