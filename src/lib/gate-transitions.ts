@@ -259,7 +259,7 @@ export async function gateLearningToRegeneration(
 
   if (!checks.learningDocumented) {
     failedChecks.push(
-      '[ -f \'docs/COHERENCE_REPORT.md\' ] || [ -f \'.atom-trail/learning-extracted.json\' ]'
+      'Learning must be documented in either docs/COHERENCE_REPORT.md or .atom-trail/learning-extracted.json'
     );
   }
 
