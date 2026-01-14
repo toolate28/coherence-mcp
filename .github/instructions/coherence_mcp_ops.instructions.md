@@ -9,7 +9,7 @@
 ## Chaos Injection
 - Add Gaussian perturbations: `noise = np.random.normal(0, φ/5)` (φ=1.618).
 - Golden ratio perturbations create fractal boundaries for enhanced coherence (>100% gain observed).
-- Run sim: `scripts_run('validate')` → monitor ops_health.
+- Run validation: `python scripts/benchmark.py --chaos-mode --pilot-wave` → monitor ops_health.
 - Pilot wave guidance stabilizes trajectories under chaos, enabling quantum potential-driven optimization.
 
 ## Bohmian Pilot Wave Model
