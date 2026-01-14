@@ -41,6 +41,13 @@ export interface WaveAnalysisResult {
   timestamp: string;
 }
 
+// Threshold constants for wave analysis warnings
+const CURL_CRITICAL_THRESHOLD = 0.6;
+const CURL_WARNING_THRESHOLD = 0.3;
+const DIVERGENCE_CRITICAL_THRESHOLD = 0.7;
+const DIVERGENCE_WARNING_THRESHOLD = 0.4;
+const POTENTIAL_HIGH_THRESHOLD = 0.7;
+
 /**
  * Calculate lexical diversity (Type-Token Ratio)
  */
@@ -234,19 +241,19 @@ export function analyzeWave(input: string): WaveAnalysisResult {
   };
 
   // Generate warnings based on thresholds (from wave-spec.md)
-  if (curl > 0.6) {
+  if (curl > CURL_CRITICAL_THRESHOLD) {
     warnings.push('CRITICAL: High curl detected (circular reasoning)');
-  } else if (curl > 0.3) {
+  } else if (curl > CURL_WARNING_THRESHOLD) {
     warnings.push('WARNING: Moderate curl detected');
   }
 
-  if (divergence > 0.7) {
+  if (divergence > DIVERGENCE_CRITICAL_THRESHOLD) {
     warnings.push('CRITICAL: High positive divergence (unresolved expansion)');
-  } else if (divergence > 0.4) {
+  } else if (divergence > DIVERGENCE_WARNING_THRESHOLD) {
     warnings.push('WARNING: Moderate positive divergence');
   }
 
-  if (potential > 0.7) {
+  if (potential > POTENTIAL_HIGH_THRESHOLD) {
     warnings.push('NOTE: High potential region (consider development)');
   }
 
