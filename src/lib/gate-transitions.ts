@@ -135,7 +135,9 @@ export async function gateIntentionToExecution(
       const content = await fs.readFile(bumpMdPath, 'utf-8');
       checks.noPlaceholders = !content.includes(DATE_PLACEHOLDER);
       if (!checks.noPlaceholders) {
-        failedChecks.push(`! grep -q '${DATE_PLACEHOLDER}' bump.md`);
+        failedChecks.push(
+          `bump.md contains date placeholder '${DATE_PLACEHOLDER}' - replace with actual date before committing`
+        );
       }
     } catch (error) {
       checks.noPlaceholders = true; // If file doesn't exist, pass
