@@ -14,10 +14,6 @@
 import fs from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
-import { exec } from 'child_process';
-import { promisify } from 'util';
-
-const execAsync = promisify(exec);
 
 export interface GateTransition {
   gate: string;
@@ -36,18 +32,6 @@ export interface GateResult {
   checks: Record<string, boolean>;
   failedChecks: string[];
   timestamp: string;
-}
-
-/**
- * Run a shell command test condition
- */
-async function runTestCondition(condition: string): Promise<boolean> {
-  try {
-    await execAsync(condition, { timeout: 5000 });
-    return true;
-  } catch (error) {
-    return false;
-  }
 }
 
 /**
