@@ -95,7 +95,7 @@ export async function gateKnowledgeToIntention(
 
   checks.kenlPatternsAvailable = kenlPatternsDir || kenlPatternsDoc;
   if (!checks.kenlPatternsAvailable) {
-    failedChecks.push('[ -d \'.atom-trail/patterns\' ] || [ -f \'docs/KENL_PATTERNS.md\' ]');
+    failedChecks.push('KENL patterns directory or KENL_PATTERNS.md documentation file not found');
   }
 
   // Check 2: Intent is well-formed (has scope and justification)
