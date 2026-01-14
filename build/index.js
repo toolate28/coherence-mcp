@@ -11,6 +11,7 @@ import { analyzeWave as realAnalyzeWave } from "./lib/wave-analysis.js";
 import { searchSpiralSafe } from "./lib/spiral-search.js";
 import { packContext as realPackContext } from "./lib/context-pack.js";
 import { checkOpsHealth as realCheckOpsHealth, getOpsStatus as realGetOpsStatus, deployOps as realDeployOps, } from "./lib/api-client.js";
+import YAML from "yaml";
 // Create server instance
 const server = new Server({
     name: "coherence-mcp",
