@@ -7,6 +7,7 @@ import {
   ListToolsRequestSchema,
   Tool,
 } from "@modelcontextprotocol/sdk/types.js";
+import YAML from "yaml";
 
 // Real implementations
 import { trackAtom as realTrackAtom } from "./lib/atom-trail.js";
@@ -386,7 +387,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   }
 });
 
-<<<<<<< HEAD
 // Implementation functions
 
 // Target average words per sentence for optimal coherence
@@ -818,8 +818,6 @@ function computeGrokMetrics(metricType: string, agentState: any) {
   };
 }
 
-=======
->>>>>>> f5b242dcaf9ad99d198b022c59ef31d8a7a56ac5
 // Start the server
 async function main() {
   const transport = new StdioServerTransport();
