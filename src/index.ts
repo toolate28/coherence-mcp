@@ -199,7 +199,9 @@ const TOOLS: Tool[] = [
       required: ["env"],
     },
   },
-  // ... [Include remaining tools from original: scripts_run, awi_intent_request, discord_post, mc_execCommand, mc_query, grok_collab, grok_metrics]
+  // Note: legacy tools scripts_run, awi_intent_request, discord_post, mc_execCommand,
+  // mc_query, grok_collab, and grok_metrics from the original implementation are
+  // intentionally not implemented in this MCP server.
 ];
 
 // Script allow-list for scripts_run
