@@ -5,6 +5,12 @@
  * Base URL: https://api.spiralsafe.org
  */
 
+/**
+ * Default API base URL for SpiralSafe operations
+ * Can be overridden via environment variables or function parameters
+ */
+export const DEFAULT_API_BASE_URL = 'https://api.spiralsafe.org';
+
 export interface OpsHealthResponse {
   status: 'healthy' | 'degraded' | 'down';
   components: {
@@ -61,7 +67,7 @@ async function fetchWithTimeout(
  * Check operational health
  */
 export async function checkOpsHealth(
-  baseUrl: string = 'https://api.spiralsafe.org'
+  baseUrl: string = DEFAULT_API_BASE_URL
 ): Promise<OpsHealthResponse> {
   const startTime = Date.now();
 
@@ -106,7 +112,7 @@ export async function checkOpsHealth(
  * Get operational status
  */
 export async function getOpsStatus(
-  baseUrl: string = 'https://api.spiralsafe.org'
+  baseUrl: string = DEFAULT_API_BASE_URL
 ): Promise<OpsStatusResponse> {
   try {
     const response = await fetchWithTimeout(`${baseUrl}/status`, {}, 5000);
@@ -148,7 +154,7 @@ export async function getOpsStatus(
 export async function deployOps(
   env: string,
   dryRun: boolean,
-  baseUrl: string = 'https://api.spiralsafe.org'
+  baseUrl: string = DEFAULT_API_BASE_URL
 ): Promise<OpsDeployResponse> {
   const validEnvs = ['development', 'staging', 'production'];
 
