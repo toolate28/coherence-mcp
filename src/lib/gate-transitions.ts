@@ -62,27 +62,6 @@ async function logGateTransition(
  * Knowledge to Intention Gate (KENL → AWI)
  */
 export async function gateKnowledgeToIntention(
-  transition: GateTransition,
-  spiralSafePath?: string
-): Promise<void> {
-  const atomTrailPath = spiralSafePath
-    ? path.join(spiralSafePath, '.atom-trail')
-    : path.join(process.cwd(), '..', 'SpiralSafe', '.atom-trail');
-
-  const logPath = path.join(atomTrailPath, 'gate-transitions.jsonl');
-
-  // Ensure directory exists
-  await fs.mkdir(atomTrailPath, { recursive: true });
-
-  // Append to jsonl file
-  const line = JSON.stringify(transition) + '\n';
-  await fs.appendFile(logPath, line);
-}
-
-/**
- * Knowledge to Intention Gate (KENL → AWI)
- */
-export async function gateKnowledgeToIntention(
   context: any,
   spiralSafePath?: string
 ): Promise<GateResult> {
