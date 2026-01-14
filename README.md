@@ -53,11 +53,11 @@ npm install @hopeandsauced/coherence-mcp@0.2.0
 | Section | Description |
 |---------|-------------|
 | [📦 Quick Install](#-quick-install) | Get started with npm |
-| [🏗️ Architecture](#️-overall-system-architecture) | System design overview |
+| [🏗️ Architecture](#-overall-system-architecture) | System design overview |
 | [🔐 ATOM-AUTH](#-atom-auth-3-factor-authentication) | 3-Factor authentication |
 | [🌊 WAVE Protocol](#-hswave-protocol-flow) | Coherence analysis pipeline |
-| [🛡️ Security](#️-api-security-architecture) | API security layers |
-| [⚛️ Quantum](#️-quantum-computer-architecture) | 72-qubit system |
+| [🛡️ Security](#-api-security-architecture) | API security layers |
+| [⚛️ Quantum](#-quantum-computer-architecture) | 72-qubit system |
 | [🧩 Features](#features) | Available MCP tools |
 | [📚 Examples](#example-tool-calls) | Usage examples |
 
