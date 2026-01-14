@@ -25,6 +25,12 @@ Protocol
 
 import sys
 import time
+import math
+import random
+import logging
+import argparse
+import statistics
+import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Dict, Any, Optional
@@ -36,6 +42,13 @@ PHI = (1 + math.sqrt(5)) / 2  # Golden Ratio (~1.618)
 LAMBDA1_THRESHOLD = 0.8       # Entropy threshold (from wave spec)
 HBAR = 1.0                     # Reduced Planck constant (normalized)
 COHERENCE_TARGET = 0.25        # Target >20% coherence gain (25% for margin)
+
+# Benchmark constants
+BASE_TIME = 1.0                # Base execution time in seconds
+TIME_VARIANCE = 0.2            # Time variance for randomization
+CHAOS_AMPLITUDE = 0.5          # Chaos noise amplitude
+CHAOS_LEVEL_SCALE = 100        # Scale factor for chaos level
+STABLE_THRESHOLD = 0.5         # Threshold for stable entropy
 
 # VS Code Shell Integration Sequences
 # Ref: https://code.visualstudio.com/docs/terminal/shell-integration
@@ -59,6 +72,28 @@ def emit_osc_property(key: str, value: str):
     if sys.stdout.isatty():
         sys.stdout.write(f"{OSC}633;P;{key}={value}{ST}")
         sys.stdout.flush()
+
+def emit_osc_633(code: str, value: str = ""):
+    """Emit OSC 633 sequence for shell integration."""
+    if sys.stdout.isatty():
+        if value:
+            sys.stdout.write(f"{OSC}633;{code};{value}{ST}")
+        else:
+            sys.stdout.write(f"{OSC}633;{code}{ST}")
+        sys.stdout.flush()
+
+def fractal_noise(iteration: int = 0, amplitude: float = 1.0) -> float:
+    """
+    Generate fractal noise using golden ratio perturbations.
+    Creates self-similar patterns that enhance coherence.
+    """
+    # Base Gaussian noise
+    noise = random.gauss(0, PHI / 5.0)
+    
+    # Add Fibonacci modulation for fractal structure
+    fib_mod = math.sin(iteration * PHI) * amplitude
+    
+    return noise + fib_mod * 0.1
 
 def emit_status_dot(color: str):
     """Emit a colored dot to visualize state in the gutter/output."""
@@ -196,7 +231,7 @@ def run_mock_op(query: str, chaos: bool = False, pilot_wave_state: Optional[Pilo
     noise = 0.0
     
     if chaos:
-        noise = fractal_noise()
+        noise = fractal_noise(0, CHAOS_AMPLITUDE)
     
     # Initialize or evolve pilot wave
     if pilot_wave_state is None:

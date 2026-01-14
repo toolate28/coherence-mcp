@@ -5,6 +5,17 @@
  * Base URL: https://api.spiralsafe.org
  */
 
+/**
+ * Default API base URL for SpiralSafe operations
+ * Can be overridden via environment variables or function parameters
+ */
+const ENV_API_BASE_URL =
+  typeof process !== 'undefined' && (process as any).env
+    ? (process as any).env.SPIRALSAFE_API_BASE_URL
+    : undefined;
+
+export const DEFAULT_API_BASE_URL =
+  ENV_API_BASE_URL || 'https://api.spiralsafe.org';
 export interface OpsHealthResponse {
   status: 'healthy' | 'degraded' | 'down';
   components: {
@@ -147,8 +158,8 @@ export async function getOpsStatus(
  */
 export async function deployOps(
   env: string,
-  dryRun: boolean,
-  baseUrl: string = 'https://api.spiralsafe.org'
+  dryRun: boolean = true,
+  baseUrl: string = DEFAULT_API_BASE_URL
 ): Promise<OpsDeployResponse> {
   const validEnvs = ['development', 'staging', 'production'];
 
