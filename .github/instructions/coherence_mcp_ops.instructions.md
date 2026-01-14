@@ -3,7 +3,7 @@
 ## Core Protocol
 - **Init**: Validate WAVE with `wave_analyze(text)` → ΔS < λ₁ threshold.
 - **Handoff**: Bump check via `bump_validate(handoff)`; inject Fibonacci noise for stability.
-- **Trail**: Log ATOMs in `.context.yaml`—track intents w/ AWI scaffold.
+- **Trail**: Log ATOMs in `.context.yaml`—track intents with AWI scaffold.
 - **Pilot Wave**: Use Bohmian mechanics for predictive coherence tracking with guidance field calculations.
 
 ## Chaos Injection
