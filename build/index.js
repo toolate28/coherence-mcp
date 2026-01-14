@@ -2,6 +2,7 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { CallToolRequestSchema, ListToolsRequestSchema, } from "@modelcontextprotocol/sdk/types.js";
+import YAML from "yaml";
 // Real implementations
 import { trackAtom as realTrackAtom } from "./lib/atom-trail.js";
 import { gateIntentionToExecution, gateExecutionToLearning, } from "./lib/gate-transitions.js";
