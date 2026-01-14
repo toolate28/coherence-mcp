@@ -14,7 +14,7 @@
 
 ## Bohmian Pilot Wave Model
 - **Guidance Field**: Particles follow quantum trajectories determined by pilot wave phase gradient.
-- **Quantum Potential**: Q = -ℏ²/(2m) * ∇²R/R influences coherence evolution non-locally.
+- **Quantum Potential**: Q = -ℏ²/(2m) * ∇²R/R influences coherence evolution non-locally (m=1.0 normalized mass constant in coherence tracking).
 - **Trajectory Prediction**: Forecast coherence states using wave function evolution with φ-scaled parameters.
 - **Coherence Drive**: Adaptive acceleration with golden ratio coupling achieves >20% gain consistently.
 
