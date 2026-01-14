@@ -39,21 +39,30 @@ export interface GateResult {
 }
 
 /**
- * Run a shell command test condition
- */
-async function runTestCondition(condition: string): Promise<boolean> {
-  try {
-    await execAsync(condition, { timeout: 5000 });
-    return true;
-  } catch (error) {
-    return false;
-  }
-}
-
-/**
  * Write gate transition to jsonl log
  */
 async function logGateTransition(
+  transition: GateTransition,
+  spiralSafePath?: string
+): Promise<void> {
+  const atomTrailPath = spiralSafePath
+    ? path.join(spiralSafePath, '.atom-trail')
+    : path.join(process.cwd(), '..', 'SpiralSafe', '.atom-trail');
+
+  const logPath = path.join(atomTrailPath, 'gate-transitions.jsonl');
+
+  // Ensure directory exists
+  await fs.mkdir(atomTrailPath, { recursive: true });
+
+  // Append to jsonl file
+  const line = JSON.stringify(transition) + '\n';
+  await fs.appendFile(logPath, line);
+}
+
+/**
+ * Knowledge to Intention Gate (KENL → AWI)
+ */
+export async function gateKnowledgeToIntention(
   transition: GateTransition,
   spiralSafePath?: string
 ): Promise<void> {
