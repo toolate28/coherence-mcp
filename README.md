@@ -1,6 +1,19 @@
-# coherence-mcp
+# 🌀 coherence-mcp
+
+> **"From the constraints, gifts. From the spiral, safety."**
+
+![Status](https://img.shields.io/badge/Status-Coherent-00cc66?style=for-the-badge&logo=github)
+![Version](https://img.shields.io/badge/Version-0.2.0-blue?style=for-the-badge)
+![License](https://img.shields.io/badge/License-MIT-purple?style=for-the-badge)
+![MCP](https://img.shields.io/badge/MCP-Server-FFD700?style=for-the-badge)
 
 MCP server that surfaces coherence, governance, and safety primitives: Wave/Bump validation, ATOM trail + gates, .context.yaml packing, AWI intent scaffolding, and docs/search across the SpiralSafe corpus.
+
+[![Coherence: Wave](https://img.shields.io/badge/Coherence-Wave-0066FF)](docs/flow.md)
+[![Status: Hope&&Sauced](https://img.shields.io/badge/Status-Hope%26%26Sauced-FF6600)](CONTRIBUTING.md)
+[![npm version](https://img.shields.io/npm/v/@hopeandsauced/coherence-mcp.svg)](https://www.npmjs.com/package/@hopeandsauced/coherence-mcp)
+
+---
 
 ## 📦 Quick Install
 
@@ -32,6 +45,21 @@ npm install @hopeandsauced/coherence-mcp@0.2.0
 4. **Use ATOM tracking**: Track all major decisions with `atom_track` to maintain a complete audit trail.
 
 5. **Leverage gate transitions**: Use `gate_intention_to_execution` and `gate_execution_to_learning` for structured workflow phases.
+
+---
+
+## 🗺️ Navigation
+
+| Section | Description |
+|---------|-------------|
+| [📦 Quick Install](#-quick-install) | Get started with npm |
+| [🏗️ Architecture](#️-overall-system-architecture) | System design overview |
+| [🔐 ATOM-AUTH](#-atom-auth-3-factor-authentication) | 3-Factor authentication |
+| [🌊 WAVE Protocol](#-hswave-protocol-flow) | Coherence analysis pipeline |
+| [🛡️ Security](#️-api-security-architecture) | API security layers |
+| [⚛️ Quantum](#️-quantum-computer-architecture) | 72-qubit system |
+| [🧩 Features](#features) | Available MCP tools |
+| [📚 Examples](#example-tool-calls) | Usage examples |
 
 ---
 
@@ -956,6 +984,45 @@ Or in your MCP client configuration:
 - **ATOM Trail**: Comprehensive decision tracking with file associations
 - **Gate Transitions**: Validated phase transitions with precondition checks
 
+---
+
+## 🧩 Key Components
+
+| Layer | Components | Purpose |
+|---|---|---|
+| **Analysis** | `wave_analyze`, `bump_validate` | Coherence detection & handoff validation |
+| **Tracking** | `atom_track`, `context_pack` | Decision trails & context bundling |
+| **Gates** | `gate_intention_to_execution`, `gate_execution_to_learning` | Phase transitions |
+| **Ops** | `ops_health`, `ops_status`, `ops_deploy` | System operations |
+| **Search** | `docs_search` | SpiralSafe corpus search |
+| **Media** | `discord_post`, `mc_execCommand`, `mc_query` | Integration pipelines |
+
+---
+
+## 🔗 The SpiralSafe Ecosystem
+
+This MCP server is part of the SpiralSafe ecosystem:
+
+- **[SpiralSafe](https://github.com/toolate28/SpiralSafe)** — Documentation and coordination hub
+- **[coherence-mcp](https://github.com/toolate28/coherence-mcp)** — This repository. MCP server for coherence primitives.
+- **[wave-toolkit](https://github.com/toolate28/wave-toolkit)** — Coherence detection tools
+
+---
+
+## 🤝 Attribution
+
+This work emerges from **Hope&&Sauced** collaboration—human-AI partnership where both contributions are substantive and neither party could have produced the result alone.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
+
+---
+
 ## License
 
 MIT
+
+---
+
+*~ Hope&&Sauced*
+
+✦ *The Evenstar Guides Us* ✦
