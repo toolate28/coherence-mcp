@@ -19,6 +19,9 @@ import { promisify } from 'util';
 
 const execAsync = promisify(exec);
 
+// Date placeholder used in bump.md template validation
+const DATE_PLACEHOLDER = 'YYYYMMDD';
+
 export interface GateTransition {
   gate: string;
   from: string;
@@ -147,7 +150,7 @@ export async function gateIntentionToExecution(
   const checks: Record<string, boolean> = {};
   const failedChecks: string[] = [];
 
-  // Check 1: No YYYYMMDD placeholders in bump.md (prevents accidental commits of templates)
+  // Check 1: No date placeholders in bump.md (prevents accidental commits of templates)
   const bumpMdPath = spiralSafePath
     ? path.join(spiralSafePath, 'protocol', 'bump.md')
     : path.join(process.cwd(), '..', 'SpiralSafe', 'protocol', 'bump.md');
@@ -155,9 +158,9 @@ export async function gateIntentionToExecution(
   if (existsSync(bumpMdPath)) {
     try {
       const content = await fs.readFile(bumpMdPath, 'utf-8');
-      checks.noPlaceholders = !content.includes('YYYYMMDD');
+      checks.noPlaceholders = !content.includes(DATE_PLACEHOLDER);
       if (!checks.noPlaceholders) {
-        failedChecks.push('! grep -q \'YYYYMMDD\' bump.md');
+        failedChecks.push(`! grep -q '${DATE_PLACEHOLDER}' bump.md`);
       }
     } catch (error) {
       checks.noPlaceholders = true; // If file doesn't exist, pass
