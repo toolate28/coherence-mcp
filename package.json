@@ -1,5 +1,5 @@
 {
-  "name": "@spiralsafe/coherence-mcp",
+  "name": "@hopeandsauced/coherence-mcp",
   "version": "0.2.0",
   "description": "MCP server that surfaces coherence, governance, and safety primitives: Wave/Bump validation, ATOM trail + gates, .context.yaml packing, AWI intent scaffolding, cross-AI collaboration (@grok), and docs/search across the SpiralSafe corpus.",
   "type": "module",
@@ -19,12 +19,8 @@
     "prepare": "npm run build",
     "watch": "tsc --watch",
     "bench": "python3 scripts/benchmark.py",
-<<<<<<< HEAD
     "bench:chaos": "python3 scripts/benchmark.py --iterations 10 --chaos-mode",
     "prepublishOnly": "npm run build"
-=======
-    "bench:chaos": "python3 scripts/benchmark.py --chaos-mode"
->>>>>>> b391123a8740dbb4860d209e5a965dd030df00d5
   },
   "keywords": [
     "mcp",
