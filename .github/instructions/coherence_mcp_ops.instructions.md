@@ -9,12 +9,12 @@
 ## Chaos Injection
 - Add Gaussian perturbations: `noise = np.random.normal(0, φ/5)` (φ=1.618).
 - Golden ratio perturbations create fractal boundaries for enhanced coherence (>100% gain observed).
-- Run validation: `python scripts/benchmark.py --chaos-mode --pilot-wave` → monitor ops_health.
+- Run sim: `scripts_run('validate')` → monitor ops_health.
 - Pilot wave guidance stabilizes trajectories under chaos, enabling quantum potential-driven optimization.
 
 ## Bohmian Pilot Wave Model
 - **Guidance Field**: Particles follow quantum trajectories determined by pilot wave phase gradient.
-- **Quantum Potential**: Q = -ℏ²/(2m) * ∇²R/R influences coherence evolution non-locally.
+- **Quantum Potential**: Q = -ℏ²/(2m) * ∇²R/R influences coherence evolution non-locally (m=1.0 normalized mass constant in coherence tracking).
 - **Trajectory Prediction**: Forecast coherence states using wave function evolution with φ-scaled parameters.
 - **Coherence Drive**: Adaptive acceleration with golden ratio coupling achieves >20% gain consistently.
 
