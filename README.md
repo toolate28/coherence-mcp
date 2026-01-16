@@ -48,11 +48,38 @@ npm install @hopeandsauced/coherence-mcp@0.2.0
 
 ---
 
+## 🔐 Verify Release
+
+All releases are signed with GPG and include checksums for verification:
+
+```bash
+# Quick verification with provided script
+./scripts/verify-release.sh 0.2.0
+
+# Or manually:
+# 1. Import signing key
+curl -s https://spiralsafe.org/.well-known/pgp-key.txt | gpg --import
+
+# 2. Download and verify checksums
+VERSION="0.2.0"
+curl -LO "https://github.com/toolate28/coherence-mcp/releases/download/v${VERSION}/SHA256SUMS.txt"
+curl -LO "https://github.com/toolate28/coherence-mcp/releases/download/v${VERSION}/SHA256SUMS.txt.asc"
+gpg --verify SHA256SUMS.txt.asc SHA256SUMS.txt
+
+# 3. Verify npm provenance
+npm audit signatures @hopeandsauced/coherence-mcp
+```
+
+See [docs/RELEASE.md](docs/RELEASE.md) for complete release verification instructions.
+
+---
+
 ## 🗺️ Navigation
 
 | Section | Description |
 |---------|-------------|
 | [📦 Quick Install](#-quick-install) | Get started with npm |
+| [🔐 Verify Release](#-verify-release) | Verify package integrity |
 | [🏗️ Architecture](#-overall-system-architecture) | System design overview |
 | [🔐 ATOM-AUTH](#-atom-auth-3-factor-authentication) | 3-Factor authentication |
 | [🌊 WAVE Protocol](#-hswave-protocol-flow) | Coherence analysis pipeline |

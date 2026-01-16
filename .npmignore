@@ -25,6 +25,9 @@ tmpclaude-*
 # CI
 .github/
 
+# Scripts (dev only)
+scripts/
+
 # Misc
 *.md
 !README.md

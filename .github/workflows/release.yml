@@ -1,0 +1,288 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., 0.2.1)'
+        required: true
+        type: string
+      prerelease:
+        description: 'Is this a pre-release?'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+  packages: write
+  id-token: write
+
+jobs:
+  validate:
+    name: Validate Release
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: npm
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+        env:
+          SPIRALSAFE_API_TOKEN: dummy-token
+
+      - name: Build
+        run: npm run build
+
+      - name: Determine version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          fi
+
+  build:
+    name: Build Release Artifacts
+    runs-on: ubuntu-latest
+    needs: validate
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: npm
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Create package tarball
+        run: npm pack
+
+      - name: Generate checksums
+        run: |
+          sha256sum *.tgz > SHA256SUMS.txt
+          sha512sum *.tgz > SHA512SUMS.txt
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-artifacts
+          path: |
+            *.tgz
+            SHA256SUMS.txt
+            SHA512SUMS.txt
+          retention-days: 30
+
+  sign:
+    name: Sign Release Artifacts
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: release-artifacts
+          path: ./artifacts
+
+      - name: Import GPG key
+        if: ${{ env.GPG_PRIVATE_KEY != '' }}
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          echo "$GPG_PRIVATE_KEY" | gpg --batch --import
+          echo "GPG key imported successfully"
+
+      - name: Sign artifacts
+        if: ${{ env.GPG_PRIVATE_KEY != '' }}
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
+        run: |
+          cd artifacts
+          for file in *.tgz SHA256SUMS.txt SHA512SUMS.txt; do
+            if [ -f "$file" ]; then
+              gpg --batch --yes --pinentry-mode loopback \
+                  --passphrase "$GPG_PASSPHRASE" \
+                  --local-user "$GPG_KEY_ID" \
+                  --armor --detach-sign "$file"
+              echo "Signed: $file"
+            fi
+          done
+
+      - name: Create unsigned notice
+        if: ${{ env.GPG_PRIVATE_KEY == '' }}
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+        run: |
+          echo "# Unsigned Release" > artifacts/UNSIGNED.txt
+          echo "" >> artifacts/UNSIGNED.txt
+          echo "This release was not signed with GPG." >> artifacts/UNSIGNED.txt
+          echo "To enable signing, add GPG_PRIVATE_KEY, GPG_PASSPHRASE, and GPG_KEY_ID secrets." >> artifacts/UNSIGNED.txt
+          echo "" >> artifacts/UNSIGNED.txt
+          echo "See docs/RELEASE.md for instructions on setting up GPG signing." >> artifacts/UNSIGNED.txt
+
+      - name: Upload signed artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: signed-artifacts
+          path: ./artifacts
+          retention-days: 30
+
+  publish-npm:
+    name: Publish to NPM
+    runs-on: ubuntu-latest
+    needs: [validate, sign]
+    environment: npm-publish
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: npm
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Publish to NPM
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [validate, sign, publish-npm]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download signed artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: signed-artifacts
+          path: ./release-files
+
+      - name: Generate release notes
+        id: release-notes
+        run: |
+          VERSION="${{ needs.validate.outputs.version }}"
+          cat > release-notes.md << 'EOF'
+          ## Release v${{ needs.validate.outputs.version }}
+
+          ### Installation
+
+          ```bash
+          npm install @hopeandsauced/coherence-mcp@${{ needs.validate.outputs.version }}
+          ```
+
+          Or use with npx:
+
+          ```bash
+          npx @hopeandsauced/coherence-mcp@${{ needs.validate.outputs.version }}
+          ```
+
+          ### Verification
+
+          To verify the package integrity:
+
+          ```bash
+          # Download checksums
+          curl -LO https://github.com/toolate28/coherence-mcp/releases/download/v${{ needs.validate.outputs.version }}/SHA256SUMS.txt
+
+          # Verify package
+          npm pack @hopeandsauced/coherence-mcp@${{ needs.validate.outputs.version }}
+          sha256sum -c SHA256SUMS.txt
+          ```
+
+          If GPG signatures are available:
+
+          ```bash
+          # Import the SpiralSafe signing key
+          curl -s https://spiralsafe.org/.well-known/pgp-key.txt | gpg --import
+
+          # Verify signature
+          gpg --verify SHA256SUMS.txt.asc SHA256SUMS.txt
+          ```
+
+          ### SpiralSafe Ecosystem
+
+          This release is part of the SpiralSafe ecosystem. See the [README](https://github.com/toolate28/coherence-mcp#readme) for full documentation.
+
+          ---
+          *~ Hope&&Sauced*
+          EOF
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: v${{ needs.validate.outputs.version }}
+          body_path: release-notes.md
+          draft: false
+          prerelease: ${{ inputs.prerelease || false }}
+          files: |
+            release-files/*
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  notify-spiralsafe:
+    name: Notify SpiralSafe
+    runs-on: ubuntu-latest
+    needs: [validate, release]
+    if: success()
+    steps:
+      - name: Notify SpiralSafe API
+        if: ${{ env.SPIRALSAFE_API_TOKEN != '' }}
+        env:
+          SPIRALSAFE_API_TOKEN: ${{ secrets.SPIRALSAFE_API_TOKEN }}
+        run: |
+          curl -X POST \
+            -H "Authorization: Bearer $SPIRALSAFE_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "package": "@hopeandsauced/coherence-mcp",
+              "version": "${{ needs.validate.outputs.version }}",
+              "repository": "toolate28/coherence-mcp",
+              "release_url": "https://github.com/toolate28/coherence-mcp/releases/tag/v${{ needs.validate.outputs.version }}"
+            }' \
+            https://api.spiralsafe.org/v1/releases/notify || echo "SpiralSafe notification skipped (API unavailable)"
+
+      - name: Create sync marker
+        run: |
+          echo "Release v${{ needs.validate.outputs.version }} published"
+          echo "Sync status: pending SpiralSafe acknowledgment"
