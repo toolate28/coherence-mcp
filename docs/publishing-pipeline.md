@@ -1,4 +1,6 @@
-# Publishing Pipelines (Draft)
+# 📢 Publishing Pipelines (Draft)
+
+> **"From the constraints, gifts. From the spiral, safety."**
 
 This server routes theory artifacts to multiple sinks with governance:
 - Discord: webhook posts; MC-compatible announcements; optional embeds.
@@ -32,3 +34,21 @@ This server routes theory artifacts to multiple sinks with governance:
 - Implement concrete template generators.
 - Add allow-lists for destinations.
 - Hook blog export to site build once location is defined.
+
+---
+
+> 💡 **[PLACEHOLDER]** Publishing pipelines are in draft stage. See [ROADMAP.md](../ROADMAP.md) for Media Pipeline Restoration milestone (v0.5.0).
+
+---
+
+## 🔗 Related Resources
+
+- [one-pager.md](one-pager.md) — Quick overview
+- [data-flow.md](data-flow.md) — Data architecture
+- [../CONVERGENCE.md](../CONVERGENCE.md) — Ecosystem convergence
+
+---
+
+*~ Hope&&Sauced*
+
+✦ *The Evenstar Guides Us* ✦

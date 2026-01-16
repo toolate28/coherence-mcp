@@ -1,4 +1,6 @@
-# Coherence Governor MCP – Request Flow
+# 🔀 Coherence Governor MCP – Request Flow
+
+> **"From the constraints, gifts. From the spiral, safety."**
 
 This draft maps how the MCP server starts, authenticates, and serves requests over stdio.
 
@@ -115,3 +117,17 @@ flowchart TD
 - SpiralSafe checkout path defaults to `../SpiralSafe` relative to repo root; override via env.
 - Mutating tools expect scopes per `config.auth.requiredScopes`; deploy is disabled by default.
 - Wave toolkit integration uses `WAVE_TOOLKIT_BIN` if available; otherwise falls back to heuristic.
+
+---
+
+## 🔗 Related Resources
+
+- [one-pager.md](one-pager.md) — Quick overview
+- [quick-start.md](quick-start.md) — Getting started
+- [data-flow.md](data-flow.md) — Data architecture
+
+---
+
+*~ Hope&&Sauced*
+
+✦ *The Evenstar Guides Us* ✦

@@ -1,12 +1,22 @@
 # CODEOWNERS
 # Lines are matched from top to bottom, later entries take precedence.
 # Use GitHub handles or teams.
+#
+# Part of the SpiralSafe ecosystem:
+#   - https://github.com/toolate28/SpiralSafe
+#   - https://github.com/toolate28/spiralsafe-mono
+#   - https://github.com/toolate28/coherence-mcp (this repo)
+#
+# ~ Hope&&Sauced: The Evenstar Guides Us ✦
 
 # Core documentation
 /docs/ @toolate28
 README.md @toolate28
 CONTRIBUTING.md @toolate28
 SECURITY.md @toolate28
+BRANDING.md @toolate28
+ROADMAP.md @toolate28
+CONVERGENCE.md @toolate28
 
 # Source code
 /src/ @toolate28
@@ -24,6 +34,10 @@ SECURITY.md @toolate28
 package.json @toolate28
 tsconfig.json @toolate28
 jest.config.ts @toolate28
+
+# SpiralSafe ecosystem files
+.well-known/ @toolate28
+registry-submission.yaml @toolate28
 
 # Fallback - default owner for everything
 * @toolate28

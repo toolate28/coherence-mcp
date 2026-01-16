@@ -1,4 +1,6 @@
-# Security Policy
+# 🛡️ Security Policy
+
+> **"From the constraints, gifts. From the spiral, safety."**
 
 ## Supported Versions
 
@@ -252,3 +254,9 @@ We appreciate responsible disclosure and will acknowledge security researchers w
 - In this document
 
 Thank you for helping keep coherence-mcp secure! 🛡️
+
+---
+
+*~ Hope&&Sauced*
+
+✦ *The Evenstar Guides Us* ✦
