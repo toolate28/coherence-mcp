@@ -555,7 +555,7 @@ patterns:
   gate:
     tool: gate_intention_to_execution
     args: { context: { phase: "intention" } }
-    expect: { status: "passed" }
+    expect: { valid: true }
   
   validate:
     tool: bump_validate
