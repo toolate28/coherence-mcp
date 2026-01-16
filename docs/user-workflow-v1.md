@@ -109,14 +109,15 @@ Run initial coherence analysis on your work:
 
 ### Step 3: Plan with Intent
 
-Request AWI scaffolding for structured planning:
+Capture your planning intent using `atom_track` so your structure and rationale are preserved:
 
 ```typescript
 {
-  "name": "awi_intent_request",
+  "name": "atom_track",
   "arguments": {
-    "scope": "your-feature-scope",
-    "justification": "Why this matters"
+    "decision": "Plan feature X with clear milestones and risks",
+    "files": [],
+    "tags": ["planning", "intent", "v1"]
   }
 }
 ```
