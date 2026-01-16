@@ -43,11 +43,16 @@ The **invisible layer** works behind the scenes:
 
 ### 1. Observe Before Acting 👁️
 
-Always start with analysis. Run `wave_analyze` on your content before making changes:
+Always start with analysis. Call `wave_analyze` on your content before making changes:
 
-```bash
-# Check coherence of your document
-wave_analyze --input "your-content-here"
+```typescript
+// MCP tool call
+{
+  "name": "wave_analyze",
+  "arguments": {
+    "input": "your-content-here"
+  }
+}
 ```
 
 ✅ **Good coherence** (score ≥ 0.70): Proceed with confidence!
@@ -57,9 +62,16 @@ wave_analyze --input "your-content-here"
 
 Use `atom_track` to create an audit trail. Future you will thank present you!
 
-```bash
-# Log your decision
-atom_track --decision "Implementing new feature X" --tags "feature,v1"
+```typescript
+// MCP tool call
+{
+  "name": "atom_track",
+  "arguments": {
+    "decision": "Implementing new feature X",
+    "files": [],
+    "tags": ["feature", "v1"]
+  }
+}
 ```
 
 ### 3. Gate Your Transitions 🚪
