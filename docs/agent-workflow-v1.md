@@ -107,7 +107,7 @@ async function transitionPhase(
 ): Promise<boolean> {
   const gateName = `gate_${from}_to_${to}`;
   const result = await callTool(gateName, { context });
-  return result.valid === true;
+  return result.status === 'passed';
 }
 ```
 
