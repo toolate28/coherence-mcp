@@ -550,7 +550,7 @@ patterns:
   track:
     tool: atom_track
     args: { decision: "<text>", files: [], tags: [] }
-    expect: { success: true }
+    expect: { status: "tracked" }
   
   gate:
     tool: gate_intention_to_execution
