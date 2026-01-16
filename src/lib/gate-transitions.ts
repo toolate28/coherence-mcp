@@ -14,6 +14,10 @@
 import fs from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+
+const execAsync = promisify(exec);
 
 // Date placeholder used in bump.md template validation
 const DATE_PLACEHOLDER = 'YYYYMMDD';
