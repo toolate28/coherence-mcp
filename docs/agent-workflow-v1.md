@@ -410,7 +410,7 @@ async function healthPollingLoop(
   const result = await callTool("ops_health", {});
   state.lastCheck = new Date();
   
-  if (result.healthy) {
+  if (result.status === 'healthy') {
     state.healthy = true;
     state.consecutiveFailures = 0;
   } else {
