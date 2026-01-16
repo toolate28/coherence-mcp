@@ -261,7 +261,7 @@ async function coherenceMonitorLoop(
 ): Promise<void> {
   while (true) {
     const health = await callTool("ops_health", {});
-    if (health.status !== "healthy") {
+    if (!health.healthy) {
       await callTool("atom_track", {
         decision: "Health check failed - investigating",
         files: [],
