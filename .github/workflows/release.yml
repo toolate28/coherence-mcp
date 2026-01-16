@@ -111,7 +111,7 @@ jobs:
           path: ./artifacts
 
       - name: Import GPG key
-        if: ${{ env.GPG_PRIVATE_KEY != '' }}
+        if: ${{ secrets.GPG_PRIVATE_KEY != '' }}
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
@@ -120,7 +120,7 @@ jobs:
           echo "GPG key imported successfully"
 
       - name: Sign artifacts
-        if: ${{ env.GPG_PRIVATE_KEY != '' }}
+        if: ${{ secrets.GPG_PRIVATE_KEY != '' }}
         env:
           GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
@@ -138,9 +138,7 @@ jobs:
           done
 
       - name: Create unsigned notice
-        if: ${{ env.GPG_PRIVATE_KEY == '' }}
-        env:
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+        if: ${{ secrets.GPG_PRIVATE_KEY == '' }}
         run: |
           echo "# Unsigned Release" > artifacts/UNSIGNED.txt
           echo "" >> artifacts/UNSIGNED.txt
@@ -267,7 +265,7 @@ jobs:
     if: success()
     steps:
       - name: Notify SpiralSafe API
-        if: ${{ env.SPIRALSAFE_API_TOKEN != '' }}
+        if: ${{ secrets.SPIRALSAFE_API_TOKEN != '' }}
         env:
           SPIRALSAFE_API_TOKEN: ${{ secrets.SPIRALSAFE_API_TOKEN }}
         run: |

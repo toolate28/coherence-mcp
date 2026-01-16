@@ -110,7 +110,7 @@ verify_release() {
     # Verify signature if available
     if [ "$has_signature" = true ]; then
         log_info "Verifying GPG signature..."
-        if gpg --verify SHA256SUMS.txt.asc SHA256SUMS.txt 2>&1; then
+        if gpg --verify SHA256SUMS.txt.asc SHA256SUMS.txt 2>/dev/null; then
             log_info "GPG signature verified successfully"
         else
             log_error "GPG signature verification failed!"
