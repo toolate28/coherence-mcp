@@ -25,22 +25,6 @@ import {
 } from "./lib/api-client.js";
 import YAML from "yaml";
 
-// Real implementations
-import { trackAtom as realTrackAtom } from "./lib/atom-trail.js";
-import {
-  gateIntentionToExecution,
-  gateExecutionToLearning,
-} from "./lib/gate-transitions.js";
-import { validateBump as realValidateBump } from "./lib/bump-validation.js";
-import { analyzeWave as realAnalyzeWave } from "./lib/wave-analysis.js";
-import { searchSpiralSafe } from "./lib/spiral-search.js";
-import { packContext as realPackContext } from "./lib/context-pack.js";
-import {
-  checkOpsHealth as realCheckOpsHealth,
-  getOpsStatus as realGetOpsStatus,
-  deployOps as realDeployOps,
-} from "./lib/api-client.js";
-
 // Create server instance
 const server = new Server(
   {
