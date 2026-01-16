@@ -56,10 +56,10 @@ integrations:
     - name: ops_status
     - name: ops_deploy
       guard: true
-  media:
-    - name: discord_post
-    - name: mc_execCommand
-    - name: mc_query
+  # Media integrations are not currently available in the MCP server.
+  # The previously documented tools (discord_post, mc_execCommand, mc_query)
+  # are legacy and intentionally removed.
+  media: []
 ```
 
 ---
