@@ -565,7 +565,7 @@ patterns:
   health:
     tool: ops_health
     args: {}
-    expect: { status: "healthy" }
+    expect: { healthy: true }
 ```
 
 ---
