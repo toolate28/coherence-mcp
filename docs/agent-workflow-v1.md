@@ -113,38 +113,6 @@ async function transitionPhase(
 
 ---
 
-## Utilities
-
-### Sleep Function
-
-```typescript
-// Async delay utility used throughout the workflow
-const sleep = (ms: number): Promise<void> => 
-  new Promise(resolve => setTimeout(resolve, ms));
-```
-
-### Tool Call Wrapper
-
-```typescript
-// Generic tool invocation interface
-// Agents should implement this based on their MCP client library
-type ToolResult = Record<string, unknown>;
-
-async function callTool(
-  name: string,
-  args: Record<string, unknown>
-): Promise<ToolResult> {
-  // Example implementation using @modelcontextprotocol/sdk:
-  // return await client.callTool({ name, arguments: args });
-  
-  // For testing/mocking:
-  console.log(`Calling tool: ${name}`, args);
-  return { success: true };
-}
-```
-
----
-
 ## Steps
 
 ### Step 1: Environment Validation
