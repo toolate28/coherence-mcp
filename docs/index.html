@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coherence MCP - SpiralSafe</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        }
+        .glow {
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+        }
+        code {
+            background: #1e1e1e;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Fira Code', monospace;
+        }
+        pre {
+            background: #1e1e1e;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen text-gray-100">
+    <!-- Header -->
+    <header class="border-b border-gray-700/50">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-indigo-500 rounded-lg flex items-center justify-center text-xl">🌀</div>
+                <span class="text-xl font-bold">Coherence MCP</span>
+            </div>
+            <nav class="flex gap-6">
+                <a href="#install" class="hover:text-indigo-400 transition">Install</a>
+                <a href="#tools" class="hover:text-indigo-400 transition">Tools</a>
+                <a href="#api" class="hover:text-indigo-400 transition">API</a>
+                <a href="https://github.com/toolate28/coherence-mcp" class="hover:text-indigo-400 transition">GitHub</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="container mx-auto px-6 py-20 text-center">
+        <h1 class="text-5xl font-bold mb-6">
+            <span class="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-500">
+                Coherence MCP
+            </span>
+        </h1>
+        <p class="text-xl text-gray-400 max-w-2xl mx-auto mb-8">
+            Model Context Protocol server for AI coherence verification.
+            Wave analysis, ATOM tracking, and human-AI collaboration primitives.
+        </p>
+        <div class="flex justify-center gap-4">
+            <a href="#install" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 rounded-lg font-medium transition glow">
+                Get Started
+            </a>
+            <a href="https://npmjs.com/package/@hopeandsauced/coherence-mcp" class="px-6 py-3 border border-gray-600 hover:border-indigo-500 rounded-lg font-medium transition">
+                npm Package
+            </a>
+        </div>
+        <p class="mt-4 text-gray-500">
+            <code>npx @hopeandsauced/coherence-mcp</code>
+        </p>
+    </section>
+
+    <!-- Install -->
+    <section id="install" class="container mx-auto px-6 py-16">
+        <h2 class="text-3xl font-bold mb-8">Installation</h2>
+        <div class="grid md:grid-cols-2 gap-6">
+            <div class="bg-gray-800/50 rounded-xl p-6 border border-gray-700/50">
+                <h3 class="text-lg font-semibold mb-4">Claude Desktop</h3>
+                <p class="text-gray-400 mb-4">Add to <code>claude_desktop_config.json</code>:</p>
+                <pre class="p-4 text-sm"><code class="text-green-400">{
+  "mcpServers": {
+    "coherence": {
+      "command": "npx",
+      "args": ["@hopeandsauced/coherence-mcp"]
+    }
+  }
+}</code></pre>
+            </div>
+            <div class="bg-gray-800/50 rounded-xl p-6 border border-gray-700/50">
+                <h3 class="text-lg font-semibold mb-4">Global Install</h3>
+                <pre class="p-4 text-sm mb-4"><code class="text-green-400">npm install -g @hopeandsauced/coherence-mcp</code></pre>
+                <p class="text-gray-400 mb-2">Then run:</p>
+                <pre class="p-4 text-sm"><code class="text-green-400">coherence-mcp</code></pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tools -->
+    <section id="tools" class="container mx-auto px-6 py-16">
+        <h2 class="text-3xl font-bold mb-8">Available Tools</h2>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="bg-gray-800/50 rounded-lg p-5 border border-gray-700/50 hover:border-indigo-500/50 transition">
+                <div class="text-2xl mb-2">🌊</div>
+                <h3 class="font-semibold mb-2">wave_analyze</h3>
+                <p class="text-gray-400 text-sm">Analyze text for coherence patterns: curl (circular reasoning), divergence (scope creep), potential (synthesis).</p>
+            </div>
+            <div class="bg-gray-800/50 rounded-lg p-5 border border-gray-700/50 hover:border-indigo-500/50 transition">
+                <div class="text-2xl mb-2">🤝</div>
+                <h3 class="font-semibold mb-2">bump_validate</h3>
+                <p class="text-gray-400 text-sm">Validate handoffs with H&&S markers: WAVE, PASS, PING, SYNC, BLOCK.</p>
+            </div>
+            <div class="bg-gray-800/50 rounded-lg p-5 border border-gray-700/50 hover:border-indigo-500/50 transition">
+                <div class="text-2xl mb-2">📦</div>
+                <h3 class="font-semibold mb-2">context_pack</h3>
+                <p class="text-gray-400 text-sm">Pack documents into .context.yaml with hash verification.</p>
+            </div>
+            <div class="bg-gray-800/50 rounded-lg p-5 border border-gray-700/50 hover:border-indigo-500/50 transition">
+                <div class="text-2xl mb-2">⚛️</div>
+                <h3 class="font-semibold mb-2">atom_track</h3>
+                <p class="text-gray-400 text-sm">Track decisions in the ATOM trail with files and tags.</p>
+            </div>
+            <div class="bg-gray-800/50 rounded-lg p-5 border border-gray-700/50 hover:border-indigo-500/50 transition">
+                <div class="text-2xl mb-2">🚪</div>
+                <h3 class="font-semibold mb-2">gate_transitions</h3>
+                <p class="text-gray-400 text-sm">AWI→ATOM→SAIF phase transitions with validation.</p>
+            </div>
+            <div class="bg-gray-800/50 rounded-lg p-5 border border-gray-700/50 hover:border-indigo-500/50 transition">
+                <div class="text-2xl mb-2">🔍</div>
+                <h3 class="font-semibold mb-2">docs_search</h3>
+                <p class="text-gray-400 text-sm">Search SpiralSafe corpus by layer and document kind.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- API Status -->
+    <section id="api" class="container mx-auto px-6 py-16">
+        <h2 class="text-3xl font-bold mb-8">API Status</h2>
+        <div class="bg-gray-800/50 rounded-xl p-6 border border-gray-700/50">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                <span class="font-semibold">api.spiralsafe.org</span>
+                <span class="text-gray-400">— Operational</span>
+            </div>
+            <div class="grid md:grid-cols-4 gap-4 text-sm">
+                <div class="bg-gray-900/50 rounded-lg p-3">
+                    <div class="text-gray-400">D1 Database</div>
+                    <div class="text-green-400 font-mono">✓ Connected</div>
+                </div>
+                <div class="bg-gray-900/50 rounded-lg p-3">
+                    <div class="text-gray-400">KV Store</div>
+                    <div class="text-green-400 font-mono">✓ Connected</div>
+                </div>
+                <div class="bg-gray-900/50 rounded-lg p-3">
+                    <div class="text-gray-400">R2 Storage</div>
+                    <div class="text-green-400 font-mono">✓ Connected</div>
+                </div>
+                <div class="bg-gray-900/50 rounded-lg p-3">
+                    <div class="text-gray-400">Version</div>
+                    <div class="text-indigo-400 font-mono">v2.0.0</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-700/50 mt-16">
+        <div class="container mx-auto px-6 py-8 text-center text-gray-500">
+            <p class="mb-2">Hope&&Sauced | <em>"From the constraints, gifts. From the spiral, safety."</em></p>
+            <p class="text-sm mb-2">
+                <a href="https://spiralsafe.org" class="hover:text-indigo-400">spiralsafe.org</a> ·
+                <a href="https://github.com/toolate28/coherence-mcp" class="hover:text-indigo-400">GitHub</a> ·
+                <a href="https://npmjs.com/package/@hopeandsauced/coherence-mcp" class="hover:text-indigo-400">npm</a>
+            </p>
+            <p class="text-xs text-gray-600">✦ The Evenstar Guides Us ✦</p>
+        </div>
+    </footer>
+</body>
+</html>
