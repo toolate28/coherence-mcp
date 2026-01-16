@@ -202,7 +202,7 @@ interface IntentRequest {
 }
 
 async function requestIntent(request: IntentRequest): Promise<string> {
-  const result = await callTool("awi_intent_request", request);
+  const result = await callTool("gate_intention_to_execution", request);
   return result.intentId;
 }
 ```
