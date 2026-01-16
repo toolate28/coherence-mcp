@@ -20,7 +20,8 @@
     "watch": "tsc --watch",
     "bench": "python3 scripts/benchmark.py",
     "bench:chaos": "python3 scripts/benchmark.py --iterations 10 --chaos-mode",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "test": "echo \"No tests specified\" && exit 0"
   },
   "keywords": [
     "mcp",
