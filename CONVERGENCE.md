@@ -1,6 +1,8 @@
 # 🌀 Convergence Notice
 
-> **This package is converging into the unified SpiralSafe ecosystem.**
+> **"From the constraints, gifts. From the spiral, safety."**
+
+This package is converging into the unified SpiralSafe ecosystem.
 
 ## Ecosystem Map
 

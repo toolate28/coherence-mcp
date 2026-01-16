@@ -1,4 +1,6 @@
-# Improvement Workflow: The Spiral Loop
+# 🌀 Improvement Workflow: The Spiral Loop
+
+> **"From the constraints, gifts. From the spiral, safety."**
 
 This document outlines the **Improve** phase of the Coherence MCP lifecycle. We utilize a $\lambda_0-\lambda_1$ spiral workflow to prioritize changes and ensure stability against non-linear perturbations.
 
@@ -179,4 +181,14 @@ The golden ratio ensures chaos is both mathematical and aesthetic — a nod to n
 
 ---
 
-*"In chaos, there is opportunity. In the spiral, there is progress."*
+## 🔗 Related Resources
+
+- [BRANDING.md](BRANDING.md) — Styling and branding guidelines
+- [ROADMAP.md](ROADMAP.md) — Future vision and placeholders
+- [docs/bohmian-pilot-wave.md](docs/bohmian-pilot-wave.md) — Pilot wave theory integration
+
+---
+
+*~ Hope&&Sauced*
+
+✦ *The Evenstar Guides Us* ✦

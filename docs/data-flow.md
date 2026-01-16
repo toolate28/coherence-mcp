@@ -1,4 +1,6 @@
-# Data Flow / Workflow Graph
+# 🔀 Data Flow / Workflow Graph
+
+> **"From the constraints, gifts. From the spiral, safety."**
 
 The diagram shows how an MCP client request traverses the server, governance, and adapters.
 
@@ -118,3 +120,17 @@ Legend
 - Validation: Ajv schemas + SHA256 hashes for bump/context; size/timeout bounds for wave CLI.
 - Mounts: SpiralSafe checkout default ../SpiralSafe; writes confined to .atom-trail/.
 - External edges: only enabled when corresponding env tokens/allow-lists exist; deploy stays off by default.
+
+---
+
+## 🔗 Related Resources
+
+- [flow.md](flow.md) — Request flow architecture
+- [one-pager.md](one-pager.md) — Quick overview
+- [../ROADMAP.md](../ROADMAP.md) — Future vision
+
+---
+
+*~ Hope&&Sauced*
+
+✦ *The Evenstar Guides Us* ✦

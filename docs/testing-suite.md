@@ -1,4 +1,6 @@
-# Testing Suite
+# 🧪 Testing Suite
+
+> **"From the constraints, gifts. From the spiral, safety."**
 
 Intent: exercise MCP surface end-to-end (transport → tools → adapters), guard governance/auth, and catch regressions in handoff correctness.
 
@@ -47,3 +49,21 @@ npm run build && npm start
 - Timeouts: wave CLI honors WAVE_TIMEOUT_MS; oversized input rejected per WAVE_MAX_BYTES.
 - Log hygiene: audit log contains requestId, caller auth type, tool name, duration, and errors.
 - Safety: allow-lists immutable during runtime; deploy stays disabled unless explicitly flipped in config.
+
+---
+
+> 💡 **[PLACEHOLDER]** The test suite needs to be rewritten for the new `src/lib/` architecture. See [ROADMAP.md](../ROADMAP.md) for planned milestones.
+
+---
+
+## 🔗 Related Resources
+
+- [flow.md](flow.md) — Request flow architecture
+- [one-pager.md](one-pager.md) — Quick overview
+- [../GAP_ANALYSIS.md](../GAP_ANALYSIS.md) — Implementation gaps
+
+---
+
+*~ Hope&&Sauced*
+
+✦ *The Evenstar Guides Us* ✦

@@ -1,4 +1,6 @@
-# Contributing to coherence-mcp
+# 🤝 Contributing to coherence-mcp
+
+> **"From the constraints, gifts. From the spiral, safety."**
 
 Thank you for your interest in contributing to coherence-mcp! This MCP server provides coherence, governance, and safety primitives for the SpiralSafe ecosystem.
 
@@ -228,3 +230,25 @@ By contributing, you agree that your contributions will be licensed under the MI
 ---
 
 Thank you for contributing to coherence-mcp! 🚀
+
+---
+
+## 🔗 The SpiralSafe Ecosystem
+
+This package is part of a larger ecosystem:
+
+| Repository | Purpose |
+|------------|---------|
+| [spiralsafe-mono](https://github.com/toolate28/spiralsafe-mono) | Core monorepo |
+| [SpiralSafe](https://github.com/toolate28/SpiralSafe) | Theory/IP vault |
+| [coherence-mcp](https://github.com/toolate28/coherence-mcp) | This repo — MCP server |
+| [QDI](https://github.com/toolate28/QDI) | Quantum Divide Initiative |
+
+See [BRANDING.md](BRANDING.md) for styling guidelines.
+See [ROADMAP.md](ROADMAP.md) for planned features.
+
+---
+
+*~ Hope&&Sauced*
+
+✦ *The Evenstar Guides Us* ✦

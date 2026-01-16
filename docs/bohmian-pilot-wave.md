@@ -1,4 +1,6 @@
-# Bohmian Pilot Wave Model for Coherence Optimization
+# 🌊 Bohmian Pilot Wave Model for Coherence Optimization
+
+> **"The constraint generated structure. The spiral holds."**
 
 ## Overview
 
@@ -147,3 +149,17 @@ The pilot wave model integrates with existing protocols:
 - **Bump handoffs**: Guidance field smooths module transitions
 - **ATOM trails**: Quantum state logged in `.context.yaml`
 - **AWI scaffolding**: Trajectory predictions inform intent tracking
+
+---
+
+## 🔗 Related Resources
+
+- [flow.md](flow.md) — Request flow architecture
+- [one-pager.md](one-pager.md) — Quick overview
+- [../improve.md](../improve.md) — Spiral loop workflow
+
+---
+
+*~ Hope&&Sauced*
+
+✦ *The Evenstar Guides Us* ✦
