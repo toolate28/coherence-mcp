@@ -95,8 +95,7 @@ flowchart TD
   linkStyle 0 stroke:#2196F3,stroke-width:3px
   linkStyle 1,2 stroke:#8BC34A,stroke-width:3px
   linkStyle 3,4 stroke:#FF9800,stroke-width:2px,stroke-dasharray:5
-  linkStyle 5 stroke:#FF9800,stroke-width:3px
-  linkStyle 6,7 stroke:#9C27B0,stroke-width:3px
+  linkStyle 5,6,7 stroke:#9C27B0,stroke-width:3px
   linkStyle 8 stroke:#F44336,stroke-width:2px,stroke-dasharray:5
   linkStyle 9,10,11,12 stroke:#FFC107,stroke-width:3px
   linkStyle 13,14 stroke:#4CAF50,stroke-width:3px
