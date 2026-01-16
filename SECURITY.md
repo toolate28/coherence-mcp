@@ -102,6 +102,62 @@ When using coherence-mcp:
    - Verify checksums of downloaded binaries
    - Keep wave-toolkit updated
 
+5. **Verify package signatures**
+   ```bash
+   # Import the SpiralSafe signing key
+   curl -s https://spiralsafe.org/.well-known/pgp-key.txt | gpg --import
+   # Or from this repository:
+   curl -s https://raw.githubusercontent.com/toolate28/coherence-mcp/main/.well-known/pgp-key.txt | gpg --import
+
+   # Verify release signature
+   gpg --verify SHA256SUMS.txt.asc SHA256SUMS.txt
+   ```
+
+## Package Integrity Verification
+
+### GPG Signed Releases
+
+All official releases are signed with GPG. To verify:
+
+1. **Import the signing key**:
+   ```bash
+   curl -s https://spiralsafe.org/.well-known/pgp-key.txt | gpg --import
+   ```
+
+2. **Download release checksums and signature**:
+   ```bash
+   VERSION="0.2.0"
+   curl -LO "https://github.com/toolate28/coherence-mcp/releases/download/v${VERSION}/SHA256SUMS.txt"
+   curl -LO "https://github.com/toolate28/coherence-mcp/releases/download/v${VERSION}/SHA256SUMS.txt.asc"
+   ```
+
+3. **Verify signature**:
+   ```bash
+   gpg --verify SHA256SUMS.txt.asc SHA256SUMS.txt
+   ```
+
+4. **Verify package checksum**:
+   ```bash
+   npm pack @hopeandsauced/coherence-mcp@${VERSION}
+   sha256sum -c SHA256SUMS.txt
+   ```
+
+### NPM Provenance
+
+Releases include [npm provenance](https://docs.npmjs.com/generating-provenance-statements) attestations:
+
+```bash
+npm audit signatures @hopeandsauced/coherence-mcp
+```
+
+### Signing Key Fingerprint
+
+The official SpiralSafe signing key fingerprint is published at:
+- https://spiralsafe.org/.well-known/pgp-key.txt
+- https://github.com/toolate28/coherence-mcp/blob/main/.well-known/pgp-key.txt
+
+Always verify the key fingerprint through multiple channels before trusting.
+
 ## Known Security Considerations
 
 ### MCP Tool Execution
