@@ -5,7 +5,7 @@
  * with hash verification for integrity.
  */
 
-import YAML from "yaml";
+import * as YAML from "yaml";
 
 export interface ContextDocument {
   path: string;
