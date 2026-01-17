@@ -202,6 +202,71 @@ Always verify the key fingerprint through multiple channels before trusting.
 - User controls data flow
 - Clear documentation of data handling
 
+### Embedding Normalization and Padding
+
+**Risk:** Padding vectors with zeros before normalization distorts embedding values
+
+**Context:** When working with vector embeddings (e.g., in quantum-LLM hybrid systems, RAG retrieval, or similarity computations), the order of operations matters. Padding a vector with zeros before normalizing it will incorrectly scale the original values, leading to distorted similarity scores and unreliable results.
+
+**Anti-Pattern:**
+```python
+# INCORRECT: Padding before normalization
+query_embedding = compute_embedding(query)  # e.g., [0.5, 0.3, 0.2]
+query_embedding = np.pad(
+    query_embedding,
+    (0, feature_dim - len(query_embedding))  # Adds zeros: [0.5, 0.3, 0.2, 0.0, 0.0, ...]
+)
+query_embedding = normalize(query_embedding)  # Normalizes with zeros included - WRONG!
+```
+
+**Correct Approaches:**
+
+1. **Normalize first, then pad:**
+```python
+# CORRECT: Normalize first, then pad
+query_embedding = compute_embedding(query)
+query_embedding = normalize(query_embedding)  # Normalize original vector
+query_embedding = np.pad(
+    query_embedding,
+    (0, feature_dim - len(query_embedding))
+)
+```
+
+2. **Use consistent wrapping/repetition strategy:**
+```python
+# CORRECT: Repeat values instead of zero-padding
+query_embedding = compute_embedding(query)
+query_embedding = normalize(query_embedding)
+# Wrap/repeat values to reach target dimension
+while len(query_embedding) < feature_dim:
+    query_embedding = np.concatenate([
+        query_embedding,
+        query_embedding[:min(len(query_embedding), feature_dim - len(query_embedding))]
+    ])
+```
+
+3. **Pad with the mean value:**
+```python
+# CORRECT: Pad with mean to maintain distribution
+query_embedding = compute_embedding(query)
+query_embedding = normalize(query_embedding)
+mean_val = np.mean(query_embedding)
+query_embedding = np.pad(
+    query_embedding,
+    (0, feature_dim - len(query_embedding)),
+    constant_values=mean_val
+)
+```
+
+**Mitigation:**
+- Always normalize embeddings before padding
+- Use consistent padding strategies (wrapping, mean values, or learned padding)
+- Validate embedding dimensions match before similarity computations
+- Test embedding quality with known reference vectors
+- Document embedding preprocessing pipelines clearly
+
+**Related:** This issue was identified in [SpiralSafe PR #117](https://github.com/toolate28/SpiralSafe/pull/117) in the Qiskit-DSPy hybrid integration experiments.
+
 ## Security Features
 
 ### Input Validation
