@@ -212,6 +212,7 @@ Always verify the key fingerprint through multiple channels before trusting.
 ```python
 # INCORRECT: Padding before normalization
 query_embedding = compute_embedding(query)  # e.g., [0.5, 0.3, 0.2]
+# feature_dim is the target dimension for all embeddings in the system
 query_embedding = np.pad(
     query_embedding,
     (0, feature_dim - len(query_embedding))  # Adds zeros: [0.5, 0.3, 0.2, 0.0, 0.0, ...]
@@ -239,6 +240,8 @@ query_embedding = compute_embedding(query)
 query_embedding = normalize(query_embedding)
 # Wrap/repeat values to reach target dimension efficiently
 if len(query_embedding) < feature_dim:
+    # Calculate repetitions needed: ceil(target_size / current_size)
+    # Then slice to exact target dimension
     reps = int(np.ceil(feature_dim / len(query_embedding)))
     query_embedding = np.tile(query_embedding, reps)[:feature_dim]
 ```
