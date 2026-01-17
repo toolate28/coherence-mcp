@@ -237,12 +237,10 @@ query_embedding = np.pad(
 # CORRECT: Repeat values instead of zero-padding
 query_embedding = compute_embedding(query)
 query_embedding = normalize(query_embedding)
-# Wrap/repeat values to reach target dimension
-while len(query_embedding) < feature_dim:
-    query_embedding = np.concatenate([
-        query_embedding,
-        query_embedding[:min(len(query_embedding), feature_dim - len(query_embedding))]
-    ])
+# Wrap/repeat values to reach target dimension efficiently
+if len(query_embedding) < feature_dim:
+    reps = int(np.ceil(feature_dim / len(query_embedding)))
+    query_embedding = np.tile(query_embedding, reps)[:feature_dim]
 ```
 
 3. **Pad with the mean value:**
