@@ -4,3 +4,23 @@ dist/
 *.log
 .DS_Store
 .env
+benchmark_results.json
+
+# Temporary files
+tmpclaude-*
+*.tmp
+.tmp/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Test artifacts
+coverage/
+.nyc_output/
+
+# OS files
+Thumbs.db
+*.bak

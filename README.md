@@ -1,96 +1,145 @@
-🏗️ Overall System Architecture # coherence-mcp
+# 🌀 coherence-mcp
+
+> **"From the constraints, gifts. From the spiral, safety."**
+
+![Status](https://img.shields.io/badge/Status-Coherent-00cc66?style=for-the-badge&logo=github)
+![Version](https://img.shields.io/badge/Version-0.2.0-blue?style=for-the-badge)
+![License](https://img.shields.io/badge/License-MIT-purple?style=for-the-badge)
+![MCP](https://img.shields.io/badge/MCP-Server-FFD700?style=for-the-badge)
 
 MCP server that surfaces coherence, governance, and safety primitives: Wave/Bump validation, ATOM trail + gates, .context.yaml packing, AWI intent scaffolding, and docs/search across the SpiralSafe corpus.
 
+[![Coherence: Wave](https://img.shields.io/badge/Coherence-Wave-0066FF)](docs/flow.md)
+[![Status: Hope&&Sauced](https://img.shields.io/badge/Status-Hope%26%26Sauced-FF6600)](CONTRIBUTING.md)
+[![npm version](https://img.shields.io/npm/v/@hopeandsauced/coherence-mcp.svg)](https://www.npmjs.com/package/@hopeandsauced/coherence-mcp)
+
+---
+
+## 📦 Quick Install
+
+```bash
+npm install @hopeandsauced/coherence-mcp@0.2.0
+```
+
+### Effective Usage Tips
+
+1. **Add to your MCP client configuration**:
+   ```json
+   {
+     "mcpServers": {
+       "coherence": {
+         "command": "npx",
+         "args": ["-y", "@hopeandsauced/coherence-mcp"]
+       }
+     }
+   }
+   ```
+
+2. **Environment Setup**: Copy `.env.example` to `.env` and configure:
+   - `ATOM_AUTH_TOKEN` - Required for authenticated operations
+   - `SPIRALSAFE_API_TOKEN` - Required for ops tools
+   - `WAVE_TOOLKIT_BIN` - Optional path to wave-toolkit CLI
+
+3. **Start with core tools**: Begin with `wave_analyze` for coherence checks and `bump_validate` for handoff validation.
+
+4. **Use ATOM tracking**: Track all major decisions with `atom_track` to maintain a complete audit trail.
+
+5. **Leverage gate transitions**: Use `gate_intention_to_execution` and `gate_execution_to_learning` for structured workflow phases.
+
+---
+
+## 🔐 Verify Release
+
+All releases are signed with GPG and include checksums for verification:
+
+```bash
+# Quick verification with provided script
+./scripts/verify-release.sh 0.2.0
+
+# Or manually:
+# 1. Import signing key
+curl -s https://spiralsafe.org/.well-known/pgp-key.txt | gpg --import
+
+# 2. Download and verify checksums
+VERSION="0.2.0"
+curl -LO "https://github.com/toolate28/coherence-mcp/releases/download/v${VERSION}/SHA256SUMS.txt"
+curl -LO "https://github.com/toolate28/coherence-mcp/releases/download/v${VERSION}/SHA256SUMS.txt.asc"
+gpg --verify SHA256SUMS.txt.asc SHA256SUMS.txt
+
+# 3. Verify npm provenance
+npm audit signatures @hopeandsauced/coherence-mcp
+```
+
+See [docs/RELEASE.md](docs/RELEASE.md) for complete release verification instructions.
+
+---
+
+## 🗺️ Navigation
+
+| Section | Description |
+|---------|-------------|
+| [📦 Quick Install](#-quick-install) | Get started with npm |
+| [🔐 Verify Release](#-verify-release) | Verify package integrity |
+| [🏗️ Architecture](#-overall-system-architecture) | System design overview |
+| [🔐 ATOM-AUTH](#-atom-auth-3-factor-authentication) | 3-Factor authentication |
+| [🌊 WAVE Protocol](#-hswave-protocol-flow) | Coherence analysis pipeline |
+| [🛡️ Security](#-api-security-architecture) | API security layers |
+| [⚛️ Quantum](#-quantum-computer-architecture) | 72-qubit system |
+| [🧩 Features](#features) | Available MCP tools |
+| [📚 Examples](#example-tool-calls) | Usage examples |
+
+---
+
+## 🏗️ Overall System Architecture
+
 ### Multi-Subdomain Platform
 
-```mermaid
-graph TB
-    subgraph "Public Layer"
-        A[spiralsafe.org<br/>Public Landing]
-    end
-
-    subgraph "Core Services"
-        B[api.spiralsafe.org<br/>REST API + D1 + KV + R2]
-        C[console.spiralsafe.org<br/>Admin Dashboard + ATOM-AUTH]
-    end
-
-    subgraph "Future Services"
-        D[quantum.spiralsafe.org<br/>Quantum Playground]
-        E[help.spiralsafe.org<br/>Support & Helpdesk]
-        F[docs.spiralsafe.org<br/>Documentation]
-        G[status.spiralsafe.org<br/>System Status]
-    end
-
-    subgraph "Infrastructure"
-        H[Cloudflare Workers<br/>Edge Computing]
-        I[Cloudflare D1<br/>SQLite Database]
-        J[Cloudflare KV<br/>Key-Value Store]
-        K[Cloudflare R2<br/>Object Storage]
-    end
-
-    A --> B
-    C --> B
-    D --> B
-    E --> B
-
-    B --> H
-    H --> I
-    H --> J
-    H --> K
-
-    style A fill:#4ade80,stroke:#22c55e,stroke-width:3px,color:#000
-    style B fill:#60a5fa,stroke:#3b82f6,stroke-width:3px,color:#000
-    style C fill:#a78bfa,stroke:#8b5cf6,stroke-width:3px,color:#000
-    style H fill:#f472b6,stroke:#ec4899,stroke-width:3px,color:#000
-    style I fill:#fb923c,stroke:#f97316,stroke-width:3px,color:#000
-    style J fill:#fb923c,stroke:#f97316,stroke-width:3px,color:#000
-    style K fill:#fb923c,stroke:#f97316,stroke-width:3px,color:#000
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                         PUBLIC LAYER                                │
+│                   ┌─────────────────────┐                          │
+│                   │   spiralsafe.org    │                          │
+│                   │   Public Landing    │                          │
+│                   └─────────┬───────────┘                          │
+└─────────────────────────────┼───────────────────────────────────────┘
+                              │
+┌─────────────────────────────┼───────────────────────────────────────┐
+│                       CORE SERVICES                                 │
+│  ┌────────────────────────┐   ┌────────────────────────────────┐   │
+│  │   api.spiralsafe.org   │   │   console.spiralsafe.org       │   │
+│  │   REST API + D1 + KV   │   │   Admin Dashboard + ATOM-AUTH  │   │
+│  └───────────┬────────────┘   └───────────────┬────────────────┘   │
+└──────────────┼────────────────────────────────┼─────────────────────┘
+               │                                │
+               └────────────────┬───────────────┘
+                                │
+┌───────────────────────────────┼─────────────────────────────────────┐
+│                        INFRASTRUCTURE                               │
+│  ┌──────────────────┐ ┌──────────────────┐ ┌──────────────────┐    │
+│  │ Cloudflare Workers│ │  Cloudflare D1   │ │  Cloudflare KV   │    │
+│  │   Edge Computing  │ │  SQLite Database │ │  Key-Value Store │    │
+│  └──────────────────┘ └──────────────────┘ └──────────────────┘    │
+│                       ┌──────────────────┐                          │
+│                       │  Cloudflare R2   │                          │
+│                       │  Object Storage  │                          │
+│                       └──────────────────┘                          │
+└─────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Technology Stack
 
-```mermaid
-graph LR
-    subgraph "Frontend"
-        A[HTML5 + Tailwind CSS]
-        B[Vanilla JavaScript]
-        C[Responsive Design]
-    end
-
-    subgraph "Backend"
-        D[TypeScript]
-        E[Cloudflare Workers]
-        F[Hono Framework]
-    end
-
-    subgraph "Storage"
-        G[D1 SQLite<br/>7 Tables]
-        H[KV Store<br/>Cache + Sessions]
-        I[R2 Bucket<br/>Context Storage]
-    end
-
-    subgraph "Security"
-        J[API Key Auth]
-        K[Rate Limiting]
-        L[ATOM-AUTH]
-    end
-
-    A --> D
-    B --> E
-    D --> G
-    E --> H
-    E --> I
-
-    J --> E
-    K --> E
-    L --> E
-
-    style A fill:#38bdf8,stroke:#0ea5e9,stroke-width:2px
-    style D fill:#a78bfa,stroke:#8b5cf6,stroke-width:2px
-    style E fill:#f472b6,stroke:#ec4899,stroke-width:2px
-    style G fill:#fb923c,stroke:#f97316,stroke-width:2px
-    style J fill:#ef4444,stroke:#dc2626,stroke-width:2px
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  FRONTEND              BACKEND                STORAGE               │
+│  ─────────             ───────                ───────               │
+│  • HTML5 + Tailwind    • TypeScript           • D1 SQLite (7 Tables)│
+│  • Vanilla JavaScript  • Cloudflare Workers   • KV Store (Cache)    │
+│  • Responsive Design   • Hono Framework       • R2 Bucket (Context) │
+├─────────────────────────────────────────────────────────────────────┤
+│  SECURITY                                                           │
+│  ────────                                                           │
+│  • API Key Auth  • Rate Limiting  • ATOM-AUTH                       │
+└─────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -99,85 +148,101 @@ graph LR
 
 ### Complete Authentication Flow
 
-```mermaid
-sequenceDiagram
-    participant User
-    participant Frontend as Login UI
-    participant Backend as ATOM-AUTH API
-    participant LED as LED Display
-    participant Projector as Projector Display
-    participant AI as Claude Vision AI
-
-    User->>Frontend: Visit console.spiralsafe.org/login
-    Frontend->>Backend: Request ATOM challenge
-    Backend->>Frontend: "What did we discover about constraints?"
-
-    Note over User,Frontend: 🧠 FACTOR 1: Conversational Coherence
-    User->>Frontend: "From constraints, gifts. From spiral, safety."
-    Frontend->>Backend: Submit response
-    Backend->>Backend: Analyze WAVE coherence
-    Backend->>Frontend: ✅ Score: 0.91 (PASS)
-
-    Note over User,LED: 💡 FACTOR 2: Physical Presence (LED)
-    Backend->>LED: Display code "7392"
-    LED->>User: Shows scrolling digits
-    User->>Frontend: Enters "7392"
-    Frontend->>Backend: Verify LED code
-    Backend->>Frontend: ✅ Code verified (PASS)
-
-    Note over User,Projector: 🎬 FACTOR 3: Visual Challenge
-    Backend->>Projector: Display quantum circuit image
-    Projector->>User: Projects full-screen image
-    Backend->>Frontend: "How many quantum gates?"
-    User->>Frontend: Answers "12"
-    Frontend->>Backend: Submit answer
-    Backend->>AI: Validate answer with vision model
-    AI->>Backend: ✅ Correct
-    Backend->>Frontend: ✅ Visual verified (PASS)
-
-    Note over Backend: 🎉 All 3 factors passed
-    Backend->>Backend: Generate ATOM token (24h expiry)
-    Backend->>Frontend: Return token + session
-    Frontend->>User: Redirect to /admin/dashboard
-
-    rect rgb(34, 197, 94, 0.2)
-        Note over User: 🌀 ULTRA-SECURE AUTHENTICATION COMPLETE
-    end
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    ATOM-AUTH 3-Factor Authentication Flow                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  User         Frontend         Backend          LED       Projector   AI   │
+│    │             │                │               │            │       │   │
+│    │  Visit /login               │               │            │       │   │
+│    │────────────►│               │               │            │       │   │
+│    │             │  Request ATOM │               │            │       │   │
+│    │             │──────────────►│               │            │       │   │
+│    │             │◄──────────────│               │            │       │   │
+│    │             │  Challenge Q  │               │            │       │   │
+│    │             │               │               │            │       │   │
+│    │  🧠 FACTOR 1: Conversational Coherence                   │       │   │
+│    │  Answer     │               │               │            │       │   │
+│    │────────────►│  Submit       │               │            │       │   │
+│    │             │──────────────►│ Analyze WAVE  │            │       │   │
+│    │             │◄──────────────│ ✅ Score 0.91 │            │       │   │
+│    │             │               │               │            │       │   │
+│    │  💡 FACTOR 2: LED Physical Presence        │            │       │   │
+│    │             │               │  Code "7392"  │            │       │   │
+│    │             │               │──────────────►│            │       │   │
+│    │◄────────────────────────────────────────────│            │       │   │
+│    │  Enters code│               │               │            │       │   │
+│    │────────────►│──────────────►│ ✅ Verified   │            │       │   │
+│    │             │               │               │            │       │   │
+│    │  🎬 FACTOR 3: Visual CAPTCHA               │            │       │   │
+│    │             │               │  Display image│            │       │   │
+│    │             │               │──────────────────────────►│       │   │
+│    │◄────────────────────────────────────────────────────────│       │   │
+│    │  Answer "12"│               │               │            │       │   │
+│    │────────────►│──────────────►│ Validate─────────────────────────►│   │
+│    │             │               │◄──────────────────────────────────│   │
+│    │             │◄──────────────│ ✅ All 3 PASS │            │       │   │
+│    │             │  Token + Redirect to /admin/dashboard      │       │   │
+│    │◄────────────│               │               │            │       │   │
+│    │             │               │               │            │       │   │
+│    │  🌀 ULTRA-SECURE AUTHENTICATION COMPLETE                 │       │   │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Authentication Factors Breakdown
 
-```mermaid
-graph TD
-    A[User Authentication Request] --> B{Factor 1:<br/>Conversational<br/>Coherence}
-
-    B -->|Pass| C{Factor 2:<br/>LED Keycode<br/>Physical Presence}
-    B -->|Fail| X1[❌ Deny Access]
-
-    C -->|Pass| D{Factor 3:<br/>Projector CAPTCHA<br/>Visual Verification}
-    C -->|Fail| X2[❌ Deny Access]
-
-    D -->|Pass| E[✅ Generate ATOM Token]
-    D -->|Fail| X3[❌ Deny Access]
-
-    E --> F[Grant Console Access]
-
-    style A fill:#60a5fa,stroke:#3b82f6,stroke-width:2px
-    style B fill:#a78bfa,stroke:#8b5cf6,stroke-width:3px
-    style C fill:#fbbf24,stroke:#f59e0b,stroke-width:3px
-    style D fill:#f472b6,stroke:#ec4899,stroke-width:3px
-    style E fill:#4ade80,stroke:#22c55e,stroke-width:3px
-    style F fill:#34d399,stroke:#10b981,stroke-width:3px
-    style X1 fill:#ef4444,stroke:#dc2626,stroke-width:2px
-    style X2 fill:#ef4444,stroke:#dc2626,stroke-width:2px
-    style X3 fill:#ef4444,stroke:#dc2626,stroke-width:2px
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      3-Factor Authentication Decision Flow                  │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│                    ┌────────────────────────┐                               │
+│                    │  User Authentication   │                               │
+│                    │       Request          │                               │
+│                    └───────────┬────────────┘                               │
+│                                │                                            │
+│                                ▼                                            │
+│                    ┌────────────────────────┐                               │
+│                    │  Factor 1: Coherence   │                               │
+│                    │  Conversational Check  │                               │
+│                    └───────────┬────────────┘                               │
+│                         Pass   │   Fail                                     │
+│                     ┌──────────┼──────────┐                                 │
+│                     ▼          │          ▼                                 │
+│         ┌────────────────┐     │    ┌─────────────┐                         │
+│         │ Factor 2: LED  │     │    │ ❌ DENIED   │                         │
+│         │ Physical Code  │     │    └─────────────┘                         │
+│         └───────┬────────┘     │                                            │
+│          Pass   │   Fail       │                                            │
+│      ┌──────────┼──────────┐   │                                            │
+│      ▼          │          ▼   │                                            │
+│  ┌────────────────┐    ┌─────────────┐                                      │
+│  │ Factor 3: Visual│   │ ❌ DENIED   │                                      │
+│  │ Projector CAPTCHA│   └─────────────┘                                      │
+│  └───────┬────────┘                                                         │
+│   Pass   │   Fail                                                           │
+│   ┌──────┼──────────┐                                                       │
+│   ▼      │          ▼                                                       │
+│ ┌────────────────┐  ┌─────────────┐                                         │
+│ │ ✅ Generate    │  │ ❌ DENIED   │                                         │
+│ │  ATOM Token    │  └─────────────┘                                         │
+│ └───────┬────────┘                                                          │
+│         │                                                                   │
+│         ▼                                                                   │
+│ ┌────────────────────┐                                                      │
+│ │ Grant Console      │                                                      │
+│ │    Access          │                                                      │
+│ └────────────────────┘                                                      │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-Legend
+**Legend**
 - Auth/safety: scopes, allow-lists, bearer/HMAC verification, requestId, rate limits.
 - Validation: Ajv schemas + SHA256 hashes for bump/context; size/timeout bounds for wave CLI.
 - Mounts: SpiralSafe checkout default ../SpiralSafe; writes confined to .atom-trail/.
 - External edges: only enabled when corresponding env tokens/allow-lists exist; deploy stays off by default.
+
 ## Features
 
 This MCP server provides the following tools:
@@ -190,44 +255,63 @@ This MCP server provides the following tools:
 
 ### Coherence Analysis Pipeline
 
-```mermaid
-flowchart TD
-    A[Input Text] --> B[Tokenization]
-    B --> C[Semantic Vector Embedding]
-    C --> D[Compute Metrics]
-
-    D --> E[Curl Analysis<br/>Repetition Detection]
-    D --> F[Divergence Analysis<br/>Expansion Detection]
-    D --> G[Potential Analysis<br/>Undeveloped Ideas]
-
-    E --> H{Curl < 0.15?}
-    F --> I{Divergence < 0.35?}
-    G --> J{Potential > 0.30?}
-
-    H -->|Yes| K[✅ Low Repetition]
-    H -->|No| L[⚠️ High Repetition]
-
-    I -->|Yes| M[✅ Focused]
-    I -->|No| N[⚠️ Too Scattered]
-
-    J -->|Yes| O[✅ Room to Grow]
-    J -->|No| P[⚠️ Over-Developed]
-
-    K --> Q[Coherence Score]
-    L --> Q
-    M --> Q
-    N --> Q
-    O --> Q
-    P --> Q
-
-    Q --> R{Score >= 0.70?}
-    R -->|Yes| S[✅ COHERENT]
-    R -->|No| T[❌ INCOHERENT]
-
-    style A fill:#60a5fa,stroke:#3b82f6,stroke-width:2px
-    style S fill:#4ade80,stroke:#22c55e,stroke-width:3px
-    style T fill:#ef4444,stroke:#dc2626,stroke-width:3px
-    style Q fill:#a78bfa,stroke:#8b5cf6,stroke-width:3px
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      WAVE Coherence Analysis Pipeline                       │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│                         ┌─────────────────┐                                 │
+│                         │   Input Text    │                                 │
+│                         └────────┬────────┘                                 │
+│                                  │                                          │
+│                                  ▼                                          │
+│                         ┌─────────────────┐                                 │
+│                         │  Tokenization   │                                 │
+│                         └────────┬────────┘                                 │
+│                                  │                                          │
+│                                  ▼                                          │
+│                    ┌──────────────────────────┐                             │
+│                    │ Semantic Vector Embedding │                             │
+│                    └─────────────┬────────────┘                             │
+│                                  │                                          │
+│                                  ▼                                          │
+│                       ┌──────────────────┐                                  │
+│                       │  Compute Metrics │                                  │
+│                       └─────────┬────────┘                                  │
+│              ┌──────────────────┼──────────────────┐                        │
+│              │                  │                  │                        │
+│              ▼                  ▼                  ▼                        │
+│   ┌──────────────────┐ ┌─────────────────┐ ┌────────────────┐               │
+│   │  Curl Analysis   │ │   Divergence    │ │   Potential    │               │
+│   │   Repetition     │ │    Expansion    │ │ Undeveloped    │               │
+│   └────────┬─────────┘ └───────┬─────────┘ └───────┬────────┘               │
+│            │                   │                   │                        │
+│            ▼                   ▼                   ▼                        │
+│    ┌───────────────┐   ┌───────────────┐   ┌───────────────┐                │
+│    │ Curl < 0.15?  │   │ Div < 0.35?   │   │ Pot > 0.30?   │                │
+│    └───────┬───────┘   └───────┬───────┘   └───────┬───────┘                │
+│            │                   │                   │                        │
+│    Yes: ✅ Low Rep     Yes: ✅ Focused     Yes: ✅ Room to Grow              │
+│    No:  ⚠️ High Rep    No:  ⚠️ Scattered   No:  ⚠️ Over-Dev                  │
+│            │                   │                   │                        │
+│            └───────────────────┼───────────────────┘                        │
+│                                │                                            │
+│                                ▼                                            │
+│                       ┌────────────────┐                                    │
+│                       │ Coherence Score │                                    │
+│                       └───────┬────────┘                                    │
+│                               │                                             │
+│                               ▼                                             │
+│                      ┌─────────────────┐                                    │
+│                      │ Score >= 0.70?  │                                    │
+│                      └────────┬────────┘                                    │
+│                   ┌───────────┴───────────┐                                 │
+│                   │                       │                                 │
+│                   ▼                       ▼                                 │
+│          ┌─────────────────┐     ┌─────────────────┐                        │
+│          │  ✅ COHERENT    │     │  ❌ INCOHERENT  │                        │
+│          └─────────────────┘     └─────────────────┘                        │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Context & Tracking
@@ -236,77 +320,75 @@ flowchart TD
 
 ### ATOM Session Lifecycle
 
-```mermaid
-stateDiagram-v2
-    [*] --> Pending: Create ATOM
-
-    Pending --> InProgress: Start execution
-    Pending --> Cancelled: Cancel before start
-
-    InProgress --> Blocked: Dependency not ready
-    InProgress --> Failed: Error occurred
-    InProgress --> Completed: Success
-
-    Blocked --> InProgress: Dependency resolved
-    Blocked --> Failed: Timeout
-
-    Completed --> Verified: Verification passed
-    Completed --> Failed: Verification failed
-
-    Failed --> Pending: Retry
-    Failed --> [*]: Abandon
-
-    Verified --> [*]: Archive
-    Cancelled --> [*]: Archive
-
-    note right of Pending
-        Created with dependencies
-        Waiting to start
-    end note
-
-    note right of InProgress
-        Actively executing
-        Can be blocked by deps
-    end note
-
-    note right of Verified
-        Final success state
-        Ready for archival
-    end note
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         ATOM Session Lifecycle                              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│        [*] ─────────────────► Pending ─────────────────► Cancelled ──► [*] │
+│                               (Create)  (Cancel)                            │
+│                                  │                                          │
+│                                  │ Start                                    │
+│                                  ▼                                          │
+│                            InProgress                                       │
+│                             │   │   │                                       │
+│               Dependency ◄──┘   │   └──► Error                              │
+│               not ready         │                                           │
+│                    │            │            │                              │
+│                    ▼            │            ▼                              │
+│                 Blocked         │         Failed                            │
+│                    │            │           │ │                             │
+│         Resolved ──┘            │    Retry──┘ └──► [*]                      │
+│                                 │    (to Pending)   (Abandon)               │
+│                                 │                                           │
+│                                 ▼ Success                                   │
+│                             Completed                                       │
+│                                 │                                           │
+│                    ┌────────────┴────────────┐                              │
+│           Verify   │                         │ Verify                       │
+│           Pass     ▼                         ▼ Fail                         │
+│                Verified                   Failed                            │
+│                    │                                                        │
+│                    ▼                                                        │
+│                  [*] (Archive)                                              │
+│                                                                             │
+│  Notes:                                                                     │
+│  • Pending: Created with dependencies, waiting to start                     │
+│  • InProgress: Actively executing, can be blocked by deps                   │
+│  • Verified: Final success state, ready for archival                        │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ### BUMP Marker State Flow
 
-```mermaid
-stateDiagram-v2
-    [*] --> Created: New BUMP
-
-    Created --> Pending: Awaiting handoff
-
-    Pending --> Acknowledged: Receiver confirms
-    Pending --> Expired: Timeout
-
-    Acknowledged --> InTransit: Transfer started
-
-    InTransit --> Completed: Handoff success
-    InTransit --> Failed: Transfer error
-
-    Completed --> Verified: Both parties confirm
-    Failed --> Retry: Attempt again
-    Retry --> InTransit: Retransmit
-
-    Verified --> [*]: Archived
-    Expired --> [*]: Cleanup
-
-    note right of Created
-        BUMP created for
-        cross-platform handoff
-    end note
-
-    note right of Completed
-        Data transferred
-        Awaiting verification
-    end note
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          BUMP Marker State Flow                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│     [*] ────► Created ────► Pending ────► Acknowledged ────► InTransit     │
+│              (New BUMP)    (Awaiting     (Receiver           (Transfer      │
+│                            handoff)      confirms)           started)       │
+│                               │                                 │           │
+│                               │ Timeout                 Success │ Error     │
+│                               ▼                                 │   │       │
+│                            Expired                              ▼   ▼       │
+│                               │                          Completed Failed   │
+│                               ▼                              │       │      │
+│                             [*]                              │   Retry      │
+│                           (Cleanup)                          │     │        │
+│                                                              │     └──►     │
+│                                          Both parties ──►    ▼    InTransit │
+│                                                          Verified           │
+│                                                              │              │
+│                                                              ▼              │
+│                                                            [*]              │
+│                                                          (Archived)         │
+│                                                                             │
+│  Notes:                                                                     │
+│  • Created: BUMP created for cross-platform handoff                         │
+│  • Completed: Data transferred, awaiting verification                       │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Gate Transitions
@@ -315,49 +397,63 @@ stateDiagram-v2
 
 ### Quantum Gate Application Flow
 
-```mermaid
-flowchart TD
-    A[QASm Program Input] --> B[Parse Instruction]
-
-    B --> C{Gate Type}
-
-    C -->|Single-Qubit| D[H, X, Y, Z, Phase]
-    C -->|Two-Qubit| E[CNOT, SWAP]
-    C -->|Three-Qubit| F[Toffoli, Fredkin]
-
-    D --> G[Fetch Qubit State]
-    E --> H[Fetch Two Qubit States]
-    F --> I[Fetch Three Qubit States]
-
-    G --> J[Apply Gate Matrix]
-    H --> K[Apply CNOT/SWAP Matrix]
-    I --> L[Apply Toffoli/Fredkin Matrix]
-
-    J --> M[Update Qubit State]
-    K --> N[Update Entangled States]
-    L --> O[Update Three Qubits]
-
-    M --> P{Entangled?}
-    N --> Q[Propagate Entanglement]
-    O --> Q
-
-    P -->|Yes| Q
-    P -->|No| R[Next Instruction]
-
-    Q --> R
-
-    R --> S{More Instructions?}
-    S -->|Yes| B
-    S -->|No| T[Measurement Phase]
-
-    T --> U[Collapse Superposition]
-    U --> V[Return Classical Bits]
-
-    style A fill:#60a5fa,stroke:#3b82f6,stroke-width:2px
-    style J fill:#a78bfa,stroke:#8b5cf6,stroke-width:2px
-    style K fill:#a78bfa,stroke:#8b5cf6,stroke-width:2px
-    style L fill:#a78bfa,stroke:#8b5cf6,stroke-width:2px
-    style V fill:#4ade80,stroke:#22c55e,stroke-width:3px
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      Quantum Gate Application Flow                          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│                       ┌─────────────────────┐                               │
+│                       │  QASm Program Input │                               │
+│                       └──────────┬──────────┘                               │
+│                                  │                                          │
+│                                  ▼                                          │
+│              ┌───────────────────────────────────────┐                      │
+│      ┌──────►│         Parse Instruction             │◄────────┐            │
+│      │       └──────────────────┬────────────────────┘         │            │
+│      │                          │                              │            │
+│      │                          ▼                              │ More       │
+│      │                    ┌───────────┐                        │ Instructions│
+│      │                    │ Gate Type │                        │            │
+│      │                    └─────┬─────┘                        │            │
+│      │         ┌────────────────┼────────────────┐             │            │
+│      │         │                │                │             │            │
+│      │         ▼                ▼                ▼             │            │
+│      │   Single-Qubit      Two-Qubit       Three-Qubit         │            │
+│      │   H, X, Y, Z,       CNOT, SWAP      Toffoli,            │            │
+│      │   Phase                             Fredkin             │            │
+│      │         │                │                │             │            │
+│      │         ▼                ▼                ▼             │            │
+│      │   Fetch State      Fetch States     Fetch States        │            │
+│      │         │                │                │             │            │
+│      │         ▼                ▼                ▼             │            │
+│      │   Apply Gate       Apply Matrix     Apply Matrix        │            │
+│      │   Matrix                                                │            │
+│      │         │                │                │             │            │
+│      │         ▼                ▼                ▼             │            │
+│      │   Update State ──►  Propagate Entanglement  ◄──         │            │
+│      │                             │                           │            │
+│      │                             ▼                           │            │
+│      │                    Next Instruction ────────────────────┘            │
+│      │                             │                                        │
+│      │                             │ No more                                │
+│      │                             ▼                                        │
+│      │                    ┌────────────────┐                                │
+│      │                    │  Measurement   │                                │
+│      │                    │     Phase      │                                │
+│      │                    └───────┬────────┘                                │
+│      │                            │                                         │
+│      │                            ▼                                         │
+│      │                    ┌────────────────┐                                │
+│      │                    │    Collapse    │                                │
+│      │                    │ Superposition  │                                │
+│      │                    └───────┬────────┘                                │
+│      │                            │                                         │
+│      │                            ▼                                         │
+│      │                    ┌────────────────┐                                │
+│      │                    │ Return Classic │                                │
+│      │                    │     Bits       │                                │
+│      │                    └────────────────┘                                │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -366,42 +462,73 @@ flowchart TD
 
 ### Request Flow with Security Layers
 
-```mermaid
-flowchart TD
-    A[Client Request] --> B{Rate Limit Check}
-
-    B -->|Exceeded| C1[❌ 429 Too Many Requests]
-    B -->|OK| D{Endpoint Type}
-
-    D -->|Read| E[✅ Allow Public Access]
-    D -->|Write| F{API Key Present?}
-
-    F -->|No| G1[❌ 401 Unauthorized]
-    F -->|Yes| H{Valid API Key?}
-
-    H -->|No| I1[❌ 403 Forbidden<br/>Log to D1]
-    H -->|Yes| J[✅ Authenticated]
-
-    J --> K{CORS Check}
-    K -->|Fail| L1[❌ CORS Error]
-    K -->|Pass| M[Execute Handler]
-
-    M --> N[Log Request to KV]
-    M --> O{Error Occurred?}
-
-    O -->|Yes| P[Return Error Response]
-    O -->|No| Q[Return Success Response]
-
-    P --> R[Log to D1 if Auth Error]
-
-    style A fill:#60a5fa,stroke:#3b82f6,stroke-width:2px
-    style J fill:#4ade80,stroke:#22c55e,stroke-width:3px
-    style C1 fill:#ef4444,stroke:#dc2626,stroke-width:2px
-    style G1 fill:#ef4444,stroke:#dc2626,stroke-width:2px
-    style I1 fill:#ef4444,stroke:#dc2626,stroke-width:2px
-    style L1 fill:#ef4444,stroke:#dc2626,stroke-width:2px
-    style Q fill:#34d399,stroke:#10b981,stroke-width:2px
 ```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    API Request Flow with Security Layers                    │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│                        ┌─────────────────┐                                  │
+│                        │ Client Request  │                                  │
+│                        └────────┬────────┘                                  │
+│                                 │                                           │
+│                                 ▼                                           │
+│                       ┌─────────────────┐                                   │
+│                       │ Rate Limit Check│                                   │
+│                       └────────┬────────┘                                   │
+│                    ┌───────────┴───────────┐                                │
+│                    │                       │                                │
+│             Exceeded                      OK                                │
+│                    │                       │                                │
+│                    ▼                       ▼                                │
+│     ┌──────────────────────┐     ┌─────────────────┐                        │
+│     │ ❌ 429 Too Many      │     │  Endpoint Type  │                        │
+│     │    Requests          │     └────────┬────────┘                        │
+│     └──────────────────────┘   ┌──────────┴──────────┐                      │
+│                                │                     │                      │
+│                              Read                  Write                    │
+│                                │                     │                      │
+│                                ▼                     ▼                      │
+│                     ┌────────────────┐     ┌─────────────────┐              │
+│                     │ ✅ Allow Public│     │ API Key Present?│              │
+│                     │    Access      │     └────────┬────────┘              │
+│                     └────────────────┘          ┌───┴───┐                   │
+│                                                No       Yes                 │
+│                                                 │        │                  │
+│                                                 ▼        ▼                  │
+│                                   ┌─────────────────┐  ┌─────────────────┐  │
+│                                   │ ❌ 401          │  │ Valid API Key?  │  │
+│                                   │ Unauthorized    │  └────────┬────────┘  │
+│                                   └─────────────────┘       ┌───┴───┐       │
+│                                                            No       Yes     │
+│                                                             │        │      │
+│                                                             ▼        ▼      │
+│                                               ┌─────────────────┐  ┌─────────┐
+│                                               │ ❌ 403 Forbidden│  │Authed ✅│
+│                                               │ (Log to D1)     │  └────┬────┘
+│                                               └─────────────────┘       │    │
+│                                                                         ▼    │
+│                                                                    CORS Check │
+│                                                                    Fail │ Pass│
+│                                                    ┌───────────────────┘   │ │
+│                                                    ▼                       │ │
+│                                         ┌─────────────────┐                │ │
+│                                         │ ❌ CORS Error   │  Execute ◄─────┘ │
+│                                         └─────────────────┘  Handler        │
+│                                                                  │          │
+│                                                             Log to KV       │
+│                                                                  │          │
+│                                                    ┌─────────────┴──────┐   │
+│                                                    │                    │   │
+│                                                  Error              Success │
+│                                                    │                    │   │
+│                                                    ▼                    ▼   │
+│                                         ┌─────────────────┐  ┌────────────┐ │
+│                                         │  Error Response │  │✅ Success  │ │
+│                                         │  (Log auth errs)│  │  Response  │ │
+│                                         └─────────────────┘  └────────────┘ │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
 ### Documentation & Search
 - **`docs_search`** - Search across the SpiralSafe corpus with optional layer and kind filters
 
@@ -410,95 +537,108 @@ flowchart TD
 - **`ops_status`** - Get operational status via SpiralSafe API
 - **`ops_deploy`** - Deploy to environment with optional dry-run (guarded operation)
 
-```mermaid
-graph TD
-    A[User Authentication Request] --> B{Factor 1:<br/>Conversational<br/>Coherence}
-
-    B -->|Pass| C{Factor 2:<br/>LED Keycode<br/>Physical Presence}
-    B -->|Fail| X1[❌ Deny Access]
-
-    C -->|Pass| D{Factor 3:<br/>Projector CAPTCHA<br/>Visual Verification}
-    C -->|Fail| X2[❌ Deny Access]
-
-    D -->|Pass| E[✅ Generate ATOM Token]
-    D -->|Fail| X3[❌ Deny Access]
-
-    E --> F[Grant Console Access]
-
-    style A fill:#60a5fa,stroke:#3b82f6,stroke-width:2px
-    style B fill:#a78bfa,stroke:#8b5cf6,stroke-width:3px
-    style C fill:#fbbf24,stroke:#f59e0b,stroke-width:3px
-    style D fill:#f472b6,stroke:#ec4899,stroke-width:3px
-    style E fill:#4ade80,stroke:#22c55e,stroke-width:3px
-    style F fill:#34d399,stroke:#10b981,stroke-width:3px
-    style X1 fill:#ef4444,stroke:#dc2626,stroke-width:2px
-    style X2 fill:#ef4444,stroke:#dc2626,stroke-width:2px
-    style X3 fill:#ef4444,stroke:#dc2626,stroke-width:2px
-```
-
 ### Rate Limiting Algorithm
 
-```mermaid
-sequenceDiagram
-    participant Client
-    participant Worker as Cloudflare Worker
-    participant KV as KV Store
-
-    Client->>Worker: API Request
-    Worker->>KV: GET ratelimit:endpoint:IP
-
-    alt First Request
-        KV->>Worker: null (no data)
-        Worker->>Worker: Create [timestamp]
-        Worker->>KV: PUT [timestamp] (TTL: 60s)
-        Worker->>Client: ✅ 200 OK (100 remaining)
-    else Within Window
-        KV->>Worker: [t1, t2, t3]
-        Worker->>Worker: Filter expired timestamps
-        Worker->>Worker: Add current timestamp
-
-        alt Under Limit (< 100 requests)
-            Worker->>KV: PUT updated array
-            Worker->>Client: ✅ 200 OK (97 remaining)
-        else Over Limit (>= 100 requests)
-            Worker->>Client: ❌ 429 Too Many Requests
-            Worker->>KV: Log failed attempt
-        end
-    end
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         Rate Limiting Algorithm                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│   Client          Cloudflare Worker                 KV Store                │
+│      │                   │                             │                    │
+│      │  API Request      │                             │                    │
+│      │──────────────────►│                             │                    │
+│      │                   │  GET ratelimit:endpoint:IP  │                    │
+│      │                   │────────────────────────────►│                    │
+│      │                   │                             │                    │
+│      │                   │◄────────────────────────────│                    │
+│      │                   │                             │                    │
+│  ┌───┴───────────────────┴─────────────────────────────┴───────────────┐    │
+│  │  FIRST REQUEST (null data):                                          │   │
+│  │    Worker: Create [timestamp]                                        │   │
+│  │    Worker ──► KV: PUT [timestamp] (TTL: 60s)                         │   │
+│  │    Worker ──► Client: ✅ 200 OK (100 remaining)                      │   │
+│  ├──────────────────────────────────────────────────────────────────────┤   │
+│  │  WITHIN WINDOW ([t1, t2, t3] received):                              │   │
+│  │    Worker: Filter expired timestamps                                 │   │
+│  │    Worker: Add current timestamp                                     │   │
+│  │                                                                      │   │
+│  │    IF Under Limit (< 100 requests):                                  │   │
+│  │      Worker ──► KV: PUT updated array                                │   │
+│  │      Worker ──► Client: ✅ 200 OK (97 remaining)                     │   │
+│  │                                                                      │   │
+│  │    IF Over Limit (>= 100 requests):                                  │   │
+│  │      Worker ──► Client: ❌ 429 Too Many Requests                     │   │
+│  │      Worker ──► KV: Log failed attempt                               │   │
+│  └──────────────────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Audit Trail Data Flow
 
-```mermaid
-graph TD
-    A[API Request] --> B{Auth Success?}
-
-    B -->|Yes| C[Log to KV<br/>30-day TTL]
-    B -->|No| D[Log to D1<br/>Permanent]
-
-    C --> E[Request Details:<br/>Timestamp, Endpoint, IP, User-Agent]
-    D --> F[Failure Details:<br/>IP, Failed Key, Timestamp, Endpoint]
-
-    E --> G[KV Namespace<br/>spiralsafe-logs]
-    F --> H[D1 Table<br/>awi_audit]
-
-    H --> I[Security Analysis]
-    I --> J{Pattern Detected?}
-
-    J -->|Brute Force| K[Alert: IP Blocking]
-    J -->|Key Leak| L[Alert: Key Rotation]
-    J -->|Normal| M[Continue Monitoring]
-
-    style A fill:#60a5fa,stroke:#3b82f6,stroke-width:2px
-    style B fill:#a78bfa,stroke:#8b5cf6,stroke-width:2px
-    style D fill:#ef4444,stroke:#dc2626,stroke-width:2px
-    style K fill:#fbbf24,stroke:#f59e0b,stroke-width:3px
-    style L fill:#fbbf24,stroke:#f59e0b,stroke-width:3px
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          Audit Trail Data Flow                              │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│                         ┌──────────────┐                                    │
+│                         │ API Request  │                                    │
+│                         └──────┬───────┘                                    │
+│                                │                                            │
+│                                ▼                                            │
+│                       ┌────────────────┐                                    │
+│                       │ Auth Success?  │                                    │
+│                       └───────┬────────┘                                    │
+│                        ┌──────┴──────┐                                      │
+│                        │             │                                      │
+│                       Yes           No                                      │
+│                        │             │                                      │
+│                        ▼             ▼                                      │
+│            ┌────────────────┐  ┌────────────────┐                           │
+│            │ Log to KV      │  │ Log to D1      │                           │
+│            │ (30-day TTL)   │  │ (Permanent)    │                           │
+│            └───────┬────────┘  └───────┬────────┘                           │
+│                    │                   │                                    │
+│                    ▼                   ▼                                    │
+│  ┌──────────────────────────┐  ┌──────────────────────────┐                 │
+│  │ Request Details:         │  │ Failure Details:         │                 │
+│  │ • Timestamp              │  │ • IP Address             │                 │
+│  │ • Endpoint               │  │ • Failed Key             │                 │
+│  │ • IP Address             │  │ • Timestamp              │                 │
+│  │ • User-Agent             │  │ • Endpoint               │                 │
+│  └───────────┬──────────────┘  └───────────┬──────────────┘                 │
+│              │                             │                                │
+│              ▼                             ▼                                │
+│   ┌───────────────────┐          ┌─────────────────┐                        │
+│   │ KV Namespace      │          │ D1 Table        │                        │
+│   │ spiralsafe-logs   │          │ awi_audit       │                        │
+│   └───────────────────┘          └────────┬────────┘                        │
+│                                           │                                 │
+│                                           ▼                                 │
+│                                 ┌─────────────────────┐                     │
+│                                 │  Security Analysis  │                     │
+│                                 └──────────┬──────────┘                     │
+│                                            │                                │
+│                                            ▼                                │
+│                                   ┌────────────────┐                        │
+│                                   │Pattern Detected│                        │
+│                                   └───────┬────────┘                        │
+│                        ┌──────────────────┼──────────────────┐              │
+│                        │                  │                  │              │
+│                   Brute Force          Key Leak           Normal            │
+│                        │                  │                  │              │
+│                        ▼                  ▼                  ▼              │
+│              ┌─────────────────┐ ┌─────────────────┐ ┌───────────────┐      │
+│              │ ⚠️ Alert:       │ │ ⚠️ Alert:       │ │ Continue      │      │
+│              │ IP Blocking     │ │ Key Rotation    │ │ Monitoring    │      │
+│              └─────────────────┘ └─────────────────┘ └───────────────┘      │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Scripts & Automation
 - **`scripts_run`** - Run a script from the strict allow-list with arguments
   - Allowed scripts: `backup`, `validate`, `sync`, `report`, `cleanup`
+
 ## ⚛️ Quantum Computer Architecture
 
 ### 72-Qubit System Overview
@@ -708,7 +848,7 @@ npm run build
 ### Running the Server
 
 ```bash
-npx coherence-mcp
+npx @hopeandsauced/coherence-mcp
 ```
 
 Or in your MCP client configuration:
@@ -718,7 +858,7 @@ Or in your MCP client configuration:
   "mcpServers": {
     "coherence": {
       "command": "npx",
-      "args": ["-y", "coherence-mcp"]
+      "args": ["-y", "@hopeandsauced/coherence-mcp"]
     }
   }
 }
@@ -871,6 +1011,45 @@ Or in your MCP client configuration:
 - **ATOM Trail**: Comprehensive decision tracking with file associations
 - **Gate Transitions**: Validated phase transitions with precondition checks
 
+---
+
+## 🧩 Key Components
+
+| Layer | Components | Purpose |
+|---|---|---|
+| **Analysis** | `wave_analyze`, `bump_validate` | Coherence detection & handoff validation |
+| **Tracking** | `atom_track`, `context_pack` | Decision trails & context bundling |
+| **Gates** | `gate_intention_to_execution`, `gate_execution_to_learning` | Phase transitions |
+| **Ops** | `ops_health`, `ops_status`, `ops_deploy` | System operations |
+| **Search** | `docs_search` | SpiralSafe corpus search |
+| **Media** | `discord_post`, `mc_execCommand`, `mc_query` | Integration pipelines |
+
+---
+
+## 🔗 The SpiralSafe Ecosystem
+
+This MCP server is part of the SpiralSafe ecosystem:
+
+- **[SpiralSafe](https://github.com/toolate28/SpiralSafe)** — Documentation and coordination hub
+- **[coherence-mcp](https://github.com/toolate28/coherence-mcp)** — This repository. MCP server for coherence primitives.
+- **[wave-toolkit](https://github.com/toolate28/wave-toolkit)** — Coherence detection tools
+
+---
+
+## 🤝 Attribution
+
+This work emerges from **Hope&&Sauced** collaboration—human-AI partnership where both contributions are substantive and neither party could have produced the result alone.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
+
+---
+
 ## License
 
 MIT
+
+---
+
+*~ Hope&&Sauced*
+
+✦ *The Evenstar Guides Us* ✦

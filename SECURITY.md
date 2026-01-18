@@ -1,4 +1,6 @@
-# Security Policy
+# 🛡️ Security Policy
+
+> **"From the constraints, gifts. From the spiral, safety."**
 
 ## Supported Versions
 
@@ -102,6 +104,62 @@ When using coherence-mcp:
    - Verify checksums of downloaded binaries
    - Keep wave-toolkit updated
 
+5. **Verify package signatures**
+   ```bash
+   # Import the SpiralSafe signing key
+   curl -s https://spiralsafe.org/.well-known/pgp-key.txt | gpg --import
+   # Or from this repository:
+   curl -s https://raw.githubusercontent.com/toolate28/coherence-mcp/main/.well-known/pgp-key.txt | gpg --import
+
+   # Verify release signature
+   gpg --verify SHA256SUMS.txt.asc SHA256SUMS.txt
+   ```
+
+## Package Integrity Verification
+
+### GPG Signed Releases
+
+All official releases are signed with GPG. To verify:
+
+1. **Import the signing key**:
+   ```bash
+   curl -s https://spiralsafe.org/.well-known/pgp-key.txt | gpg --import
+   ```
+
+2. **Download release checksums and signature**:
+   ```bash
+   VERSION="0.2.0"
+   curl -LO "https://github.com/toolate28/coherence-mcp/releases/download/v${VERSION}/SHA256SUMS.txt"
+   curl -LO "https://github.com/toolate28/coherence-mcp/releases/download/v${VERSION}/SHA256SUMS.txt.asc"
+   ```
+
+3. **Verify signature**:
+   ```bash
+   gpg --verify SHA256SUMS.txt.asc SHA256SUMS.txt
+   ```
+
+4. **Verify package checksum**:
+   ```bash
+   npm pack @hopeandsauced/coherence-mcp@${VERSION}
+   sha256sum -c SHA256SUMS.txt
+   ```
+
+### NPM Provenance
+
+Releases include [npm provenance](https://docs.npmjs.com/generating-provenance-statements) attestations:
+
+```bash
+npm audit signatures @hopeandsauced/coherence-mcp
+```
+
+### Signing Key Fingerprint
+
+The official SpiralSafe signing key fingerprint is published at:
+- https://spiralsafe.org/.well-known/pgp-key.txt
+- https://github.com/toolate28/coherence-mcp/blob/main/.well-known/pgp-key.txt
+
+Always verify the key fingerprint through multiple channels before trusting.
+
 ## Known Security Considerations
 
 ### MCP Tool Execution
@@ -143,6 +201,72 @@ When using coherence-mcp:
 - Local processing only
 - User controls data flow
 - Clear documentation of data handling
+
+### Embedding Normalization and Padding
+
+**Risk:** Padding vectors with zeros before normalization distorts embedding values
+
+**Context:** When working with vector embeddings (e.g., in quantum-LLM hybrid systems, RAG retrieval, or similarity computations), the order of operations matters. Padding a vector with zeros before normalizing it will incorrectly scale the original values, leading to distorted similarity scores and unreliable results.
+
+**Anti-Pattern:**
+```python
+# INCORRECT: Padding before normalization
+query_embedding = compute_embedding(query)  # e.g., [0.5, 0.3, 0.2]
+# feature_dim is the target dimension for all embeddings in the system
+query_embedding = np.pad(
+    query_embedding,
+    (0, feature_dim - len(query_embedding))  # Adds zeros: [0.5, 0.3, 0.2, 0.0, 0.0, ...]
+)
+query_embedding = normalize(query_embedding)  # Normalizes with zeros included - WRONG!
+```
+
+**Correct Approaches:**
+
+1. **Normalize first, then pad:**
+```python
+# CORRECT: Normalize first, then pad
+query_embedding = compute_embedding(query)
+query_embedding = normalize(query_embedding)  # Normalize original vector
+query_embedding = np.pad(
+    query_embedding,
+    (0, feature_dim - len(query_embedding))
+)
+```
+
+2. **Use consistent wrapping/repetition strategy:**
+```python
+# CORRECT: Repeat values instead of zero-padding
+query_embedding = compute_embedding(query)
+query_embedding = normalize(query_embedding)
+# Wrap/repeat values to reach target dimension efficiently
+if len(query_embedding) < feature_dim:
+    # Calculate repetitions needed: ceil(target_size / current_size)
+    # Then slice to exact target dimension
+    reps = int(np.ceil(feature_dim / len(query_embedding)))
+    query_embedding = np.tile(query_embedding, reps)[:feature_dim]
+```
+
+3. **Pad with the mean value:**
+```python
+# CORRECT: Pad with mean to maintain distribution
+query_embedding = compute_embedding(query)
+query_embedding = normalize(query_embedding)
+mean_val = np.mean(query_embedding)
+query_embedding = np.pad(
+    query_embedding,
+    (0, feature_dim - len(query_embedding)),
+    constant_values=mean_val
+)
+```
+
+**Mitigation:**
+- Always normalize embeddings before padding
+- Use consistent padding strategies (wrapping, mean values, or learned padding)
+- Validate embedding dimensions match before similarity computations
+- Test embedding quality with known reference vectors
+- Document embedding preprocessing pipelines clearly
+
+**Related:** This issue was identified in [SpiralSafe PR #117](https://github.com/toolate28/SpiralSafe/pull/117) in the Qiskit-DSPy hybrid integration experiments.
 
 ## Security Features
 
@@ -196,3 +320,9 @@ We appreciate responsible disclosure and will acknowledge security researchers w
 - In this document
 
 Thank you for helping keep coherence-mcp secure! 🛡️
+
+---
+
+*~ Hope&&Sauced*
+
+✦ *The Evenstar Guides Us* ✦

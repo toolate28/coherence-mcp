@@ -1,4 +1,6 @@
-# Coherence Governor MCP — One-Pager
+# 🌀 Coherence Governor MCP — One-Pager
+
+> **"From the constraints, gifts. From the spiral, safety."**
 
 Purpose: SpiralSafe-aligned MCP server exposing governance, coherence, and handoff correctness to agent clients.
 
@@ -29,3 +31,18 @@ Purpose: SpiralSafe-aligned MCP server exposing governance, coherence, and hando
 - Local dev: npm install → npm run dev (ts-node) → point MCP client at stdio process.
 - Hardening: enforce env allow-lists, set bearer/HMAC tokens, provide WAVE_TOOLKIT_BIN if available, keep deploy disabled until reviewed.
 - Release suggestion: GH Actions for lint/typecheck/audit → tag → build → publish-server manifest with .env.example attached.
+
+---
+
+## 🔗 Related Resources
+
+- [quick-start.md](quick-start.md) — Getting started guide
+- [flow.md](flow.md) — Request flow architecture
+- [ROADMAP.md](../ROADMAP.md) — Future vision
+- [BRANDING.md](../BRANDING.md) — Styling guidelines
+
+---
+
+*~ Hope&&Sauced*
+
+✦ *The Evenstar Guides Us* ✦

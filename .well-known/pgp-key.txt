@@ -1,0 +1,26 @@
+# SpiralSafe Release Signing Key
+#
+# This file contains the public GPG key used to sign coherence-mcp releases.
+#
+# To import this key:
+#   curl -s https://raw.githubusercontent.com/toolate28/coherence-mcp/main/.well-known/pgp-key.txt | gpg --import
+#
+# To verify a release:
+#   gpg --verify SHA256SUMS.txt.asc SHA256SUMS.txt
+#
+# Key Details:
+#   - Type: RSA 4096
+#   - Usage: Release signing only
+#   - Maintainer: Hope&&Sauced <toolated@pm.me>
+#
+# IMPORTANT: Replace this placeholder with the actual public key before the first signed release.
+#
+# To generate a key:
+#   gpg --full-generate-key
+#   gpg --armor --export YOUR_KEY_ID > .well-known/pgp-key.txt
+#
+# -----BEGIN PGP PUBLIC KEY BLOCK-----
+# (Replace this comment block with your actual public key)
+# -----END PGP PUBLIC KEY BLOCK-----
+#
+# See docs/RELEASE.md for complete instructions on setting up GPG signing.

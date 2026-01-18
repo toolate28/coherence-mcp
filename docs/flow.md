@@ -1,4 +1,6 @@
-# Coherence Governor MCP – Request Flow
+# 🔀 Coherence Governor MCP – Request Flow
+
+> **"From the constraints, gifts. From the spiral, safety."**
 
 This draft maps how the MCP server starts, authenticates, and serves requests over stdio.
 
@@ -14,59 +16,66 @@ This draft maps how the MCP server starts, authenticates, and serves requests ov
 ## Request flow (stdio)
 ```mermaid
 flowchart TD
-  A[Client (MCP)] -->|JSON-RPC over stdio| B(StdioServerTransport)
+  A[["🖥️ Client (MCP)"]] -->|"📡 JSON-RPC over stdio"| B("💬 StdioServerTransport")
   
-  subgraph initialization[" Initialization Phase "]
-    C[Server init handshake]
-    D[Advertise capabilities]
+  subgraph initialization["🚀 Initialization Phase"]
+    direction TB
+    C["🤝 Server init handshake"]
+    D["📢 Advertise capabilities"]
   end
   
-  subgraph handlers[" Request Handlers "]
-    E[Resources handler]
-    F[Tools handler]
+  subgraph handlers["⚙️ Request Handlers"]
+    direction TB
+    E["📁 Resources handler"]
+    F["🛠️ Tools handler"]
   end
   
-  subgraph routing[" Tool Routing & Security "]
-    G[Tool router]
-    H{Rate limit}
-    I[Auth context<br/>bearer/HMAC to scopes]
-    J[Lookup tool]
+  subgraph routing["🔀 Tool Routing & Security"]
+    direction TB
+    G["🎯 Tool router"]
+    H{"⏱️ Rate limit"}
+    I["🔐 Auth context<br/>bearer/HMAC to scopes"]
+    J["🔍 Lookup tool"]
   end
   
-  subgraph execution[" Execution Layer "]
-    K[Execute tool handler]
-    L[Adapters / IO]
+  subgraph execution["⚡ Execution Layer"]
+    direction TB
+    K["▶️ Execute tool handler"]
+    L["🔌 Adapters / IO"]
   end
   
-  subgraph response[" Response & Audit "]
-    M[Result]
-    N[Audit log write]
-    O[Response to client]
+  subgraph response["✅ Response & Audit"]
+    direction TB
+    M["📊 Result"]
+    N["📝 Audit log write"]
+    O["📤 Response to client"]
   end
   
-  B --> C
-  C --> D
-  B -->|resources/list| E
-  B -->|tools/list| F
-  B -->|call_tool| G
-  G --> H
-  H -->|✓ allowed| I
-  I --> J
-  J --> K
-  K --> L
-  K --> M
-  M --> N
-  N --> O
+  B ==> C
+  C ==> D
+  B -.->|"resources/list"| E
+  B -.->|"tools/list"| F
+  B ==>|"call_tool"| G
+  G ==> H
+  H ==>|"✓ allowed"| I
+  H -.->|"✗ denied"| O
+  I ==> J
+  J ==> K
+  K ==> L
+  K ==> M
+  M ==> N
+  N ==> O
+  O ==> A
   
-  %% Styling
-  classDef clientStyle fill:#4A90E2,stroke:#2E5C8A,stroke-width:3px,color:#fff
-  classDef transportStyle fill:#50E3C2,stroke:#2E8B7F,stroke-width:2px,color:#000
-  classDef initStyle fill:#B8E986,stroke:#7CB342,stroke-width:2px,color:#000
-  classDef handlerStyle fill:#F5A623,stroke:#D68910,stroke-width:2px,color:#000
-  classDef securityStyle fill:#BD10E0,stroke:#8B0AA8,stroke-width:2px,color:#fff
-  classDef executionStyle fill:#FFD700,stroke:#DAA520,stroke-width:2px,color:#000
-  classDef auditStyle fill:#7ED321,stroke:#5FA319,stroke-width:2px,color:#000
-  classDef limitStyle fill:#F5365C,stroke:#C62828,stroke-width:2px,color:#fff
+  %% Enhanced Styling
+  classDef clientStyle fill:#2196F3,stroke:#0D47A1,stroke-width:4px,color:#fff,rx:15,ry:15
+  classDef transportStyle fill:#00BCD4,stroke:#00838F,stroke-width:3px,color:#000,rx:20,ry:20
+  classDef initStyle fill:#8BC34A,stroke:#558B2F,stroke-width:3px,color:#000,rx:10,ry:10
+  classDef handlerStyle fill:#FF9800,stroke:#E65100,stroke-width:3px,color:#fff,rx:10,ry:10
+  classDef securityStyle fill:#9C27B0,stroke:#4A148C,stroke-width:3px,color:#fff,rx:10,ry:10
+  classDef executionStyle fill:#FFC107,stroke:#F57F17,stroke-width:3px,color:#000,rx:10,ry:10
+  classDef auditStyle fill:#4CAF50,stroke:#1B5E20,stroke-width:3px,color:#fff,rx:10,ry:10
+  classDef limitStyle fill:#F44336,stroke:#B71C1C,stroke-width:3px,color:#fff
   
   class A clientStyle
   class B transportStyle
@@ -76,6 +85,23 @@ flowchart TD
   class H limitStyle
   class K,L executionStyle
   class M,N,O auditStyle
+  
+  %% Subgraph Styling
+  style initialization fill:#E8F5E9,stroke:#4CAF50,stroke-width:3px,color:#1B5E20
+  style handlers fill:#FFF3E0,stroke:#FF9800,stroke-width:3px,color:#E65100
+  style routing fill:#F3E5F5,stroke:#9C27B0,stroke-width:3px,color:#4A148C
+  style execution fill:#FFFDE7,stroke:#FFC107,stroke-width:3px,color:#F57F17
+  style response fill:#E8F5E9,stroke:#4CAF50,stroke-width:3px,color:#1B5E20
+  
+  %% Link Styling
+  linkStyle 0 stroke:#2196F3,stroke-width:3px
+  linkStyle 1,2 stroke:#8BC34A,stroke-width:3px
+  linkStyle 3,4 stroke:#FF9800,stroke-width:2px,stroke-dasharray:5
+  linkStyle 5,6,7 stroke:#9C27B0,stroke-width:3px
+  linkStyle 8 stroke:#F44336,stroke-width:2px,stroke-dasharray:5
+  linkStyle 9,10,11,12 stroke:#FFC107,stroke-width:3px
+  linkStyle 13,14 stroke:#4CAF50,stroke-width:3px
+  linkStyle 15 stroke:#2196F3,stroke-width:3px
 ```
 
 ## Sequence (call_tool happy path)
@@ -91,3 +117,17 @@ flowchart TD
 - SpiralSafe checkout path defaults to `../SpiralSafe` relative to repo root; override via env.
 - Mutating tools expect scopes per `config.auth.requiredScopes`; deploy is disabled by default.
 - Wave toolkit integration uses `WAVE_TOOLKIT_BIN` if available; otherwise falls back to heuristic.
+
+---
+
+## 🔗 Related Resources
+
+- [one-pager.md](one-pager.md) — Quick overview
+- [quick-start.md](quick-start.md) — Getting started
+- [data-flow.md](data-flow.md) — Data architecture
+
+---
+
+*~ Hope&&Sauced*
+
+✦ *The Evenstar Guides Us* ✦

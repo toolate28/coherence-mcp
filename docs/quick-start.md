@@ -1,4 +1,6 @@
-# Quick Start
+# 🚀 Quick Start
+
+> **"From the constraints, gifts. From the spiral, safety."**
 
 ## Prereqs
 - Node 18+; npm.
@@ -38,3 +40,17 @@ npm start
 ## Operational hints
 - Keep deploy and mutating tools behind scopes/allow-lists; verify audit logs for requestId and caller context.
 - Constrain external calls with timeouts/byte limits; avoid running without auth tokens in shared environments.
+
+---
+
+## 🔗 Related Resources
+
+- [one-pager.md](one-pager.md) — Quick overview
+- [flow.md](flow.md) — Request flow architecture
+- [../ROADMAP.md](../ROADMAP.md) — Future vision
+
+---
+
+*~ Hope&&Sauced*
+
+✦ *The Evenstar Guides Us* ✦
