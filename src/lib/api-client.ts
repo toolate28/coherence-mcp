@@ -1,23 +1,23 @@
 /**
- * API Client Module
- * 
- * Provides operational API functions for SpiralSafe:
- * - Health checks
- * - Status queries
- * - Deployment operations (with production safety guards)
+ * SpiralSafe API Client
+ *
+ * Connects to real SpiralSafe API endpoints for ops health, status, and deploy
+ * Base URL: https://api.spiralsafe.org
  */
 
-export interface HealthResponse {
-  status: string;
+export interface OpsHealthResponse {
+  status: 'healthy' | 'degraded' | 'down';
   components: {
-    api: string;
-    database: string;
-    cache: string;
+    api: 'up' | 'down';
+    database?: 'up' | 'down';
+    cache?: 'up' | 'down';
+    [key: string]: string | undefined;
   };
   timestamp: string;
+  responseTime?: number;
 }
 
-export interface StatusResponse {
+export interface OpsStatusResponse {
   environment: string;
   version: string;
   uptime: string;
@@ -25,68 +25,196 @@ export interface StatusResponse {
   timestamp: string;
 }
 
-export interface DeployResponse {
+export interface OpsDeployResponse {
   environment: string;
   dryRun: boolean;
-  status: string;
+  status: 'deployed' | 'dry-run-complete' | 'blocked' | 'failed';
   message?: string;
   timestamp: string;
 }
 
 /**
- * Check operational health status via SpiralSafe API
+ * Fetch with timeout
  */
-export async function checkOpsHealth(): Promise<HealthResponse> {
-  return {
-    status: "healthy",
-    components: {
-      api: "up",
-      database: "up",
-      cache: "up",
-    },
-    timestamp: new Date().toISOString(),
-  };
-}
+async function fetchWithTimeout(
+  url: string,
+  options: RequestInit = {},
+  timeout: number = 5000
+): Promise<Response> {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
 
-/**
- * Get operational status via SpiralSafe API
- */
-export async function getOpsStatus(): Promise<StatusResponse> {
-  return {
-    environment: "development",
-    version: "0.2.0",
-    uptime: "0d 0h 0m",
-    activeConnections: 0,
-    timestamp: new Date().toISOString(),
-  };
-}
-
-/**
- * Deploy to environment with optional dry-run
- * Production deployments require dry-run validation first for safety
- */
-export async function deployOps(env: string, dryRun: boolean = false): Promise<DeployResponse> {
-  const validEnvs = ["development", "staging", "production"];
-  
-  if (!validEnvs.includes(env)) {
-    throw new Error(`Invalid environment: ${env}. Must be one of: ${validEnvs.join(", ")}`);
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    });
+    clearTimeout(id);
+    return response;
+  } catch (error) {
+    clearTimeout(id);
+    throw error;
   }
-  
-  // Production deployments are guarded: they must be explicitly run as dry-run first for safety
-  if (env === "production" && !dryRun) {
+}
+
+/**
+ * Check operational health
+ */
+export async function checkOpsHealth(
+  baseUrl: string = 'https://api.spiralsafe.org'
+): Promise<OpsHealthResponse> {
+  const startTime = Date.now();
+
+  try {
+    const response = await fetchWithTimeout(`${baseUrl}/health`, {}, 5000);
+    const responseTime = Date.now() - startTime;
+
+    if (response.ok) {
+      const data = await response.json();
+      return {
+        status: data.status || 'healthy',
+        components: data.components || {
+          api: 'up',
+        },
+        timestamp: new Date().toISOString(),
+        responseTime,
+      };
+    } else {
+      // API responded but with error status
+      return {
+        status: 'degraded',
+        components: {
+          api: 'down',
+        },
+        timestamp: new Date().toISOString(),
+        responseTime,
+      };
+    }
+  } catch (error) {
+    // Network error or timeout
     return {
-      environment: env,
-      dryRun: false,
-      status: "blocked",
-      message: "Production deployment requires dry-run validation first. Run with dryRun=true to preview changes.",
+      status: 'down',
+      components: {
+        api: 'down',
+      },
       timestamp: new Date().toISOString(),
     };
   }
-  
-  return {
-    environment: env,
-    dryRun,
-    status: dryRun ? "dry-run-complete" : "deployed",
-    timestamp: new Date().toISOString(),
-  };
+}
+
+/**
+ * Get operational status
+ */
+export async function getOpsStatus(
+  baseUrl: string = 'https://api.spiralsafe.org'
+): Promise<OpsStatusResponse> {
+  try {
+    const response = await fetchWithTimeout(`${baseUrl}/status`, {}, 5000);
+
+    if (response.ok) {
+      const data = await response.json();
+      return {
+        environment: data.environment || 'unknown',
+        version: data.version || '0.0.0',
+        uptime: data.uptime || '0d 0h 0m',
+        activeConnections: data.activeConnections || 0,
+        timestamp: new Date().toISOString(),
+      };
+    } else {
+      // Return fallback status
+      return {
+        environment: 'unknown',
+        version: '0.0.0',
+        uptime: '0d 0h 0m',
+        activeConnections: 0,
+        timestamp: new Date().toISOString(),
+      };
+    }
+  } catch (error) {
+    // Return fallback status on error
+    return {
+      environment: 'offline',
+      version: '0.0.0',
+      uptime: '0d 0h 0m',
+      activeConnections: 0,
+      timestamp: new Date().toISOString(),
+    };
+  }
+}
+
+/**
+ * Deploy to environment
+ */
+export async function deployOps(
+  env: string,
+  dryRun: boolean,
+  baseUrl: string = 'https://api.spiralsafe.org'
+): Promise<OpsDeployResponse> {
+  const validEnvs = ['development', 'staging', 'production'];
+
+  if (!validEnvs.includes(env)) {
+    return {
+      environment: env,
+      dryRun,
+      status: 'failed',
+      message: `Invalid environment: ${env}. Must be one of: ${validEnvs.join(', ')}`,
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  // Production safety guard
+  if (env === 'production' && !dryRun) {
+    return {
+      environment: env,
+      dryRun: false,
+      status: 'blocked',
+      message:
+        'Production deployment requires dry-run validation first. Run with dryRun=true to preview changes.',
+      timestamp: new Date().toISOString(),
+    };
+  }
+
+  try {
+    const response = await fetchWithTimeout(
+      `${baseUrl}/deploy`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          environment: env,
+          dryRun,
+        }),
+      },
+      10000
+    );
+
+    if (response.ok) {
+      const data = await response.json();
+      return {
+        environment: env,
+        dryRun,
+        status: data.status || (dryRun ? 'dry-run-complete' : 'deployed'),
+        message: data.message,
+        timestamp: new Date().toISOString(),
+      };
+    } else {
+      return {
+        environment: env,
+        dryRun,
+        status: 'failed',
+        message: `Deploy failed with status ${response.status}`,
+        timestamp: new Date().toISOString(),
+      };
+    }
+  } catch (error) {
+    return {
+      environment: env,
+      dryRun,
+      status: 'failed',
+      message: error instanceof Error ? error.message : 'Network error',
+      timestamp: new Date().toISOString(),
+    };
+  }
 }

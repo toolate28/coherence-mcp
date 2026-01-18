@@ -19,9 +19,6 @@ import { promisify } from 'util';
 
 const execAsync = promisify(exec);
 
-// Date placeholder used in bump.md template validation
-const DATE_PLACEHOLDER = 'YYYYMMDD';
-
 export interface GateTransition {
   gate: string;
   from: string;

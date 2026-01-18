@@ -10,17 +10,18 @@
 
 ## Executive Summary
 
-coherence-mcp underwent a **complete architectural rewrite** (commit 373aa5d), replacing a modular `dist/` structure with consolidated `src/lib/` modules. This analysis examines what was lost, gained, and what remains to be done.
+coherence-mcp underwent a **complete architectural rewrite** (commit 373aa5d), replacing a modular `dist/` structure with 
+consolidated `src/lib/` modules. This analysis examines what was lost, gained, and what remains to be done.
 
 ### Key Findings
 
-| Category | Status | Impact |
-|----------|--------|--------|
-| **Core Tools** | ✅ **COMPLETE** (10/10) | All main tools now REAL |
-| **Tests** | 🔴 **BROKEN** | Test suite references old architecture |
-| **Documentation** | 🟡 **PARTIAL** | README accurate, docs/ outdated |
-| **Old Architecture** | 📦 **ARCHIVED** | dist/ contains superseded implementation |
-| **Security/Auth** | ❌ **REMOVED** | ATOM-AUTH, rate limiting, scopes all gone |
+| Category             | Status                  | Impact                                    |
+|----------------------|-------------------------|-------------------------------------------|
+| **Core Tools**       | ✅ **COMPLETE** (10/10) | All main tools now REAL                   |
+| **Tests**            | 🔴 **BROKEN**           | Test suite references old architecture    |
+| **Documentation**    | 🟡 **PARTIAL**          | README accurate, docs/ outdated           |
+| **Old Architecture** | 📦 **ARCHIVED**         | dist/ contains superseded implementation  |
+| **Security/Auth**    | ❌ **REMOVED**          | ATOM-AUTH, rate limiting, scopes all gone |
 
 ---
 
@@ -225,15 +226,15 @@ None! All 10 defined tools have real implementations.
 
 ### Missing Features
 
-| Feature | Priority | Effort | Notes |
-|---------|----------|--------|-------|
-| **Test suite** | 🔴 P0 | HIGH | Rewrite for new architecture |
-| **ATOM-AUTH** | 🟡 P1 | HIGH | Security critical |
-| **Discord adapter** | 🟢 P2 | MEDIUM | Media pipeline |
-| **Minecraft adapter** | 🟢 P2 | MEDIUM | RCON integration |
-| **Config system** | 🟡 P1 | LOW | Make paths configurable |
-| **Audit logging** | 🟡 P1 | MEDIUM | Compliance requirement |
-| **Rate limiting** | 🟡 P1 | LOW | DOS protection |
+| Feature               | Priority | Effort | Notes                       |
+|-----------------------|----------|--------|-----------------------------|
+| **Test suite**        | 🔴 P0   | HIGH   | Rewrite for new architecture |
+| **ATOM-AUTH**         | 🟡 P1   | HIGH   | Security critical           |
+| **Discord adapter**   | 🟢 P2   | MEDIUM | Media pipeline              |
+| **Minecraft adapter** | 🟢 P2   | MEDIUM | RCON integration            |
+| **Config system**     | 🟡 P1   | LOW    | Make paths configurable     |
+| **Audit logging**     | 🟡 P1   | MEDIUM | Compliance requirement      |
+| **Rate limiting**     | 🟡 P1   | LOW    | DOS protection              |
 
 ---
 
@@ -241,22 +242,22 @@ None! All 10 defined tools have real implementations.
 
 ### Integration Points
 
-| Component | Status | Notes |
-|-----------|--------|-------|
-| **../SpiralSafe/ mount** | ✅ WORKING | Hardcoded relative path |
-| **.atom-trail/ writes** | ✅ WORKING | Real file system operations |
-| **api.spiralsafe.org** | ✅ WORKING | HTTP client with timeout |
-| **corpus search** | ✅ WORKING | fast-glob across layers/kinds |
-| **.context.yaml** | ✅ WORKING | YAML + SHA256 hashing |
+| Component                     | Status      | Notes                         |
+|--------- ---------------------|-------------|-------------------------------|
+| **../SpiralSafe/ mount**      | ✅ WORKING | Hardcoded relative path       | 
+| **.atom-trail/ writes**       | ✅ WORKING | Real file system operations   |
+| **api.spiralsafe.org**        | ✅ WORKING | HTTP client with timeout      |
+| **corpus search**             | ✅ WORKING | fast-glob across layers/kinds |
+| **.context.yaml**             | ✅ WORKING | YAML + SHA256 hashing         |
 
 ### Missing Integrations
 
-| Integration | Old? | New? | Impact |
-|-------------|------|------|--------|
-| **wave-toolkit CLI** | ✅ | ❌ | Self-contained NLP sufficient |
-| **Discord webhooks** | ✅ | ❌ | Media pipeline incomplete |
-| **Minecraft RCON** | ✅ | ❌ | Quantum Valley disconnected |
-| **ATOM session tracking** | ❌ | ❌ | Mentioned in docs but not implemented |
+| Integration               | Old? | New? | Impact                               |
+|---------------------------|------|------|--------------------------------------|
+| **wave-toolkit CLI**      | ✅  | ❌   | Self-contained NLP sufficient        |
+| **Discord webhooks**      | ✅  | ❌   | Media pipeline incomplete            |
+| **Minecraft RCON**        | ✅  | ❌   | Quantum Valley disconnected          |
+| **ATOM session tracking** | ❌  | ❌   | Mentioned in docs but not implemented |
 
 ---
 
@@ -264,11 +265,11 @@ None! All 10 defined tools have real implementations.
 
 ### Scripts Status
 
-| Script | Status | Notes |
-|--------|--------|-------|
-| **scripts/benchmark.py** | ✅ WORKING | Golden ratio chaos, Fibonacci scoring |
-| **scripts/smoke.mjs** | ⚠️ UNKNOWN | Not analyzed (may reference old arch) |
-| **improve.md** | ✅ ACCURATE | Documents benchmark workflow |
+| Script                   | Status      | Notes                                  |
+|--------------------------|-------------|----------------------------------------|
+| **scripts/benchmark.py** | ✅ WORKING  | Golden ratio chaos, Fibonacci scoring  |
+| **scripts/smoke.mjs**    | ⚠️ UNKNOWN  | Not analyzed (may reference old arch)  |
+| **improve.md**           | ✅ ACCURATE | Documents benchmark workflow           |
 
 ### Performance Analysis
 
@@ -451,9 +452,3 @@ coherence-mcp has been **successfully refactored** from a modular, auth-heavy ar
 ---
 
 **H&&S:WAVE** - Gap analysis complete, ready for systematic remediation.
-
----
-
-*~ Hope&&Sauced*
-
-✦ *The Evenstar Guides Us* ✦
