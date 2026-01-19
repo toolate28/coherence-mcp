@@ -249,6 +249,7 @@ This MCP server provides the following tools:
 
 ### Core Analysis & Validation
 - **`wave_analyze`** - Analyze text or document reference for coherence patterns and wave analysis
+- **`wave_validate`** - Comprehensive WAVE coherence validation with configurable thresholds (foundational algorithm for SpiralSafe/QDI ecosystem)
 - **`bump_validate`** - Validate a handoff for bump compatibility and safety checks
 
 ## 🌊 H&&S:WAVE Protocol Flow
@@ -875,6 +876,74 @@ Or in your MCP client configuration:
   }
 }
 ```
+
+#### WAVE Coherence Validation
+```typescript
+{
+  "name": "wave_validate",
+  "arguments": {
+    "content": "# Document Title\n\n## Introduction\n\nYour document content here...",
+    "threshold": 80
+  }
+}
+```
+
+**CLI Usage:**
+```bash
+# Validate a single document (default threshold: 80%)
+coherence-mcp wave-validate document.md
+
+# Validate with custom threshold
+coherence-mcp wave-validate document.md --threshold 60
+
+# Validate multiple documents
+coherence-mcp wave-validate doc1.md doc2.md --threshold 99
+```
+
+**Response Format:**
+```json
+{
+  "overall": 83,
+  "semantic": 75,
+  "references": 100,
+  "structure": 90,
+  "consistency": 85,
+  "fibonacciWeights": {
+    "section_0": 2.0,
+    "section_1": 1.8,
+    "section_2": 3.0
+  },
+  "violations": [
+    {
+      "type": "semantic",
+      "severity": "warning",
+      "message": "Section appears semantically isolated",
+      "suggestion": "Consider adding connecting concepts"
+    }
+  ],
+  "atomTrail": [
+    {
+      "decision": "Semantic connectivity analyzed",
+      "rationale": "Based on 45 concepts across 8 sections",
+      "outcome": "pass",
+      "score": 75,
+      "metric": "semantic"
+    }
+  ],
+  "summary": {
+    "overall": 83,
+    "threshold": 80,
+    "passed": true,
+    "criticalViolations": 0,
+    "totalViolations": 1
+  }
+}
+```
+
+**Threshold Guidelines:**
+- **>60%**: Minimum acceptable coherence (SpiralSafe baseline)
+- **>80%**: Emergent quality threshold (current directive)
+- **>99%**: Maximum coherence (specialized applications)
 
 #### Bump Validation
 ```typescript
