@@ -21,7 +21,9 @@
     "bench": "python3 scripts/benchmark.py",
     "bench:chaos": "python3 scripts/benchmark.py --iterations 10 --chaos-mode",
     "prepublishOnly": "npm run build",
-    "test": "echo \"No tests specified\" && exit 0"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "keywords": [
     "mcp",
@@ -36,14 +38,23 @@
   "author": "Hope&&Sauced <toolated@pm.me>",
   "license": "MIT",
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.71.2",
+    "@babel/parser": "^7.28.6",
     "@modelcontextprotocol/sdk": "^1.25.2",
     "ajv": "^8.12.0",
+    "dotenv": "^16.4.5",
     "fast-glob": "^3.3.2",
-    "yaml": "^2.3.4",
-    "dotenv": "^16.4.5"
+    "graph-data-structure": "^4.5.0",
+    "remark": "^15.0.1",
+    "remark-parse": "^11.0.0",
+    "unified": "^11.0.5",
+    "yaml": "^2.3.4"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
-    "typescript": "^5.3.3"
+    "@vitest/coverage-v8": "^4.0.17",
+    "@vitest/ui": "^4.0.17",
+    "typescript": "^5.3.3",
+    "vitest": "^4.0.17"
   }
 }
