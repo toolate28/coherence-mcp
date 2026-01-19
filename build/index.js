@@ -229,6 +229,117 @@ const TOOLS = [
             required: ["env"],
         },
     },
+    {
+        name: "fibonacci_assign_weight",
+        description: "Assign Fibonacci weight to a system component based on importance. Returns weight position, impact multiplier, and priority level (critical/high/medium/low). Higher importance = exponentially greater weight.",
+        inputSchema: {
+            type: "object",
+            properties: {
+                componentName: {
+                    type: "string",
+                    description: "Name of the component to weight",
+                },
+                importance: {
+                    type: "number",
+                    description: "Importance score (0-100). Maps to Fibonacci position for exponential weighting.",
+                    minimum: 0,
+                    maximum: 100,
+                },
+            },
+            required: ["componentName", "importance"],
+        },
+    },
+    {
+        name: "fibonacci_calculate_impact",
+        description: "Calculate impact of component failure using Fibonacci weighting. Impact = weight × degradation. Shows exponential sensitivity to critical component failures.",
+        inputSchema: {
+            type: "object",
+            properties: {
+                component: {
+                    type: "object",
+                    description: "Weighted component with name, fibonacciWeight, impactMultiplier, priority",
+                    properties: {
+                        name: { type: "string" },
+                        fibonacciWeight: { type: "number" },
+                        impactMultiplier: { type: "number" },
+                        priority: { type: "string", enum: ["critical", "high", "medium", "low"] },
+                    },
+                    required: ["name", "fibonacciWeight", "impactMultiplier", "priority"],
+                },
+                degradation: {
+                    type: "number",
+                    description: "Degradation factor (0-1). 0.1 = 10% degradation",
+                    minimum: 0,
+                    maximum: 1,
+                },
+            },
+            required: ["component", "degradation"],
+        },
+    },
+    {
+        name: "fibonacci_optimize_allocation",
+        description: "Optimize resource allocation across components using Fibonacci weights. Returns proportional allocation plan with efficiency metrics.",
+        inputSchema: {
+            type: "object",
+            properties: {
+                components: {
+                    type: "array",
+                    description: "Array of weighted components",
+                    items: {
+                        type: "object",
+                        properties: {
+                            name: { type: "string" },
+                            fibonacciWeight: { type: "number" },
+                            impactMultiplier: { type: "number" },
+                            priority: { type: "string" },
+                        },
+                    },
+                },
+                budget: {
+                    type: "number",
+                    description: "Total resource budget to allocate",
+                },
+            },
+            required: ["components", "budget"],
+        },
+    },
+    {
+        name: "fibonacci_find_critical_paths",
+        description: "Identify critical paths by analyzing component weights and priorities. Groups by risk level (extreme/high/medium/low) with total weight calculations.",
+        inputSchema: {
+            type: "object",
+            properties: {
+                components: {
+                    type: "array",
+                    description: "Array of weighted components",
+                    items: {
+                        type: "object",
+                        properties: {
+                            name: { type: "string" },
+                            fibonacciWeight: { type: "number" },
+                            impactMultiplier: { type: "number" },
+                            priority: { type: "string" },
+                        },
+                    },
+                },
+            },
+            required: ["components"],
+        },
+    },
+    {
+        name: "fibonacci_refine_threshold",
+        description: "Refine threshold using golden ratio (φ ≈ 1.618). For optimal coherence: base threshold × φ. Example: 60 → 97.08 (optimal threshold).",
+        inputSchema: {
+            type: "object",
+            properties: {
+                baseThreshold: {
+                    type: "number",
+                    description: "Base threshold to refine",
+                },
+            },
+            required: ["baseThreshold"],
+        },
+    },
     // ... [Include remaining tools from original: scripts_run, awi_intent_request, discord_post, mc_execCommand, mc_query, grok_collab, grok_metrics]
 ];
 // Legacy script allow-list associated with the former scripts_run tool.
@@ -416,6 +527,96 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                         {
                             type: "text",
                             text: JSON.stringify(deployment, null, 2),
+                        },
+                    ],
+                };
+            }
+            case "fibonacci_assign_weight": {
+                const { componentName, importance } = args;
+                const { FibonacciWeightingEngine } = await import('./fibonacci/weighting.js');
+                const engine = new FibonacciWeightingEngine();
+                const component = engine.assignWeight(componentName, importance);
+                return {
+                    content: [
+                        {
+                            type: "text",
+                            text: JSON.stringify({
+                                component: component.name,
+                                importance,
+                                fibonacciPosition: component.fibonacciWeight,
+                                impactMultiplier: component.impactMultiplier,
+                                priority: component.priority,
+                                description: `Component assigned Fibonacci weight F(${component.fibonacciWeight}) = ${component.impactMultiplier}`
+                            }, null, 2),
+                        },
+                    ],
+                };
+            }
+            case "fibonacci_calculate_impact": {
+                const { component, degradation } = args;
+                const { FibonacciWeightingEngine } = await import('./fibonacci/weighting.js');
+                const engine = new FibonacciWeightingEngine();
+                const impact = engine.calculateImpact(component, degradation);
+                return {
+                    content: [
+                        {
+                            type: "text",
+                            text: JSON.stringify({
+                                component: component.name,
+                                impactMultiplier: component.impactMultiplier,
+                                degradation,
+                                impact,
+                                description: `Impact = ${component.impactMultiplier} × ${degradation} = ${impact}`
+                            }, null, 2),
+                        },
+                    ],
+                };
+            }
+            case "fibonacci_optimize_allocation": {
+                const { components, budget } = args;
+                const { FibonacciWeightingEngine } = await import('./fibonacci/weighting.js');
+                const engine = new FibonacciWeightingEngine();
+                const plan = engine.optimizeAllocation(components, budget);
+                return {
+                    content: [
+                        {
+                            type: "text",
+                            text: JSON.stringify(plan, null, 2),
+                        },
+                    ],
+                };
+            }
+            case "fibonacci_find_critical_paths": {
+                const { components } = args;
+                const { FibonacciWeightingEngine } = await import('./fibonacci/weighting.js');
+                const engine = new FibonacciWeightingEngine();
+                const paths = engine.findCriticalPaths(components);
+                return {
+                    content: [
+                        {
+                            type: "text",
+                            text: JSON.stringify(paths, null, 2),
+                        },
+                    ],
+                };
+            }
+            case "fibonacci_refine_threshold": {
+                const { baseThreshold } = args;
+                const { FibonacciWeightingEngine, GOLDEN_RATIO } = await import('./fibonacci/weighting.js');
+                const engine = new FibonacciWeightingEngine();
+                const refined = engine.refineThresholdWithGoldenRatio(baseThreshold);
+                return {
+                    content: [
+                        {
+                            type: "text",
+                            text: JSON.stringify({
+                                method: "golden-ratio",
+                                goldenRatio: GOLDEN_RATIO,
+                                baseThreshold,
+                                refinedThreshold: refined,
+                                multiplier: refined / baseThreshold,
+                                description: `${baseThreshold} × φ = ${refined.toFixed(2)}`
+                            }, null, 2),
                         },
                     ],
                 };
