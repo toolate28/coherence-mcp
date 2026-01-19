@@ -10,6 +10,7 @@ import { analyzeWave as realAnalyzeWave } from "./lib/wave-analysis.js";
 import { searchSpiralSafe } from "./lib/spiral-search.js";
 import { packContext as realPackContext } from "./lib/context-pack.js";
 import { checkOpsHealth as realCheckOpsHealth, getOpsStatus as realGetOpsStatus, deployOps as realDeployOps, } from "./lib/api-client.js";
+import { waveCoherenceCheck } from "./tools/wave-check.js";
 // Create server instance
 const server = new Server({
     name: "coherence-mcp",
@@ -21,6 +22,28 @@ const server = new Server({
 });
 // [TOOLS array from original - keeping all tool definitions unchanged]
 const TOOLS = [
+    {
+        name: "wave_coherence_check",
+        description: "Validates coherence between documentation and implementation using WAVE algorithm. Returns alignment scores and recommendations.",
+        inputSchema: {
+            type: "object",
+            properties: {
+                documentation: {
+                    type: "string",
+                    description: "Documentation text (markdown/yaml) to analyze",
+                },
+                code: {
+                    type: "string",
+                    description: "Code implementation to compare against documentation",
+                },
+                threshold: {
+                    type: "number",
+                    description: "Coherence threshold (60=minimum, 80=high, 99=critical). Defaults to 60.",
+                },
+            },
+            required: ["documentation", "code"],
+        },
+    },
     {
         name: "wave_analyze",
         description: "Analyze text or document reference for coherence patterns using WAVE protocol (curl, divergence, potential)",
@@ -204,6 +227,18 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const { name, arguments: args } = request.params;
     try {
         switch (name) {
+            case "wave_coherence_check": {
+                const { documentation, code, threshold } = args;
+                const result = await waveCoherenceCheck({ documentation, code, threshold });
+                return {
+                    content: [
+                        {
+                            type: "text",
+                            text: JSON.stringify(result, null, 2),
+                        },
+                    ],
+                };
+            }
             case "wave_analyze": {
                 const { input } = args;
                 const analysis = realAnalyzeWave(input);
