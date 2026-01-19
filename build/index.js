@@ -10,6 +10,7 @@ import { analyzeWave as realAnalyzeWave } from "./lib/wave-analysis.js";
 import { searchSpiralSafe } from "./lib/spiral-search.js";
 import { packContext as realPackContext } from "./lib/context-pack.js";
 import { checkOpsHealth as realCheckOpsHealth, getOpsStatus as realGetOpsStatus, deployOps as realDeployOps, } from "./lib/api-client.js";
+import { validateWAVE } from "./wave/validator.js";
 import { waveCoherenceCheck } from "./tools/wave-check.js";
 // Create server instance
 const server = new Server({
@@ -56,6 +57,30 @@ const TOOLS = [
                 },
             },
             required: ["input"],
+        },
+    },
+    {
+        name: "wave_validate",
+        description: "Validate documentation/code coherence using the foundational WAVE algorithm. Returns comprehensive coherence score (0-100) with semantic, reference, structure, and consistency analysis. Supports configurable thresholds (>60% baseline, >80% emergent, >99% maximum). Includes Fibonacci weighting for critical sections and full ATOM trail provenance.",
+        inputSchema: {
+            type: "object",
+            properties: {
+                content: {
+                    oneOf: [
+                        { type: "string" },
+                        { type: "array", items: { type: "string" } }
+                    ],
+                    description: "Single document string or array of strings for multi-document analysis",
+                },
+                threshold: {
+                    type: "number",
+                    description: "Minimum acceptable coherence percentage (default: 80). Common thresholds: >60 (baseline), >80 (emergent), >99 (maximum)",
+                    default: 80,
+                    minimum: 0,
+                    maximum: 100
+                },
+            },
+            required: ["content"],
         },
     },
     {
@@ -251,6 +276,44 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                     ],
                 };
             }
+            case "wave_validate": {
+                const args_ = args;
+                // Validate required parameters
+                if (!args_.content) {
+                    throw new Error('Missing required parameter: content');
+                }
+                const content = args_.content;
+                const threshold = typeof args_.threshold === 'number' ? args_.threshold : 80;
+                // Validate threshold range
+                if (threshold < 0 || threshold > 100) {
+                    throw new Error('Threshold must be between 0 and 100');
+                }
+                const score = await validateWAVE(content, threshold);
+                // Convert Map to object for JSON serialization
+                const fibonacciWeightsObj = {};
+                score.fibonacciWeights.forEach((value, key) => {
+                    fibonacciWeightsObj[key] = value;
+                });
+                const result = {
+                    ...score,
+                    fibonacciWeights: fibonacciWeightsObj,
+                    summary: {
+                        overall: score.overall,
+                        threshold,
+                        passed: score.overall >= threshold,
+                        criticalViolations: score.violations.filter(v => v.severity === 'critical').length,
+                        totalViolations: score.violations.length
+                    }
+                };
+                return {
+                    content: [
+                        {
+                            type: "text",
+                            text: JSON.stringify(result, null, 2),
+                        },
+                    ],
+                };
+            }
             case "bump_validate": {
                 const { handoff } = args;
                 const validation = realValidateBump(handoff);
@@ -375,11 +438,76 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         };
     }
 });
-// Start the server
+// Start the server or handle CLI commands
 async function main() {
+    const args = process.argv.slice(2);
+    // Check if this is a CLI command
+    if (args.length > 0 && args[0] === 'wave-validate') {
+        // CLI mode: coherence-mcp wave-validate <file> --threshold 80
+        await handleWaveValidateCLI(args.slice(1));
+        return;
+    }
+    // MCP Server mode
     const transport = new StdioServerTransport();
     await server.connect(transport);
     console.error("Coherence MCP server running on stdio (REAL implementations)");
+}
+// Handle CLI wave-validate command
+async function handleWaveValidateCLI(args) {
+    const fs = await import('fs/promises');
+    // Parse arguments
+    let filePath;
+    let threshold = 80;
+    for (let i = 0; i < args.length; i++) {
+        if (args[i] === '--threshold' || args[i] === '-t') {
+            threshold = parseInt(args[i + 1], 10);
+            i++;
+        }
+        else if (!filePath) {
+            filePath = args[i];
+        }
+    }
+    if (!filePath) {
+        console.error('Usage: coherence-mcp wave-validate <file> [--threshold 80]');
+        process.exit(1);
+    }
+    try {
+        // Read file content
+        const content = await fs.readFile(filePath, 'utf-8');
+        // Validate
+        console.error(`Validating ${filePath} with threshold ${threshold}%...`);
+        const score = await validateWAVE(content, threshold);
+        // Display results
+        console.log('\n=== WAVE Coherence Validation Results ===\n');
+        console.log(`Overall Score: ${score.overall}% (threshold: ${threshold}%)`);
+        console.log(`Status: ${score.overall >= threshold ? '✅ PASS' : '❌ FAIL'}\n`);
+        console.log('Component Scores:');
+        console.log(`  Semantic:     ${score.semantic}%`);
+        console.log(`  References:   ${score.references}%`);
+        console.log(`  Structure:    ${score.structure}%`);
+        console.log(`  Consistency:  ${score.consistency}%\n`);
+        if (score.violations.length > 0) {
+            console.log(`Violations (${score.violations.length}):`);
+            score.violations.forEach((v, idx) => {
+                const icon = v.severity === 'critical' ? '🔴' : v.severity === 'warning' ? '⚠️' : 'ℹ️';
+                console.log(`  ${icon} [${v.type}] ${v.message}`);
+                if (v.suggestion) {
+                    console.log(`     → ${v.suggestion}`);
+                }
+            });
+            console.log('');
+        }
+        console.log(`ATOM Trail Entries: ${score.atomTrail.length}`);
+        score.atomTrail.forEach(entry => {
+            console.log(`  ${entry.outcome === 'pass' ? '✓' : '✗'} ${entry.decision}`);
+        });
+        // Exit with appropriate code
+        process.exit(score.overall >= threshold ? 0 : 1);
+    }
+    catch (error) {
+        console.error(`Error: ${error instanceof Error ? error.message : String(error)}`);
+        process.exit(1);
+    }
 }
 main().catch((error) => {
     console.error("Fatal error in main():", error);

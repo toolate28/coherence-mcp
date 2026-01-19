@@ -4,7 +4,7 @@
  * Exposes WAVE coherence validator as an MCP tool
  */
 
-import { validateCoherence, WAVE_MINIMUM } from '../core/wave-validator.js';
+import { validateWAVE } from '../wave/validator.js';
 
 export interface WaveCheckInput {
   documentation: string;
@@ -13,15 +13,18 @@ export interface WaveCheckInput {
 }
 
 export async function waveCoherenceCheck(input: WaveCheckInput) {
-  const { documentation, code, threshold = WAVE_MINIMUM } = input;
+  const { documentation, code, threshold = 80 } = input;
   
-  const result = await validateCoherence(documentation, code, threshold);
+  // Combine documentation and code for analysis
+  const combinedContent = `${documentation}\n\n${code}`;
+  
+  const result = await validateWAVE(combinedContent, threshold);
   
   return {
-    score: result.score,
-    passed: result.passed,
-    threshold: result.threshold,
-    recommendations: result.recommendations,
-    timestamp: result.timestamp,
+    score: result.overall,
+    passed: result.overall >= threshold,
+    threshold: threshold,
+    recommendations: result.violations.map(v => v.message),
+    timestamp: new Date().toISOString(),
   };
 }
