@@ -174,9 +174,9 @@ export async function validateCoherence(
   const waveResult = await validateWAVE(combinedContent, threshold);
   
   const recommendations = waveResult.violations.map(v => ({
-    category: v.type,
+    category: v.type === 'structure' ? 'structural' : v.type === 'reference' ? 'temporal' : v.type,
     message: v.message,
-    severity: v.severity,
+    severity: v.severity === 'info' ? 'low' : v.severity === 'warning' ? 'medium' : v.severity === 'critical' ? 'critical' : 'high',
     suggestion: v.suggestion
   }));
   
