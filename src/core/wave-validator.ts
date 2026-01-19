@@ -95,6 +95,7 @@ function calculateTemporalCoherence(documentation: string, code: string): number
   }
   
   // Extract dates
+  datePattern.lastIndex = 0;
   while ((match = datePattern.exec(documentation)) !== null) {
     docDates.add(match[0]);
   }
