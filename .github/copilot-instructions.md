@@ -37,14 +37,14 @@ npm run watch    # Development mode
 - **Test coverage** >80% for new code
 
 ## Integration Points
-- **@spiralsafe/wave-toolkit**: Import for WAVE validation
-- **@spiralsafe/atom-trail**: Import for provenance logging
+- **src/lib/wave-analysis.ts**: Local WAVE validation implementation
+- **src/lib/atom-trail.ts**: Local provenance logging implementation
 - **SpiralSafe repo**: Search and reference docs
 - **Claude Desktop**: Primary MCP client
 
 ## Common Tasks
-- **Add WAVE check to tool**: Use `analyzeWave()` from wave-toolkit
-- **Log ATOM entry**: Use `createDecision()` from atom-trail
+- **Add WAVE check to tool**: Use `analyzeWave()` from src/lib/wave-analysis.ts
+- **Log ATOM entry**: Use `trackAtom()` from src/lib/atom-trail.ts
 - **Validate schema**: Use Ajv with JSON Schema Draft 7
 - **Handle errors**: Return structured error responses per MCP spec
 
