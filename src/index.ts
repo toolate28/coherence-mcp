@@ -273,6 +273,114 @@ const TOOLS: Tool[] = [
         },
       },
       required: ["code", "vulnerability"],
+    name: "fibonacci_assign_weight",
+    description: "Assign Fibonacci weight to a system component based on importance. Returns weight position, impact multiplier, and priority level (critical/high/medium/low). Higher importance = exponentially greater weight.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        componentName: {
+          type: "string",
+          description: "Name of the component to weight",
+        },
+        importance: {
+          type: "number",
+          description: "Importance score (0-100). Maps to Fibonacci position for exponential weighting.",
+          minimum: 0,
+          maximum: 100,
+        },
+      },
+      required: ["componentName", "importance"],
+    },
+  },
+  {
+    name: "fibonacci_calculate_impact",
+    description: "Calculate impact of component failure using Fibonacci weighting. Impact = weight × degradation. Shows exponential sensitivity to critical component failures.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        component: {
+          type: "object",
+          description: "Weighted component with name, fibonacciWeight, impactMultiplier, priority",
+          properties: {
+            name: { type: "string" },
+            fibonacciWeight: { type: "number" },
+            impactMultiplier: { type: "number" },
+            priority: { type: "string", enum: ["critical", "high", "medium", "low"] },
+          },
+          required: ["name", "fibonacciWeight", "impactMultiplier", "priority"],
+        },
+        degradation: {
+          type: "number",
+          description: "Degradation factor (0-1). 0.1 = 10% degradation",
+          minimum: 0,
+          maximum: 1,
+        },
+      },
+      required: ["component", "degradation"],
+    },
+  },
+  {
+    name: "fibonacci_optimize_allocation",
+    description: "Optimize resource allocation across components using Fibonacci weights. Returns proportional allocation plan with efficiency metrics.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        components: {
+          type: "array",
+          description: "Array of weighted components",
+          items: {
+            type: "object",
+            properties: {
+              name: { type: "string" },
+              fibonacciWeight: { type: "number" },
+              impactMultiplier: { type: "number" },
+              priority: { type: "string" },
+            },
+          },
+        },
+        budget: {
+          type: "number",
+          description: "Total resource budget to allocate",
+        },
+      },
+      required: ["components", "budget"],
+    },
+  },
+  {
+    name: "fibonacci_find_critical_paths",
+    description: "Identify critical paths by analyzing component weights and priorities. Groups by risk level (extreme/high/medium/low) with total weight calculations.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        components: {
+          type: "array",
+          description: "Array of weighted components",
+          items: {
+            type: "object",
+            properties: {
+              name: { type: "string" },
+              fibonacciWeight: { type: "number" },
+              impactMultiplier: { type: "number" },
+              priority: { type: "string" },
+            },
+          },
+        },
+      },
+      required: ["components"],
+    },
+  },
+  {
+    name: "fibonacci_refine_threshold",
+    description: "Refine threshold using golden ratio (φ ≈ 1.618). For optimal coherence: base threshold × φ. Example: 60 → 97.08 (optimal threshold).",
+    inputSchema: {
+      type: "object",
+      properties: {
+        baseThreshold: {
+          type: "number",
+          description: "Base threshold to refine",
+        },
+      },
+      required: ["baseThreshold"],
     },
   },
   // ... [Include remaining tools from original: scripts_run, awi_intent_request, discord_post, mc_execCommand, mc_query, grok_collab, grok_metrics]
@@ -522,12 +630,111 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           targetBinary,
           mitigations
         });
+      case "fibonacci_assign_weight": {
+        const { componentName, importance } = args as {
+          componentName: string;
+          importance: number;
+        };
+        const { FibonacciWeightingEngine } = await import('./fibonacci/weighting.js');
+        const engine = new FibonacciWeightingEngine();
+        const component = engine.assignWeight(componentName, importance);
+        
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                component: component.name,
+                importance,
+                fibonacciPosition: component.fibonacciWeight,
+                impactMultiplier: component.impactMultiplier,
+                priority: component.priority,
+                description: `Component assigned Fibonacci weight F(${component.fibonacciWeight}) = ${component.impactMultiplier}`
+              }, null, 2),
+            },
+          ],
+        };
+      }
+
+      case "fibonacci_calculate_impact": {
+        const { component, degradation } = args as {
+          component: any;
+          degradation: number;
+        };
+        const { FibonacciWeightingEngine } = await import('./fibonacci/weighting.js');
+        const engine = new FibonacciWeightingEngine();
+        const impact = engine.calculateImpact(component, degradation);
+        
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                component: component.name,
+                impactMultiplier: component.impactMultiplier,
+                degradation,
+                impact,
+                description: `Impact = ${component.impactMultiplier} × ${degradation} = ${impact}`
+              }, null, 2),
+            },
+          ],
+        };
+      }
+
+      case "fibonacci_optimize_allocation": {
+        const { components, budget } = args as {
+          components: any[];
+          budget: number;
+        };
+        const { FibonacciWeightingEngine } = await import('./fibonacci/weighting.js');
+        const engine = new FibonacciWeightingEngine();
+        const plan = engine.optimizeAllocation(components, budget);
+        
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(plan, null, 2),
+            },
+          ],
+        };
+      }
+
+      case "fibonacci_find_critical_paths": {
+        const { components } = args as { components: any[] };
+        const { FibonacciWeightingEngine } = await import('./fibonacci/weighting.js');
+        const engine = new FibonacciWeightingEngine();
+        const paths = engine.findCriticalPaths(components);
+        
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(paths, null, 2),
+            },
+          ],
+        };
+      }
+
+      case "fibonacci_refine_threshold": {
+        const { baseThreshold } = args as { baseThreshold: number };
+        const { FibonacciWeightingEngine, GOLDEN_RATIO } = await import('./fibonacci/weighting.js');
+        const engine = new FibonacciWeightingEngine();
+        const refined = engine.refineThresholdWithGoldenRatio(baseThreshold);
         
         return {
           content: [
             {
               type: "text",
               text: JSON.stringify(result, null, 2),
+              text: JSON.stringify({
+                method: "golden-ratio",
+                goldenRatio: GOLDEN_RATIO,
+                baseThreshold,
+                refinedThreshold: refined,
+                multiplier: refined / baseThreshold,
+                description: `${baseThreshold} × φ = ${refined.toFixed(2)}`
+              }, null, 2),
             },
           ],
         };
@@ -566,6 +773,9 @@ async function main() {
   // Anamnesis CLI commands
   if (args.length > 0 && args[0] === 'anamnesis') {
     await handleAnamnesisCliCommands(args.slice(1));
+  // Fibonacci weighting CLI commands
+  if (args.length > 0 && args[0] === 'fibonacci') {
+    await handleFibonacciCLI(args.slice(1));
     return;
   }
   
@@ -649,6 +859,25 @@ async function handleAnamnesisCliCommands(args: string[]) {
     console.error('Commands:');
     console.error('  validate <file> --vuln <CVE>         Validate single exploit file');
     console.error('  batch-validate <dir> --output <file> Validate all exploits in directory');
+// Handle Fibonacci CLI commands
+async function handleFibonacciCLI(args: string[]) {
+  const {
+    assignCommand,
+    optimizeCommand,
+    visualizeCommand,
+    refineCommand,
+    criticalPathsCommand,
+  } = await import('./fibonacci/cli.js');
+  
+  if (args.length === 0) {
+    console.error('Usage: coherence-mcp fibonacci <command> [args...]');
+    console.error('');
+    console.error('Commands:');
+    console.error('  assign <component> <importance>         Assign Fibonacci weight to component');
+    console.error('  optimize --components <file> --budget <n>  Optimize resource allocation');
+    console.error('  visualize --input <file> [--output <file>]  Generate priority heatmap');
+    console.error('  refine --threshold <n> --method golden-ratio  Refine threshold with golden ratio');
+    console.error('  paths --components <file>                Find critical paths');
     process.exit(1);
   }
   
@@ -878,6 +1107,103 @@ async function handleAnamnesiBatchValidate(args: string[]) {
     
     process.exit(failedCount === 0 ? 0 : 1);
     
+  try {
+    switch (command) {
+      case 'assign':
+        if (args.length < 3) {
+          console.error('Usage: coherence-mcp fibonacci assign <component> <importance>');
+          process.exit(1);
+        }
+        await assignCommand(args[1], parseFloat(args[2]));
+        break;
+        
+      case 'optimize': {
+        let componentsFile = '';
+        let budget = 100;
+        
+        for (let i = 1; i < args.length; i++) {
+          if (args[i] === '--components' && i + 1 < args.length) {
+            componentsFile = args[i + 1];
+            i++;
+          } else if (args[i] === '--budget' && i + 1 < args.length) {
+            budget = parseFloat(args[i + 1]);
+            i++;
+          }
+        }
+        
+        if (!componentsFile) {
+          console.error('Usage: coherence-mcp fibonacci optimize --components <file> --budget <n>');
+          process.exit(1);
+        }
+        
+        await optimizeCommand(componentsFile, budget);
+        break;
+      }
+        
+      case 'visualize': {
+        let inputFile = '';
+        let outputFile: string | undefined;
+        
+        for (let i = 1; i < args.length; i++) {
+          if (args[i] === '--input' && i + 1 < args.length) {
+            inputFile = args[i + 1];
+            i++;
+          } else if (args[i] === '--output' && i + 1 < args.length) {
+            outputFile = args[i + 1];
+            i++;
+          }
+        }
+        
+        if (!inputFile) {
+          console.error('Usage: coherence-mcp fibonacci visualize --input <file> [--output <file>]');
+          process.exit(1);
+        }
+        
+        await visualizeCommand(inputFile, outputFile);
+        break;
+      }
+        
+      case 'refine': {
+        let threshold = 60;
+        let method = 'golden-ratio';
+        
+        for (let i = 1; i < args.length; i++) {
+          if (args[i] === '--threshold' && i + 1 < args.length) {
+            threshold = parseFloat(args[i + 1]);
+            i++;
+          } else if (args[i] === '--method' && i + 1 < args.length) {
+            method = args[i + 1];
+            i++;
+          }
+        }
+        
+        await refineCommand(threshold, method);
+        break;
+      }
+        
+      case 'paths': {
+        let componentsFile = '';
+        
+        for (let i = 1; i < args.length; i++) {
+          if (args[i] === '--components' && i + 1 < args.length) {
+            componentsFile = args[i + 1];
+            i++;
+          }
+        }
+        
+        if (!componentsFile) {
+          console.error('Usage: coherence-mcp fibonacci paths --components <file>');
+          process.exit(1);
+        }
+        
+        await criticalPathsCommand(componentsFile);
+        break;
+      }
+        
+      default:
+        console.error(`Unknown command: ${command}`);
+        process.exit(1);
+    }
   } catch (error) {
     console.error(`Error: ${error instanceof Error ? error.message : String(error)}`);
     process.exit(1);
