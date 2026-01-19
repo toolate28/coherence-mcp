@@ -8,7 +8,6 @@
 import { parse as babelParse } from '@babel/parser';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
-import Graph from 'graph-data-structure';
 
 // Thresholds
 export const WAVE_MINIMUM = 60;
