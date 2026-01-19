@@ -54,6 +54,11 @@ export interface ValidationResult {
 }
 
 /**
+ * Default coherence threshold for SPHINX Gate 3
+ */
+const DEFAULT_COHERENCE_THRESHOLD = 60;
+
+/**
  * Analyze JavaScript code structure for exploit patterns
  */
 function analyzeJavaScriptStructure(code: string): {
@@ -144,7 +149,7 @@ function checkIntentGate(code: string): boolean {
  */
 async function checkCoherenceGate(
   code: string,
-  threshold: number = 60
+  threshold: number = DEFAULT_COHERENCE_THRESHOLD
 ): Promise<{ passed: boolean; score: number }> {
   // Run WAVE analysis on the code itself
   const waveResult = await validateWAVE(code, threshold);
@@ -191,10 +196,10 @@ function checkIdentityGate(code: string): boolean {
 function checkPassageGate(request: ExploitValidationRequest): boolean {
   // Validate that mitigations are documented if provided
   if (request.mitigations && request.mitigations.length > 0) {
-    // Check for common mitigations
-    const validMitigations = new Set(['ASLR', 'PIE', 'NX', 'DEP', 'RELRO', 'Stack Canary', 'FORTIFY_SOURCE']);
+    // Check for common mitigations (case-insensitive)
+    const validMitigations = new Set(['aslr', 'pie', 'nx', 'dep', 'relro', 'stack canary', 'fortify_source']);
     const hasValidMitigations = request.mitigations.some(m => 
-      Array.from(validMitigations).some(v => v.toLowerCase() === m.toLowerCase())
+      validMitigations.has(m.toLowerCase())
     );
     
     if (!hasValidMitigations) {
@@ -216,8 +221,8 @@ function checkPassageGate(request: ExploitValidationRequest): boolean {
 function generateRecommendations(
   request: ExploitValidationRequest,
   sphinxGates: SPHINXGates,
-  waveScore: any,
-  structure: any
+  waveScore: { overall: number; semantic: number; structure: number; consistency: number },
+  structure: { functionCount: number; commentRatio: number; variableNaming: number; modularity: number }
 ): string[] {
   const recommendations: string[] = [];
   
@@ -294,7 +299,6 @@ function generateRecommendations(
 export async function validateExploit(
   request: ExploitValidationRequest
 ): Promise<ValidationResult> {
-  const timestamp = new Date().toISOString();
   const atomTrail: string[] = [];
   
   // Analyze code structure
@@ -309,7 +313,7 @@ export async function validateExploit(
   const sphinxGates: SPHINXGates = {
     origin: checkOriginGate(request),
     intent: checkIntentGate(request.code),
-    coherence: (await checkCoherenceGate(request.code, 60)).passed,
+    coherence: (await checkCoherenceGate(request.code, DEFAULT_COHERENCE_THRESHOLD)).passed,
     identity: checkIdentityGate(request.code),
     passage: checkPassageGate(request)
   };
@@ -331,7 +335,7 @@ export async function validateExploit(
   
   // Overall validation result
   const allGatesPassed = gateFailures.length === 0;
-  const passed = allGatesPassed && waveResult.overall >= 60;
+  const passed = allGatesPassed && waveResult.overall >= DEFAULT_COHERENCE_THRESHOLD;
   
   // Generate recommendations
   const recommendations = generateRecommendations(
