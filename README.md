@@ -252,6 +252,7 @@ This MCP server provides the following tools:
 - **`wave_analyze`** - Analyze text or document reference for coherence patterns and wave analysis
 - **`wave_validate`** - Comprehensive WAVE coherence validation with configurable thresholds (foundational algorithm for SpiralSafe/QDI ecosystem)
 - **`bump_validate`** - Validate a handoff for bump compatibility and safety checks
+- **`anamnesis_validate`** - **NEW!** Validate AI-generated exploit code using WAVE, SPHINX gates, and ATOM trail (see [Anamnesis Validator](#-anamnesis-exploit-validator) below)
 
 ## 🌊 WAVE Coherence Validator
 
@@ -384,6 +385,206 @@ The WAVE validator uses:
 - 78% statement coverage
 - 87.5% function coverage
 - All edge cases handled (empty inputs, malformed code, etc.)
+
+
+---
+
+## 🔬 Anamnesis Exploit Validator
+
+The **Anamnesis Validator** integrates SpiralSafe verification primitives (WAVE, SPHINX, ATOM) to validate AI-generated exploit code. Designed for Anamnesis-style autonomous exploit generators to check code coherence and security properties.
+
+### Overview
+
+This tool enables external AI agents (like the [Anamnesis project](https://github.com/SeanHeelan/anamnesis-release)) to validate their generated exploits through:
+
+- **WAVE Analysis**: Measures code coherence, structure, and consistency
+- **SPHINX Gates**: 5-gate security validation framework
+- **ATOM Trail**: Complete decision provenance logging
+
+### SPHINX Gates
+
+The validator checks exploits through five security gates:
+
+1. **ORIGIN Gate** - Is the vulnerability context legitimate? (CVE validation)
+2. **INTENT Gate** - Do comments match implementation? (Documentation quality)
+3. **COHERENCE Gate** - Is the code internally consistent? (WAVE score ≥ 60%)
+4. **IDENTITY Gate** - Are type signatures valid? (Structure validation)
+5. **PASSAGE Gate** - Is this contextually appropriate? (Mitigation validation)
+
+### Usage
+
+#### Via MCP Tool
+
+```typescript
+{
+  "name": "anamnesis_validate",
+  "arguments": {
+    "code": "// Exploit for CVE-2024-1234\nfunction exploit() { ... }",
+    "vulnerability": "CVE-2024-1234",
+    "targetBinary": "vulnerable_app",
+    "mitigations": ["ASLR", "NX", "PIE"]
+  }
+}
+
+// Returns:
+{
+  "coherenceScore": 85,
+  "passed": true,
+  "sphinxGates": {
+    "origin": true,
+    "intent": true,
+    "coherence": true,
+    "identity": true,
+    "passage": true
+  },
+  "atomTrail": [
+    "Code structure analyzed: 4 functions, 33.3% comments",
+    "WAVE analysis complete: 85% coherence",
+    "SPHINX Gate 1 (ORIGIN): PASS",
+    ...
+  ],
+  "recommendations": [],
+  "details": {
+    "waveAnalysis": {
+      "semantic": 48,
+      "references": 100,
+      "structure": 100,
+      "consistency": 100
+    },
+    "gateFailures": [],
+    "vulnerabilityContext": "CVE-2024-1234"
+  }
+}
+```
+
+#### Via CLI
+
+##### Single File Validation
+
+```bash
+# Validate a single exploit file
+coherence-mcp anamnesis validate exploit.js \
+  --vuln CVE-2024-1234 \
+  --target vulnerable_app \
+  --mitigations ASLR,NX,PIE
+
+# Output:
+# === Anamnesis Exploit Validation Results ===
+# File: exploit.js
+# Vulnerability: CVE-2024-1234
+# Target: vulnerable_app
+# Mitigations: ASLR, NX, PIE
+#
+# Overall Status: ✅ PASS
+# Coherence Score: 85%
+#
+# WAVE Analysis:
+#   Semantic:     48%
+#   References:   100%
+#   Structure:    100%
+#   Consistency:  100%
+#
+# SPHINX Gates:
+#   ✅ Gate 1: ORIGIN - Vulnerability context validation
+#   ✅ Gate 2: INTENT - Comment-to-code alignment
+#   ✅ Gate 3: COHERENCE - Internal consistency
+#   ✅ Gate 4: IDENTITY - Type signatures and structure
+#   ✅ Gate 5: PASSAGE - Context appropriateness
+```
+
+##### Batch Validation
+
+```bash
+# Validate all exploits in a directory
+coherence-mcp anamnesis batch-validate ./exploits --output results.json
+
+# Output:
+# Found 10 files to validate in ./exploits
+# 
+# Validating exploit-1.js...  ✅ PASS (85%)
+# Validating exploit-2.js...  ✅ PASS (92%)
+# Validating exploit-3.js...  ❌ FAIL (45%)
+# ...
+#
+# === Batch Validation Summary ===
+# Total: 10 files
+# Passed: 8
+# Failed: 2
+# Success Rate: 80.0%
+#
+# Results written to results.json
+```
+
+### Integration with Anamnesis
+
+Example Python integration for autonomous exploit generation:
+
+```python
+import json
+import subprocess
+
+def validate_exploit(code, vulnerability, mitigations=None):
+    """Validate exploit via coherence-mcp"""
+    # Write code to temp file
+    with open('/tmp/exploit.js', 'w') as f:
+        f.write(code)
+    
+    # Call validator
+    cmd = [
+        'coherence-mcp', 'anamnesis', 'validate',
+        '/tmp/exploit.js',
+        '--vuln', vulnerability
+    ]
+    
+    if mitigations:
+        cmd.extend(['--mitigations', ','.join(mitigations)])
+    
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    
+    # Parse results from output
+    return result.returncode == 0
+
+# In exploit generation loop
+exploit_code = generate_exploit(vulnerability)
+
+# Validate before testing
+if not validate_exploit(exploit_code, 'CVE-2024-1234', ['ASLR', 'NX']):
+    # Refine based on recommendations
+    exploit_code = refine_exploit(exploit_code)
+```
+
+### Research Applications
+
+The validator enables several research questions:
+
+1. **Coherence-Success Correlation**: Do higher WAVE scores predict exploit success?
+2. **Gate Effectiveness**: Can SPHINX gates detect malicious patterns?
+3. **ATOM Trail Analysis**: What decision patterns lead to failed exploits?
+4. **Automated Refinement**: Can recommendations guide exploit improvement?
+
+### Example Output (Failed Validation)
+
+```
+Overall Status: ❌ FAIL
+Coherence Score: 45%
+
+SPHINX Gates:
+  ❌ Gate 1: ORIGIN - Vulnerability context validation
+  ❌ Gate 2: INTENT - Comment-to-code alignment
+  ✅ Gate 3: COHERENCE - Internal consistency
+  ❌ Gate 4: IDENTITY - Type signatures and structure
+  ✅ Gate 5: PASSAGE - Context appropriateness
+
+Failed Gates: ORIGIN, INTENT, IDENTITY
+
+Recommendations (3):
+  1. Specify a valid CVE identifier (CVE-YYYY-NNNNN) or provide detailed 
+     vulnerability description (minimum 20 characters)
+  2. Increase code documentation: current comment ratio is 5.2%, 
+     recommended minimum is 10%
+  3. Use more descriptive variable names: current score is 33.3%, 
+     recommended minimum is 50%
+```
 
 ---
 
