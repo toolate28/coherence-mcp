@@ -25,6 +25,7 @@ import {
 } from "./lib/api-client.js";
 import { validateWAVE } from "./wave/validator.js";
 import { waveCoherenceCheck } from "./tools/wave-check.js";
+import { validateExploit } from "./tools/anamnesis-validator.js";
 
 // Create server instance
 const server = new Server(
@@ -245,6 +246,33 @@ const TOOLS: Tool[] = [
         },
       },
       required: ["env"],
+    },
+  },
+  {
+    name: "anamnesis_validate",
+    description: "Validate AI-generated exploit code using SpiralSafe verification primitives (WAVE, SPHINX gates, ATOM trail). Designed for Anamnesis-style exploit generators to check code coherence and security properties.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        code: {
+          type: "string",
+          description: "JavaScript exploit code to validate",
+        },
+        vulnerability: {
+          type: "string",
+          description: "CVE identifier or vulnerability description",
+        },
+        targetBinary: {
+          type: "string",
+          description: "Optional: Binary being exploited",
+        },
+        mitigations: {
+          type: "array",
+          items: { type: "string" },
+          description: "Optional: Active protections (e.g., ['ASLR', 'PIE', 'NX'])",
+        },
+      },
+      required: ["code", "vulnerability"],
     },
   },
   // ... [Include remaining tools from original: scripts_run, awi_intent_request, discord_post, mc_execCommand, mc_query, grok_collab, grok_metrics]
@@ -475,6 +503,31 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             {
               type: "text",
               text: JSON.stringify(deployment, null, 2),
+            },
+          ],
+        };
+      }
+
+      case "anamnesis_validate": {
+        const { code, vulnerability, targetBinary, mitigations } = args as {
+          code: string;
+          vulnerability: string;
+          targetBinary?: string;
+          mitigations?: string[];
+        };
+        
+        const result = await validateExploit({
+          code,
+          vulnerability,
+          targetBinary,
+          mitigations
+        });
+        
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(result, null, 2),
             },
           ],
         };
