@@ -21,7 +21,7 @@ export async function waveCoherenceCheck(input: WaveCheckInput) {
     score: result.score,
     passed: result.passed,
     threshold: result.threshold,
-    recommendations: result.recommendations.map(r => r.message),
+    recommendations: result.recommendations, // Return full recommendation objects
     timestamp: result.timestamp,
   };
 }

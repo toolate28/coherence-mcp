@@ -447,6 +447,11 @@ async function main() {
         await handleWaveValidateCLI(args.slice(1));
         return;
     }
+    // Fibonacci weighting CLI commands
+    if (args.length > 0 && args[0] === 'fibonacci') {
+        await handleFibonacciCLI(args.slice(1));
+        return;
+    }
     // MCP Server mode
     const transport = new StdioServerTransport();
     await server.connect(transport);
@@ -503,6 +508,111 @@ async function handleWaveValidateCLI(args) {
         });
         // Exit with appropriate code
         process.exit(score.overall >= threshold ? 0 : 1);
+    }
+    catch (error) {
+        console.error(`Error: ${error instanceof Error ? error.message : String(error)}`);
+        process.exit(1);
+    }
+}
+// Handle Fibonacci CLI commands
+async function handleFibonacciCLI(args) {
+    const { assignCommand, optimizeCommand, visualizeCommand, refineCommand, criticalPathsCommand, } = await import('./fibonacci/cli.js');
+    if (args.length === 0) {
+        console.error('Usage: coherence-mcp fibonacci <command> [args...]');
+        console.error('');
+        console.error('Commands:');
+        console.error('  assign <component> <importance>         Assign Fibonacci weight to component');
+        console.error('  optimize --components <file> --budget <n>  Optimize resource allocation');
+        console.error('  visualize --input <file> [--output <file>]  Generate priority heatmap');
+        console.error('  refine --threshold <n> --method golden-ratio  Refine threshold with golden ratio');
+        console.error('  paths --components <file>                Find critical paths');
+        process.exit(1);
+    }
+    const command = args[0];
+    try {
+        switch (command) {
+            case 'assign':
+                if (args.length < 3) {
+                    console.error('Usage: coherence-mcp fibonacci assign <component> <importance>');
+                    process.exit(1);
+                }
+                await assignCommand(args[1], parseFloat(args[2]));
+                break;
+            case 'optimize': {
+                let componentsFile = '';
+                let budget = 100;
+                for (let i = 1; i < args.length; i++) {
+                    if (args[i] === '--components' && i + 1 < args.length) {
+                        componentsFile = args[i + 1];
+                        i++;
+                    }
+                    else if (args[i] === '--budget' && i + 1 < args.length) {
+                        budget = parseFloat(args[i + 1]);
+                        i++;
+                    }
+                }
+                if (!componentsFile) {
+                    console.error('Usage: coherence-mcp fibonacci optimize --components <file> --budget <n>');
+                    process.exit(1);
+                }
+                await optimizeCommand(componentsFile, budget);
+                break;
+            }
+            case 'visualize': {
+                let inputFile = '';
+                let outputFile;
+                for (let i = 1; i < args.length; i++) {
+                    if (args[i] === '--input' && i + 1 < args.length) {
+                        inputFile = args[i + 1];
+                        i++;
+                    }
+                    else if (args[i] === '--output' && i + 1 < args.length) {
+                        outputFile = args[i + 1];
+                        i++;
+                    }
+                }
+                if (!inputFile) {
+                    console.error('Usage: coherence-mcp fibonacci visualize --input <file> [--output <file>]');
+                    process.exit(1);
+                }
+                await visualizeCommand(inputFile, outputFile);
+                break;
+            }
+            case 'refine': {
+                let threshold = 60;
+                let method = 'golden-ratio';
+                for (let i = 1; i < args.length; i++) {
+                    if (args[i] === '--threshold' && i + 1 < args.length) {
+                        threshold = parseFloat(args[i + 1]);
+                        i++;
+                    }
+                    else if (args[i] === '--method' && i + 1 < args.length) {
+                        method = args[i + 1];
+                        i++;
+                    }
+                }
+                await refineCommand(threshold, method);
+                break;
+            }
+            case 'paths': {
+                let componentsFile = '';
+                for (let i = 1; i < args.length; i++) {
+                    if (args[i] === '--components' && i + 1 < args.length) {
+                        componentsFile = args[i + 1];
+                        i++;
+                    }
+                }
+                if (!componentsFile) {
+                    console.error('Usage: coherence-mcp fibonacci paths --components <file>');
+                    process.exit(1);
+                }
+                await criticalPathsCommand(componentsFile);
+                break;
+            }
+            default:
+                console.error(`Unknown command: ${command}`);
+                process.exit(1);
+        }
     }
     catch (error) {
         console.error(`Error: ${error instanceof Error ? error.message : String(error)}`);
