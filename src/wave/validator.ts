@@ -52,6 +52,26 @@ export interface WAVEScore {
   atomTrail: ATOMEntry[];       // Provenance of scoring decisions
 }
 
+// Constants for semantic analysis
+const MIN_WORD_LENGTH = 4;
+const ISOLATION_THRESHOLD = 0.05; // 5% overlap minimum
+const LEXICAL_DIVERSITY_MULTIPLIER = 300; // Scales diversity to 0-100 range
+
+// Common stop words to ignore in semantic analysis
+const STOP_WORDS = new Set([
+  'this', 'that', 'with', 'from', 'have', 'been', 'were', 'would', 'could', 
+  'should', 'will', 'what', 'when', 'where', 'which', 'their', 'there', 
+  'these', 'those', 'about', 'into', 'through', 'during', 'before', 'after', 
+  'above', 'below', 'between', 'under', 'again', 'further', 'then', 'once'
+]);
+
+/**
+ * Extract words from text for analysis
+ */
+function extractWords(text: string, minLength: number = MIN_WORD_LENGTH): string[] {
+  return text.toLowerCase().match(/\b\w{4,}\b/g) || [];
+}
+
 /**
  * Generate Fibonacci sequence up to n terms
  */
@@ -132,13 +152,10 @@ function analyzeSemanticConnectivity(content: string, sections: string[]): {
   
   // Extract concepts (nouns and important terms)
   const concepts = new Set<string>();
-  const words = content.toLowerCase().match(/\b[a-z]{4,}\b/g) || [];
-  
-  // Common stop words to ignore
-  const stopWords = new Set(['this', 'that', 'with', 'from', 'have', 'been', 'were', 'would', 'could', 'should', 'will', 'what', 'when', 'where', 'which', 'their', 'there', 'these', 'those', 'about', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'between', 'under', 'again', 'further', 'then', 'once']);
+  const words = extractWords(content);
   
   words.forEach(word => {
-    if (!stopWords.has(word) && word.length >= 4) {
+    if (!STOP_WORDS.has(word) && word.length >= MIN_WORD_LENGTH) {
       concepts.add(word);
     }
   });
@@ -148,8 +165,8 @@ function analyzeSemanticConnectivity(content: string, sections: string[]): {
   const sectionConcepts: Set<string>[] = [];
   
   sections.forEach(section => {
-    const sectionWords = section.toLowerCase().match(/\b[a-z]{4,}\b/g) || [];
-    const sectionConceptSet = new Set(sectionWords.filter(w => concepts.has(w) && !stopWords.has(w)));
+    const sectionWords = extractWords(section);
+    const sectionConceptSet = new Set(sectionWords.filter(w => concepts.has(w) && !STOP_WORDS.has(w)));
     sectionConcepts.push(sectionConceptSet);
     const coverage = sectionConceptSet.size / Math.max(concepts.size, 1);
     conceptDistribution.push(coverage);
@@ -173,8 +190,8 @@ function analyzeSemanticConnectivity(content: string, sections: string[]): {
       maxOverlap = Math.max(maxOverlap, overlapRatio);
     }
     
-    // Only flag if truly isolated (less than 5% overlap with any other section)
-    if (maxOverlap < 0.05) {
+    // Only flag if truly isolated (less than threshold overlap with any other section)
+    if (maxOverlap < ISOLATION_THRESHOLD) {
       isolatedCount++;
       violations.push({
         type: 'semantic',
@@ -191,7 +208,7 @@ function analyzeSemanticConnectivity(content: string, sections: string[]): {
   const isolationPenalty = (isolatedCount / Math.max(sections.length, 1)) * 15;
   
   // Base score on concept richness and distribution
-  const conceptRichness = Math.min(100, (concepts.size / Math.max(words.length, 1)) * 300); // Lexical diversity
+  const conceptRichness = Math.min(100, (concepts.size / Math.max(words.length, 1)) * LEXICAL_DIVERSITY_MULTIPLIER);
   const distributionScore = avgCoverage * 100;
   
   const semanticScore = Math.max(0, Math.min(100, (conceptRichness * 0.4 + distributionScore * 0.6 - isolationPenalty)));
@@ -436,9 +453,9 @@ function detectContradictions(content: string, contentArray: string[]): {
       const s2 = statements[j];
       
       if (s1.polarity !== s2.polarity) {
-        // Check if they reference similar concepts (simplified: check word overlap)
-        const words1 = new Set(s1.text.toLowerCase().match(/\b[a-z]{4,}\b/g) || []);
-        const words2 = new Set(s2.text.toLowerCase().match(/\b[a-z]{4,}\b/g) || []);
+        // Check if they reference similar concepts (check word overlap)
+        const words1 = new Set(extractWords(s1.text));
+        const words2 = new Set(extractWords(s2.text));
         
         const overlap = [...words1].filter(w => words2.has(w)).length;
         const minSize = Math.min(words1.size, words2.size);
@@ -460,7 +477,7 @@ function detectContradictions(content: string, contentArray: string[]): {
   if (contentArray.length > 1) {
     // Extract key terms from each document
     const docTerms = contentArray.map(doc => {
-      const terms = new Set(doc.toLowerCase().match(/\b[a-z]{5,}\b/g) || []);
+      const terms = new Set(extractWords(doc, 5)); // Use slightly longer words for cross-doc
       return terms;
     });
     
@@ -587,8 +604,11 @@ export async function validateWAVE(
     ['validator.ts'],
     ['WAVE', 'COHERENCE', `SCORE_${overall}`],
     'VERIFY'
-  ).catch(() => {
-    // Silently fail if ATOM tracking is unavailable
+  ).catch((error) => {
+    // Log ATOM tracking failure if in debug mode
+    if (process.env.DEBUG) {
+      console.error('ATOM tracking failed:', error instanceof Error ? error.message : String(error));
+    }
   });
   
   return {

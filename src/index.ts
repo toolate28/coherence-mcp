@@ -305,7 +305,21 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case "wave_validate": {
-        const { content, threshold = 80 } = args as { content: string | string[]; threshold?: number };
+        const args_ = args as { content?: string | string[]; threshold?: number };
+        
+        // Validate required parameters
+        if (!args_.content) {
+          throw new Error('Missing required parameter: content');
+        }
+        
+        const content = args_.content;
+        const threshold = typeof args_.threshold === 'number' ? args_.threshold : 80;
+        
+        // Validate threshold range
+        if (threshold < 0 || threshold > 100) {
+          throw new Error('Threshold must be between 0 and 100');
+        }
+        
         const score = await validateWAVE(content, threshold);
         
         // Convert Map to object for JSON serialization
