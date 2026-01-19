@@ -49,12 +49,20 @@ export interface CriticalPath {
 export const GOLDEN_RATIO = (1 + Math.sqrt(5)) / 2; // φ ≈ 1.618
 
 /**
+ * Round number to two decimal places
+ */
+function roundToTwoDecimals(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+/**
  * Fibonacci Weighting Engine
  * 
  * Core class for managing Fibonacci-based component prioritization
  */
 export class FibonacciWeightingEngine {
   private fibSequence: number[];
+  private static readonly MAX_FIBONACCI_POSITION = 10;
   
   constructor() {
     // Pre-calculate Fibonacci sequence up to F(20)
@@ -108,7 +116,7 @@ export class FibonacciWeightingEngine {
     // Map importance to Fibonacci position (1-10)
     // Higher importance = higher Fibonacci position = exponentially greater weight
     // Ensure minimum position of 1 (even for 0 importance)
-    const position = Math.max(1, Math.ceil((normalizedImportance / 100) * 10));
+    const position = Math.max(1, Math.ceil((normalizedImportance / 100) * FibonacciWeightingEngine.MAX_FIBONACCI_POSITION));
     const fibonacciWeight = this.getFibonacci(position);
     
     // Determine priority level
@@ -169,8 +177,8 @@ export class FibonacciWeightingEngine {
       
       return {
         component: component.name,
-        allocation: Math.round(allocation * 100) / 100,
-        percentage: Math.round(percentage * 100) / 100
+        allocation: roundToTwoDecimals(allocation),
+        percentage: roundToTwoDecimals(percentage)
       };
     });
     
@@ -181,8 +189,8 @@ export class FibonacciWeightingEngine {
     
     return {
       allocations,
-      totalAllocated: Math.round(totalAllocated * 100) / 100,
-      efficiency: Math.round(efficiency * 100) / 100
+      totalAllocated: roundToTwoDecimals(totalAllocated),
+      efficiency: roundToTwoDecimals(efficiency)
     };
   }
   
@@ -257,7 +265,7 @@ export class FibonacciWeightingEngine {
    * @returns Refined threshold using golden ratio
    */
   refineThresholdWithGoldenRatio(baseThreshold: number): number {
-    return Math.round(baseThreshold * GOLDEN_RATIO * 100) / 100;
+    return roundToTwoDecimals(baseThreshold * GOLDEN_RATIO);
   }
   
   /**
@@ -282,7 +290,7 @@ export class FibonacciWeightingEngine {
       name: component.name,
       weight: component.impactMultiplier,
       barLength: Math.round((component.impactMultiplier / maxWeight) * 40), // 40 chars max
-      percentage: Math.round((component.impactMultiplier / totalWeight) * 100 * 100) / 100
+      percentage: roundToTwoDecimals((component.impactMultiplier / totalWeight) * 100)
     }));
   }
 }
