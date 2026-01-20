@@ -159,8 +159,16 @@ function calculatePotential(text: string, lexicalDiversity: number): number {
   const connectiveCount = words.filter(w => connectives.includes(w)).length;
   const connectiveRatio = words.length > 0 ? connectiveCount / words.length : 0;
 
+  // Guard against invalid lexicalDiversity
+  const safeLexDiv = isNaN(lexicalDiversity) || !isFinite(lexicalDiversity) ? 0 : lexicalDiversity;
+
   // High potential = rich vocabulary + structured connections
-  return Math.min(1, lexicalDiversity * 0.6 + connectiveRatio * 20 * 0.4);
+  const potential = safeLexDiv * 0.6 + connectiveRatio * 20 * 0.4;
+  
+  // Guard against NaN or Infinity
+  if (isNaN(potential) || !isFinite(potential)) return 0;
+  
+  return Math.min(1, Math.max(0, potential));
 }
 
 /**
@@ -169,6 +177,9 @@ function calculatePotential(text: string, lexicalDiversity: number): number {
 function calculateEntropy(text: string): number {
   const chars = text.split('');
   const freq: Map<string, number> = new Map();
+
+  // Guard against empty text
+  if (chars.length === 0) return 0;
 
   for (const char of chars) {
     freq.set(char, (freq.get(char) || 0) + 1);
@@ -179,11 +190,19 @@ function calculateEntropy(text: string): number {
 
   for (const count of freq.values()) {
     const p = count / total;
-    entropy -= p * Math.log2(p);
+    // Guard against log2(0) which is -Infinity
+    if (p > 0) {
+      entropy -= p * Math.log2(p);
+    }
   }
 
   // Normalize to 0-1 range (assuming max entropy ≈ 8 bits for English text)
-  return Math.min(1, entropy / 8);
+  const normalized = entropy / 8;
+  
+  // Final guard against NaN or Infinity
+  if (isNaN(normalized) || !isFinite(normalized)) return 0.5;
+  
+  return Math.min(1, Math.max(0, normalized));
 }
 
 /**
@@ -226,38 +245,47 @@ export function analyzeWave(input: string): WaveAnalysisResult {
   const potential = calculatePotential(input, lexicalDiversity);
   const entropy = calculateEntropy(input);
 
+  // Guard against NaN values
+  const safeCurl = isNaN(curl) || !isFinite(curl) ? 0 : curl;
+  const safeDivergence = isNaN(divergence) || !isFinite(divergence) ? 0 : divergence;
+  const safePotential = isNaN(potential) || !isFinite(potential) ? 0 : potential;
+  const safeEntropy = isNaN(entropy) || !isFinite(entropy) ? 0.5 : entropy;
+
   const coherence: CoherenceMetrics = {
-    curl,
-    divergence,
-    potential,
-    entropy,
+    curl: safeCurl,
+    divergence: safeDivergence,
+    potential: safePotential,
+    entropy: safeEntropy,
   };
 
   // Generate warnings based on thresholds (from wave-spec.md)
-  if (curl > 0.6) {
+  if (safeCurl > 0.6) {
     warnings.push('CRITICAL: High curl detected (circular reasoning)');
-  } else if (curl > 0.3) {
+  } else if (safeCurl > 0.3) {
     warnings.push('WARNING: Moderate curl detected');
   }
 
-  if (divergence > 0.7) {
+  if (safeDivergence > 0.7) {
     warnings.push('CRITICAL: High positive divergence (unresolved expansion)');
-  } else if (divergence > 0.4) {
+  } else if (safeDivergence > 0.4) {
     warnings.push('WARNING: Moderate positive divergence');
   }
 
-  if (potential > 0.7) {
+  if (safePotential > 0.7) {
     warnings.push('NOTE: High potential region (consider development)');
   }
 
   // Overall coherence score (weighted combination)
   const coherenceScore = Math.round(
-    (1 - curl * 0.4 - // Penalize circular reasoning
-      Math.abs(divergence - 0.2) * 0.3 - // Prefer slight positive divergence
-      (1 - potential) * 0.2 - // Reward high potential
-      (1 - entropy) * 0.1) * // Reward information density
+    (1 - safeCurl * 0.4 - // Penalize circular reasoning
+      Math.abs(safeDivergence - 0.2) * 0.3 - // Prefer slight positive divergence
+      (1 - safePotential) * 0.2 - // Reward high potential
+      (1 - safeEntropy) * 0.1) * // Reward information density
       100
   );
+
+  // Final guard to ensure coherenceScore is never NaN
+  const finalCoherenceScore = isNaN(coherenceScore) || !isFinite(coherenceScore) ? 0 : coherenceScore;
 
   // Identify regions (simplified: sentences with issues)
   const highCurl: number[] = [];
@@ -280,7 +308,7 @@ export function analyzeWave(input: string): WaveAnalysisResult {
     input: input.substring(0, 200) + (input.length > 200 ? '...' : ''),
     metrics,
     coherence,
-    coherenceScore: Math.max(0, Math.min(100, coherenceScore)),
+    coherenceScore: Math.max(0, Math.min(100, finalCoherenceScore)),
     warnings,
     regions: {
       highCurl,
