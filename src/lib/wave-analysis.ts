@@ -322,7 +322,7 @@ export function analyzeWave(input: string): WaveAnalysisResult {
     input: input.substring(0, 200) + (input.length > 200 ? '...' : ''),
     metrics,
     coherence,
-    coherenceScore: Math.max(0, Math.min(100, finalCoherenceScore)),
+    coherenceScore: finalCoherenceScore,
     warnings,
     regions: {
       highCurl,
