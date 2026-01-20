@@ -9,6 +9,24 @@
  * Future enhancement: integrate semantic embeddings for true vector field analysis.
  */
 
+// Constants for default/fallback values
+const DEFAULT_ENTROPY = 0.5; // Fallback for invalid entropy (middle-ground value)
+
+/**
+ * Guard against NaN and Infinity values
+ * @param value - Value to check
+ * @param fallback - Fallback value if invalid
+ * @param min - Minimum allowed value
+ * @param max - Maximum allowed value
+ * @returns Validated value within range
+ */
+function sanitizeMetric(value: number, fallback: number, min: number = 0, max: number = 1): number {
+  if (isNaN(value) || !isFinite(value)) {
+    return fallback;
+  }
+  return Math.min(max, Math.max(min, value));
+}
+
 export interface WaveMetrics {
   wordCount: number;
   sentenceCount: number;
@@ -159,8 +177,14 @@ function calculatePotential(text: string, lexicalDiversity: number): number {
   const connectiveCount = words.filter(w => connectives.includes(w)).length;
   const connectiveRatio = words.length > 0 ? connectiveCount / words.length : 0;
 
+  // Guard against invalid lexicalDiversity using sanitizeMetric
+  const safeLexDiv = sanitizeMetric(lexicalDiversity, 0);
+
   // High potential = rich vocabulary + structured connections
-  return Math.min(1, lexicalDiversity * 0.6 + connectiveRatio * 20 * 0.4);
+  const potential = safeLexDiv * 0.6 + connectiveRatio * 20 * 0.4;
+  
+  // Use sanitizeMetric for final validation
+  return sanitizeMetric(potential, 0);
 }
 
 /**
@@ -169,6 +193,9 @@ function calculatePotential(text: string, lexicalDiversity: number): number {
 function calculateEntropy(text: string): number {
   const chars = text.split('');
   const freq: Map<string, number> = new Map();
+
+  // Guard against empty text
+  if (chars.length === 0) return 0;
 
   for (const char of chars) {
     freq.set(char, (freq.get(char) || 0) + 1);
@@ -179,11 +206,17 @@ function calculateEntropy(text: string): number {
 
   for (const count of freq.values()) {
     const p = count / total;
-    entropy -= p * Math.log2(p);
+    // Guard against log2(0) which is -Infinity
+    if (p > 0) {
+      entropy -= p * Math.log2(p);
+    }
   }
 
   // Normalize to 0-1 range (assuming max entropy ≈ 8 bits for English text)
-  return Math.min(1, entropy / 8);
+  const normalized = entropy / 8;
+  
+  // Use sanitizeMetric with DEFAULT_ENTROPY fallback
+  return sanitizeMetric(normalized, DEFAULT_ENTROPY);
 }
 
 /**
@@ -226,38 +259,47 @@ export function analyzeWave(input: string): WaveAnalysisResult {
   const potential = calculatePotential(input, lexicalDiversity);
   const entropy = calculateEntropy(input);
 
+  // Guard against NaN values using sanitizeMetric utility
+  const safeCurl = sanitizeMetric(curl, 0);
+  const safeDivergence = sanitizeMetric(divergence, 0);
+  const safePotential = sanitizeMetric(potential, 0);
+  const safeEntropy = sanitizeMetric(entropy, DEFAULT_ENTROPY);
+
   const coherence: CoherenceMetrics = {
-    curl,
-    divergence,
-    potential,
-    entropy,
+    curl: safeCurl,
+    divergence: safeDivergence,
+    potential: safePotential,
+    entropy: safeEntropy,
   };
 
   // Generate warnings based on thresholds (from wave-spec.md)
-  if (curl > 0.6) {
+  if (safeCurl > 0.6) {
     warnings.push('CRITICAL: High curl detected (circular reasoning)');
-  } else if (curl > 0.3) {
+  } else if (safeCurl > 0.3) {
     warnings.push('WARNING: Moderate curl detected');
   }
 
-  if (divergence > 0.7) {
+  if (safeDivergence > 0.7) {
     warnings.push('CRITICAL: High positive divergence (unresolved expansion)');
-  } else if (divergence > 0.4) {
+  } else if (safeDivergence > 0.4) {
     warnings.push('WARNING: Moderate positive divergence');
   }
 
-  if (potential > 0.7) {
+  if (safePotential > 0.7) {
     warnings.push('NOTE: High potential region (consider development)');
   }
 
   // Overall coherence score (weighted combination)
   const coherenceScore = Math.round(
-    (1 - curl * 0.4 - // Penalize circular reasoning
-      Math.abs(divergence - 0.2) * 0.3 - // Prefer slight positive divergence
-      (1 - potential) * 0.2 - // Reward high potential
-      (1 - entropy) * 0.1) * // Reward information density
+    (1 - safeCurl * 0.4 - // Penalize circular reasoning
+      Math.abs(safeDivergence - 0.2) * 0.3 - // Prefer slight positive divergence
+      (1 - safePotential) * 0.2 - // Reward high potential
+      (1 - safeEntropy) * 0.1) * // Reward information density
       100
   );
+
+  // Final guard using sanitizeMetric for coherenceScore (0-100 range)
+  const finalCoherenceScore = sanitizeMetric(coherenceScore, 0, 0, 100);
 
   // Identify regions (simplified: sentences with issues)
   const highCurl: number[] = [];
@@ -280,7 +322,7 @@ export function analyzeWave(input: string): WaveAnalysisResult {
     input: input.substring(0, 200) + (input.length > 200 ? '...' : ''),
     metrics,
     coherence,
-    coherenceScore: Math.max(0, Math.min(100, coherenceScore)),
+    coherenceScore: finalCoherenceScore,
     warnings,
     regions: {
       highCurl,

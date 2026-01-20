@@ -273,6 +273,9 @@ const TOOLS: Tool[] = [
         },
       },
       required: ["code", "vulnerability"],
+    },
+  },
+  {
     name: "fibonacci_assign_weight",
     description: "Assign Fibonacci weight to a system component based on importance. Returns weight position, impact multiplier, and priority level (critical/high/medium/low). Higher importance = exponentially greater weight.",
     inputSchema: {
@@ -630,6 +633,17 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           targetBinary,
           mitigations
         });
+        
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(result, null, 2),
+            },
+          ],
+        };
+      }
+      
       case "fibonacci_assign_weight": {
         const { componentName, importance } = args as {
           componentName: string;
@@ -726,7 +740,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           content: [
             {
               type: "text",
-              text: JSON.stringify(result, null, 2),
               text: JSON.stringify({
                 method: "golden-ratio",
                 goldenRatio: GOLDEN_RATIO,
@@ -773,6 +786,9 @@ async function main() {
   // Anamnesis CLI commands
   if (args.length > 0 && args[0] === 'anamnesis') {
     await handleAnamnesisCliCommands(args.slice(1));
+    return;
+  }
+  
   // Fibonacci weighting CLI commands
   if (args.length > 0 && args[0] === 'fibonacci') {
     await handleFibonacciCLI(args.slice(1));
@@ -859,6 +875,21 @@ async function handleAnamnesisCliCommands(args: string[]) {
     console.error('Commands:');
     console.error('  validate <file> --vuln <CVE>         Validate single exploit file');
     console.error('  batch-validate <dir> --output <file> Validate all exploits in directory');
+    process.exit(1);
+  }
+  
+  const command = args[0];
+  
+  if (command === 'validate') {
+    await handleAnamnesisValidate(args.slice(1));
+  } else if (command === 'batch-validate') {
+    await handleAnamnesiBatchValidate(args.slice(1));
+  } else {
+    console.error(`Unknown anamnesis command: ${command}`);
+    process.exit(1);
+  }
+}
+
 // Handle Fibonacci CLI commands
 async function handleFibonacciCLI(args: string[]) {
   const {
@@ -883,14 +914,8 @@ async function handleFibonacciCLI(args: string[]) {
   
   const command = args[0];
   
-  if (command === 'validate') {
-    await handleAnamnesisValidate(args.slice(1));
-  } else if (command === 'batch-validate') {
-    await handleAnamnesiBatchValidate(args.slice(1));
-  } else {
-    console.error(`Unknown anamnesis command: ${command}`);
-    process.exit(1);
-  }
+  // Delegate to handleFibonacciCommand for actual execution
+  await handleFibonacciCommand(args);
 }
 
 // Handle CLI anamnesis validate command
@@ -1107,6 +1132,24 @@ async function handleAnamnesiBatchValidate(args: string[]) {
     
     process.exit(failedCount === 0 ? 0 : 1);
     
+  } catch (error) {
+    console.error(`Error: ${error instanceof Error ? error.message : String(error)}`);
+    process.exit(1);
+  }
+}
+
+// Fibonacci CLI handler
+async function handleFibonacciCommand(args: string[]) {
+  const {
+    assignCommand,
+    optimizeCommand,
+    visualizeCommand,
+    refineCommand,
+    criticalPathsCommand,
+  } = await import('./fibonacci/cli.js');
+  
+  const command = args[0];
+  
   try {
     switch (command) {
       case 'assign':
