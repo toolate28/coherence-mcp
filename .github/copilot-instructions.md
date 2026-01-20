@@ -58,3 +58,8 @@ npm run watch    # Development mode
 - SpiralSafe README: Core protocols
 - MCP Specification: https://modelcontextprotocol.io
 - This repo's README.md: Tool listing
+
+## Repository Context
+
+- **Description**: MCP server that surfaces coherence, governance, and safety primitives: Wave/Bump validation, ATOM trail + gates, .context.yaml packing, AWI intent scaffolding, and docs/search across the SpiralSafe corpus.
+- **Language Composition**: TypeScript (58%), JavaScript (32.6%), Python (7.5%), Shell (1.9%)
