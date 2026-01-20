@@ -255,6 +255,9 @@ const TOOLS = [
                 },
             },
             required: ["code", "vulnerability"],
+        },
+    },
+    {
         name: "fibonacci_assign_weight",
         description: "Assign Fibonacci weight to a system component based on importance. Returns weight position, impact multiplier, and priority level (critical/high/medium/low). Higher importance = exponentially greater weight.",
         inputSchema: {
@@ -564,6 +567,15 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                     targetBinary,
                     mitigations
                 });
+                return {
+                    content: [
+                        {
+                            type: "text",
+                            text: JSON.stringify(result, null, 2),
+                        },
+                    ],
+                };
+            }
             case "fibonacci_assign_weight": {
                 const { componentName, importance } = args;
                 const { FibonacciWeightingEngine } = await import('./fibonacci/weighting.js');
@@ -573,7 +585,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                     content: [
                         {
                             type: "text",
-                            text: JSON.stringify(result, null, 2),
                             text: JSON.stringify({
                                 component: component.name,
                                 importance,
@@ -685,6 +696,8 @@ async function main() {
     // Anamnesis CLI commands
     if (args.length > 0 && args[0] === 'anamnesis') {
         await handleAnamnesisCliCommands(args.slice(1));
+        return;
+    }
     // Fibonacci weighting CLI commands
     if (args.length > 0 && args[0] === 'fibonacci') {
         await handleFibonacciCLI(args.slice(1));
@@ -772,6 +785,24 @@ async function handleAnamnesisCliCommands(args) {
         console.error(`Unknown anamnesis command: ${command}`);
         process.exit(1);
     }
+}
+// Handle Fibonacci CLI commands
+async function handleFibonacciCLI(args) {
+    const { assignCommand, optimizeCommand, visualizeCommand, refineCommand, criticalPathsCommand, } = await import('./fibonacci/cli.js');
+    if (args.length === 0) {
+        console.error('Usage: coherence-mcp fibonacci <command> [args...]');
+        console.error('');
+        console.error('Commands:');
+        console.error('  assign <component> <importance>         Assign Fibonacci weight to component');
+        console.error('  optimize --components <file> --budget <n>  Optimize resource allocation');
+        console.error('  visualize --input <file> [--output <file>]  Generate priority heatmap');
+        console.error('  refine --threshold <n> --method golden-ratio  Refine threshold with golden ratio');
+        console.error('  paths --components <file>                Find critical paths');
+        process.exit(1);
+    }
+    const command = args[0];
+    // Delegate to handleFibonacciCommand for actual execution
+    await handleFibonacciCommand(args);
 }
 // Handle CLI anamnesis validate command
 async function handleAnamnesisValidate(args) {
@@ -962,20 +993,15 @@ async function handleAnamnesiBatchValidate(args) {
             console.log(output);
         }
         process.exit(failedCount === 0 ? 0 : 1);
-// Handle Fibonacci CLI commands
-async function handleFibonacciCLI(args) {
-    const { assignCommand, optimizeCommand, visualizeCommand, refineCommand, criticalPathsCommand, } = await import('./fibonacci/cli.js');
-    if (args.length === 0) {
-        console.error('Usage: coherence-mcp fibonacci <command> [args...]');
-        console.error('');
-        console.error('Commands:');
-        console.error('  assign <component> <importance>         Assign Fibonacci weight to component');
-        console.error('  optimize --components <file> --budget <n>  Optimize resource allocation');
-        console.error('  visualize --input <file> [--output <file>]  Generate priority heatmap');
-        console.error('  refine --threshold <n> --method golden-ratio  Refine threshold with golden ratio');
-        console.error('  paths --components <file>                Find critical paths');
+    }
+    catch (error) {
+        console.error(`Error: ${error instanceof Error ? error.message : String(error)}`);
         process.exit(1);
     }
+}
+// Fibonacci CLI handler
+async function handleFibonacciCommand(args) {
+    const { assignCommand, optimizeCommand, visualizeCommand, refineCommand, criticalPathsCommand, } = await import('./fibonacci/cli.js');
     const command = args[0];
     try {
         switch (command) {
