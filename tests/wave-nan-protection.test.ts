@@ -7,6 +7,9 @@
 import { describe, it, expect } from 'vitest';
 import { analyzeWave } from '../src/lib/wave-analysis.js';
 
+// Test constants
+const VERY_LONG_TEXT_WORD_COUNT = 10000;
+
 describe('WAVE Analysis NaN Protection', () => {
   it('should never return NaN for empty string', () => {
     const result = analyzeWave('');
@@ -109,7 +112,7 @@ describe('WAVE Analysis NaN Protection', () => {
   });
 
   it('should never return NaN for very long text', () => {
-    const longText = 'word '.repeat(10000);
+    const longText = 'word '.repeat(VERY_LONG_TEXT_WORD_COUNT);
     const result = analyzeWave(longText);
     
     expect(result.coherenceScore).not.toBeNaN();

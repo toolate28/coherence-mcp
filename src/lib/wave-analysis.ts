@@ -9,6 +9,24 @@
  * Future enhancement: integrate semantic embeddings for true vector field analysis.
  */
 
+// Constants for default/fallback values
+const DEFAULT_ENTROPY = 0.5; // Fallback for invalid entropy (middle-ground value)
+
+/**
+ * Guard against NaN and Infinity values
+ * @param value - Value to check
+ * @param fallback - Fallback value if invalid
+ * @param min - Minimum allowed value
+ * @param max - Maximum allowed value
+ * @returns Validated value within range
+ */
+function sanitizeMetric(value: number, fallback: number, min: number = 0, max: number = 1): number {
+  if (isNaN(value) || !isFinite(value)) {
+    return fallback;
+  }
+  return Math.min(max, Math.max(min, value));
+}
+
 export interface WaveMetrics {
   wordCount: number;
   sentenceCount: number;
@@ -159,16 +177,14 @@ function calculatePotential(text: string, lexicalDiversity: number): number {
   const connectiveCount = words.filter(w => connectives.includes(w)).length;
   const connectiveRatio = words.length > 0 ? connectiveCount / words.length : 0;
 
-  // Guard against invalid lexicalDiversity
-  const safeLexDiv = isNaN(lexicalDiversity) || !isFinite(lexicalDiversity) ? 0 : lexicalDiversity;
+  // Guard against invalid lexicalDiversity using sanitizeMetric
+  const safeLexDiv = sanitizeMetric(lexicalDiversity, 0);
 
   // High potential = rich vocabulary + structured connections
   const potential = safeLexDiv * 0.6 + connectiveRatio * 20 * 0.4;
   
-  // Guard against NaN or Infinity
-  if (isNaN(potential) || !isFinite(potential)) return 0;
-  
-  return Math.min(1, Math.max(0, potential));
+  // Use sanitizeMetric for final validation
+  return sanitizeMetric(potential, 0);
 }
 
 /**
@@ -199,10 +215,8 @@ function calculateEntropy(text: string): number {
   // Normalize to 0-1 range (assuming max entropy ≈ 8 bits for English text)
   const normalized = entropy / 8;
   
-  // Final guard against NaN or Infinity
-  if (isNaN(normalized) || !isFinite(normalized)) return 0.5;
-  
-  return Math.min(1, Math.max(0, normalized));
+  // Use sanitizeMetric with DEFAULT_ENTROPY fallback
+  return sanitizeMetric(normalized, DEFAULT_ENTROPY);
 }
 
 /**
@@ -245,11 +259,11 @@ export function analyzeWave(input: string): WaveAnalysisResult {
   const potential = calculatePotential(input, lexicalDiversity);
   const entropy = calculateEntropy(input);
 
-  // Guard against NaN values
-  const safeCurl = isNaN(curl) || !isFinite(curl) ? 0 : curl;
-  const safeDivergence = isNaN(divergence) || !isFinite(divergence) ? 0 : divergence;
-  const safePotential = isNaN(potential) || !isFinite(potential) ? 0 : potential;
-  const safeEntropy = isNaN(entropy) || !isFinite(entropy) ? 0.5 : entropy;
+  // Guard against NaN values using sanitizeMetric utility
+  const safeCurl = sanitizeMetric(curl, 0);
+  const safeDivergence = sanitizeMetric(divergence, 0);
+  const safePotential = sanitizeMetric(potential, 0);
+  const safeEntropy = sanitizeMetric(entropy, DEFAULT_ENTROPY);
 
   const coherence: CoherenceMetrics = {
     curl: safeCurl,
@@ -284,8 +298,8 @@ export function analyzeWave(input: string): WaveAnalysisResult {
       100
   );
 
-  // Final guard to ensure coherenceScore is never NaN
-  const finalCoherenceScore = isNaN(coherenceScore) || !isFinite(coherenceScore) ? 0 : coherenceScore;
+  // Final guard using sanitizeMetric for coherenceScore (0-100 range)
+  const finalCoherenceScore = sanitizeMetric(coherenceScore, 0, 0, 100);
 
   // Identify regions (simplified: sentences with issues)
   const highCurl: number[] = [];
