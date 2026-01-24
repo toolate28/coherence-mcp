@@ -16,66 +16,67 @@ This draft maps how the MCP server starts, authenticates, and serves requests ov
 ## Request flow (stdio)
 ```mermaid
 flowchart TD
-  A[["🖥️ Client (MCP)"]] -->|"📡 JSON-RPC over stdio"| B("💬 StdioServerTransport")
+  A[["🖥️ Client (MCP)"]] -->|"📡 JSON-RPC over stdio"| B(("💬 StdioServerTransport"))
   
   subgraph initialization["🚀 Initialization Phase"]
     direction TB
-    C["🤝 Server init handshake"]
-    D["📢 Advertise capabilities"]
+    C[/"🤝 Server init handshake"/]
+    D[/"📢 Advertise capabilities"/]
   end
   
   subgraph handlers["⚙️ Request Handlers"]
     direction TB
-    E["📁 Resources handler"]
-    F["🛠️ Tools handler"]
+    E(["📁 Resources handler"])
+    F(["🛠️ Tools handler"])
   end
   
   subgraph routing["🔀 Tool Routing & Security"]
     direction TB
-    G["🎯 Tool router"]
-    H{"⏱️ Rate limit"}
-    I["🔐 Auth context<br/>bearer/HMAC to scopes"]
-    J["🔍 Lookup tool"]
+    G{{"🎯 Tool router"}}
+    H{{"⏱️ Rate limit<br/>check"}}
+    I[["🔐 Auth context<br/>bearer/HMAC to scopes"]]
+    J[["🔍 Lookup tool<br/>from registry"]]
   end
   
   subgraph execution["⚡ Execution Layer"]
     direction TB
-    K["▶️ Execute tool handler"]
-    L["🔌 Adapters / IO"]
+    K>"▶️ Execute tool handler"]
+    L>"🔌 Adapters / IO<br/>External Systems"]
   end
   
   subgraph response["✅ Response & Audit"]
     direction TB
-    M["📊 Result"]
-    N["📝 Audit log write"]
-    O["📤 Response to client"]
+    M[\"📊 Result"\]
+    N[\"📝 Audit log write"\]
+    O[\"📤 Response to client"\]
   end
   
   B ==> C
   C ==> D
-  B -.->|"resources/list"| E
-  B -.->|"tools/list"| F
-  B ==>|"call_tool"| G
+  D ==> handlers
+  B -.->|"📋 resources/list"| E
+  B -.->|"🔧 tools/list"| F
+  B ==>|"⚡ call_tool"| G
   G ==> H
-  H ==>|"✓ allowed"| I
-  H -.->|"✗ denied"| O
-  I ==> J
-  J ==> K
-  K ==> L
+  H ==>|"✅ allowed"| I
+  H -.->|"❌ denied<br/>rate exceeded"| O
+  I ==>|"🔓 authorized"| J
+  J ==>|"✓ found"| K
+  K <--> L
   K ==> M
   M ==> N
   N ==> O
   O ==> A
   
-  %% Enhanced Styling
-  classDef clientStyle fill:#2196F3,stroke:#0D47A1,stroke-width:4px,color:#fff,rx:15,ry:15
-  classDef transportStyle fill:#00BCD4,stroke:#00838F,stroke-width:3px,color:#000,rx:20,ry:20
-  classDef initStyle fill:#8BC34A,stroke:#558B2F,stroke-width:3px,color:#000,rx:10,ry:10
-  classDef handlerStyle fill:#FF9800,stroke:#E65100,stroke-width:3px,color:#fff,rx:10,ry:10
-  classDef securityStyle fill:#9C27B0,stroke:#4A148C,stroke-width:3px,color:#fff,rx:10,ry:10
-  classDef executionStyle fill:#FFC107,stroke:#F57F17,stroke-width:3px,color:#000,rx:10,ry:10
-  classDef auditStyle fill:#4CAF50,stroke:#1B5E20,stroke-width:3px,color:#fff,rx:10,ry:10
-  classDef limitStyle fill:#F44336,stroke:#B71C1C,stroke-width:3px,color:#fff
+  %% Enhanced Styling with Modern Colors
+  classDef clientStyle fill:#1E88E5,stroke:#0D47A1,stroke-width:5px,color:#fff,font-weight:bold
+  classDef transportStyle fill:#00ACC1,stroke:#006064,stroke-width:4px,color:#fff,font-weight:bold
+  classDef initStyle fill:#66BB6A,stroke:#2E7D32,stroke-width:3px,color:#fff,font-weight:bold
+  classDef handlerStyle fill:#FF7043,stroke:#D84315,stroke-width:3px,color:#fff,font-weight:bold
+  classDef securityStyle fill:#AB47BC,stroke:#6A1B9A,stroke-width:4px,color:#fff,font-weight:bold
+  classDef executionStyle fill:#FFCA28,stroke:#F57F17,stroke-width:3px,color:#000,font-weight:bold
+  classDef auditStyle fill:#26A69A,stroke:#00695C,stroke-width:3px,color:#fff,font-weight:bold
+  classDef limitStyle fill:#EF5350,stroke:#C62828,stroke-width:4px,color:#fff,font-weight:bold
   
   class A clientStyle
   class B transportStyle
@@ -86,22 +87,23 @@ flowchart TD
   class K,L executionStyle
   class M,N,O auditStyle
   
-  %% Subgraph Styling
-  style initialization fill:#E8F5E9,stroke:#4CAF50,stroke-width:3px,color:#1B5E20
-  style handlers fill:#FFF3E0,stroke:#FF9800,stroke-width:3px,color:#E65100
-  style routing fill:#F3E5F5,stroke:#9C27B0,stroke-width:3px,color:#4A148C
-  style execution fill:#FFFDE7,stroke:#FFC107,stroke-width:3px,color:#F57F17
-  style response fill:#E8F5E9,stroke:#4CAF50,stroke-width:3px,color:#1B5E20
+  %% Subgraph Styling with Enhanced Colors and Borders
+  style initialization fill:#E8F5E9,stroke:#43A047,stroke-width:4px,color:#1B5E20,rx:15,ry:15
+  style handlers fill:#FFF3E0,stroke:#FB8C00,stroke-width:4px,color:#E65100,rx:15,ry:15
+  style routing fill:#F3E5F5,stroke:#8E24AA,stroke-width:5px,color:#4A148C,rx:15,ry:15
+  style execution fill:#FFF9C4,stroke:#F9A825,stroke-width:4px,color:#F57F17,rx:15,ry:15
+  style response fill:#E0F2F1,stroke:#00897B,stroke-width:4px,color:#004D40,rx:15,ry:15
   
-  %% Link Styling
-  linkStyle 0 stroke:#2196F3,stroke-width:3px
-  linkStyle 1,2 stroke:#8BC34A,stroke-width:3px
-  linkStyle 3,4 stroke:#FF9800,stroke-width:2px,stroke-dasharray:5
-  linkStyle 5,6,7 stroke:#9C27B0,stroke-width:3px
-  linkStyle 8 stroke:#F44336,stroke-width:2px,stroke-dasharray:5
-  linkStyle 9,10,11,12 stroke:#FFC107,stroke-width:3px
-  linkStyle 13,14 stroke:#4CAF50,stroke-width:3px
-  linkStyle 15 stroke:#2196F3,stroke-width:3px
+  %% Link Styling with Enhanced Colors and Width
+  linkStyle 0 stroke:#1E88E5,stroke-width:4px
+  linkStyle 1,2,3 stroke:#66BB6A,stroke-width:3px
+  linkStyle 4,5 stroke:#FF7043,stroke-width:2px,stroke-dasharray:5 5
+  linkStyle 6,7,8 stroke:#AB47BC,stroke-width:4px
+  linkStyle 9 stroke:#EF5350,stroke-width:3px,stroke-dasharray:5 5
+  linkStyle 10,11 stroke:#AB47BC,stroke-width:3px
+  linkStyle 12,13 stroke:#FFCA28,stroke-width:3px
+  linkStyle 14,15 stroke:#26A69A,stroke-width:3px
+  linkStyle 16 stroke:#1E88E5,stroke-width:4px
 ```
 
 ## Sequence (call_tool happy path)

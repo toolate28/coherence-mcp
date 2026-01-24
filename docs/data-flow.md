@@ -6,85 +6,85 @@ The diagram shows how an MCP client request traverses the server, governance, an
 
 ```mermaid
 graph TD
-  A[["🖥️ Client<br/>MCP-capable"]] -->|"📡 stdio"| B["💻 MCP Server"]
+  A[["🖥️ Client<br/>MCP-capable"]] -->|"📡 stdio transport"| B[("💻 MCP Server<br/>Entry Point")]
   
   subgraph security["🔒 Security & Governance Layer"]
     direction TB
-    C["🔐 Auth + Scope Check<br/>bearer/HMAC"]
-    D["📋 Audit + RequestId<br/>+ Rate Limit"]
+    C[["🔐 Auth + Scope Check<br/>bearer/HMAC"]]
+    D[["📋 Audit + RequestId<br/>+ Rate Limit"]]
   end
   
-  B ==> C
-  C ==> D
-  D ==> E{"🎯 Tool Router"}
+  B ==>|"authenticate"| C
+  C ==>|"authorized"| D
+  D ==>|"route request"| E{{"🎯 Tool Router<br/>Dispatcher"}}
 
   subgraph wave_tools["🌊 Wave Analysis Tools"]
     direction TB
-    F["📡 Wave Adapter"]
-    G["⚙️ wave-toolkit CLI"]
-    H["🔍 Heuristic Analyzer"]
+    F(["📡 Wave Adapter<br/>Orchestrator"])
+    G>"⚙️ wave-toolkit CLI<br/>External Binary"]
+    H>"🔍 Heuristic Analyzer<br/>Fallback Logic"]
   end
   
   subgraph validation_tools["✅ Validation & Context Tools"]
     direction TB
-    I["📐 Ajv Schema + Hash"]
-    J["📦 Context Builder + Hash"]
+    I(["📐 Ajv Schema Validator<br/>+ Hash Verifier"])
+    J(["📦 Context Builder<br/>+ Hash Generator"])
   end
   
   subgraph ops_tools["🔧 Operations Tools"]
     direction TB
-    K["🌐 SpiralSafe API Client"]
-    L["📜 Allow-Listed Scripts"]
-    M["🔗 ATOM Trail + Gates<br/>fs under mount"]
+    K(["🌐 SpiralSafe API Client"])
+    L(["📜 Allow-Listed Scripts<br/>Sandboxed Execution"])
+    M(["🔗 ATOM Trail + Gates<br/>fs under mount"])
   end
   
   subgraph comm_adapters["💬 Communication Adapters"]
     direction TB
-    N["🔌 Adapters"]
-    N1["💭 Discord Webhook"]
-    N2["🎮 Minecraft RCON<br/>stub"]
-    N3["📧 Email/X/Reddit<br/>stubs + allow-lists"]
+    N{{"🔌 Adapter Registry"}}
+    N1[\"💭 Discord Webhook<br/>Notifications"/]
+    N2[\"🎮 Minecraft RCON<br/>stub"/]
+    N3[\"📧 Email/X/Reddit<br/>stubs + allow-lists"/]
   end
 
-  E ==>|"wave.analyze"| F
-  F -->|"if WAVE_TOOLKIT_BIN"| G
-  F -.->|"fallback"| H
+  E ==>|"⚡ wave.analyze"| F
+  F -->|"🔧 if WAVE_TOOLKIT_BIN set"| G
+  F -.->|"🔄 fallback path"| H
 
-  E ==>|"bump.validate"| I
-  E ==>|"context.pack"| J
+  E ==>|"✔️ bump.validate"| I
+  E ==>|"📦 context.pack"| J
 
-  E ==>|"ops.health/status/deploy"| K
-  E ==>|"scripts.run"| L
-  E ==>|"atom/gate/awi"| M
+  E ==>|"🏥 ops.health/status/deploy"| K
+  E ==>|"🚀 scripts.run"| L
+  E ==>|"🔗 atom/gate/awi"| M
   
-  E ==>|"comm/media"| N
-  N ==> N1
-  N ==> N2
-  N ==> N3
+  E ==>|"📢 comm/media"| N
+  N ==>|"send"| N1
+  N ==>|"send"| N2
+  N ==>|"send"| N3
 
-  G ==> D1[["📊 Audit Log<br/>+ Response"]]
-  H ==> D1
-  I ==> D1
-  J ==> D1
-  K ==> D1
-  L ==> D1
-  M ==> D1
-  N1 ==> D1
-  N2 ==> D1
-  N3 ==> D1
+  G ==>|"✅ success"| D1[["📊 Audit Log<br/>+ Response Builder"]]
+  H ==>|"✅ complete"| D1
+  I ==>|"✅ validated"| D1
+  J ==>|"✅ packed"| D1
+  K ==>|"✅ status"| D1
+  L ==>|"✅ executed"| D1
+  M ==>|"✅ recorded"| D1
+  N1 ==>|"✅ sent"| D1
+  N2 ==>|"✅ sent"| D1
+  N3 ==>|"✅ sent"| D1
 
-  D1 ==> A
+  D1 ==>|"📤 return result"| A
   
-  %% Enhanced Styling
-  classDef clientStyle fill:#2196F3,stroke:#0D47A1,stroke-width:4px,color:#fff,rx:15,ry:15
-  classDef serverStyle fill:#00BCD4,stroke:#00838F,stroke-width:3px,color:#000,rx:12,ry:12
-  classDef securityStyle fill:#9C27B0,stroke:#4A148C,stroke-width:3px,color:#fff,rx:10,ry:10
-  classDef routerStyle fill:#FF9800,stroke:#E65100,stroke-width:4px,color:#fff
-  classDef waveStyle fill:#FFC107,stroke:#F57F17,stroke-width:3px,color:#000,rx:10,ry:10
-  classDef validationStyle fill:#7B2CBF,stroke:#5A189A,stroke-width:3px,color:#fff,rx:10,ry:10
-  classDef opsStyle fill:#F44336,stroke:#B71C1C,stroke-width:3px,color:#fff,rx:10,ry:10
-  classDef commStyle fill:#00BFA5,stroke:#00695C,stroke-width:3px,color:#fff,rx:10,ry:10
-  classDef auditStyle fill:#4CAF50,stroke:#1B5E20,stroke-width:4px,color:#fff,rx:15,ry:15
+  %% Enhanced Styling with Richer Colors and Bold Text
+  classDef clientStyle fill:#1565C0,stroke:#0D47A1,stroke-width:5px,color:#fff,font-weight:bold
+  classDef serverStyle fill:#00897B,stroke:#004D40,stroke-width:4px,color:#fff,font-weight:bold
+  classDef securityStyle fill:#7B1FA2,stroke:#4A148C,stroke-width:4px,color:#fff,font-weight:bold
+  classDef routerStyle fill:#EF6C00,stroke:#BF360C,stroke-width:5px,color:#fff,font-weight:bold
+  classDef waveStyle fill:#F9A825,stroke:#F57F17,stroke-width:3px,color:#000,font-weight:bold
+  classDef validationStyle fill:#5E35B1,stroke:#311B92,stroke-width:3px,color:#fff,font-weight:bold
+  classDef opsStyle fill:#C62828,stroke:#B71C1C,stroke-width:3px,color:#fff,font-weight:bold
+  classDef commStyle fill:#00897B,stroke:#004D40,stroke-width:3px,color:#fff,font-weight:bold
+  classDef auditStyle fill:#2E7D32,stroke:#1B5E20,stroke-width:5px,color:#fff,font-weight:bold
   
   class A clientStyle
   class B serverStyle
@@ -96,23 +96,23 @@ graph TD
   class N,N1,N2,N3 commStyle
   class D1 auditStyle
   
-  %% Subgraph Styling
-  style security fill:#F3E5F5,stroke:#9C27B0,stroke-width:4px,color:#4A148C
-  style wave_tools fill:#FFFDE7,stroke:#FFC107,stroke-width:4px,color:#F57F17
-  style validation_tools fill:#EDE7F6,stroke:#7B2CBF,stroke-width:4px,color:#5A189A
-  style ops_tools fill:#FFEBEE,stroke:#F44336,stroke-width:4px,color:#B71C1C
-  style comm_adapters fill:#E0F2F1,stroke:#00BFA5,stroke-width:4px,color:#00695C
+  %% Subgraph Styling with Enhanced Borders and Backgrounds
+  style security fill:#F3E5F5,stroke:#7B1FA2,stroke-width:5px,color:#4A148C,rx:20,ry:20
+  style wave_tools fill:#FFF8E1,stroke:#F9A825,stroke-width:5px,color:#F57F17,rx:20,ry:20
+  style validation_tools fill:#EDE7F6,stroke:#5E35B1,stroke-width:5px,color:#311B92,rx:20,ry:20
+  style ops_tools fill:#FFEBEE,stroke:#C62828,stroke-width:5px,color:#B71C1C,rx:20,ry:20
+  style comm_adapters fill:#E0F2F1,stroke:#00897B,stroke-width:5px,color:#004D40,rx:20,ry:20
   
-  %% Link Styling
-  linkStyle 0 stroke:#2196F3,stroke-width:3px
-  linkStyle 1,2,3 stroke:#9C27B0,stroke-width:3px
-  linkStyle 4,5 stroke:#FFC107,stroke-width:3px
-  linkStyle 6 stroke:#FFC107,stroke-width:2px,stroke-dasharray:5
-  linkStyle 7,8 stroke:#7B2CBF,stroke-width:3px
-  linkStyle 9,10,11 stroke:#F44336,stroke-width:3px
-  linkStyle 12,13,14,15 stroke:#00BFA5,stroke-width:3px
-  linkStyle 16,17,18,19,20,21,22,23,24,25 stroke:#4CAF50,stroke-width:3px
-  linkStyle 26 stroke:#2196F3,stroke-width:3px
+  %% Link Styling with Enhanced Colors and Width
+  linkStyle 0 stroke:#1565C0,stroke-width:4px
+  linkStyle 1,2,3 stroke:#7B1FA2,stroke-width:4px
+  linkStyle 4,5 stroke:#F9A825,stroke-width:4px
+  linkStyle 6 stroke:#F9A825,stroke-width:3px,stroke-dasharray:5 5
+  linkStyle 7,8 stroke:#5E35B1,stroke-width:4px
+  linkStyle 9,10,11 stroke:#C62828,stroke-width:4px
+  linkStyle 12,13,14,15 stroke:#00897B,stroke-width:3px
+  linkStyle 16,17,18,19,20,21,22,23,24,25 stroke:#2E7D32,stroke-width:4px
+  linkStyle 26 stroke:#1565C0,stroke-width:4px
 ```
 
 Legend
