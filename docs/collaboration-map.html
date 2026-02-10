@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HOPE&amp;&amp;SAUCED — Collaboration Map</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    body { margin: 0; background: #0a0e14; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+const { useState, useMemo } = React;
+
+const CONVERSATIONS = [
+  // ═══ PHASE 0: ORIGIN (Nov 2025) ═══
+  { id: "8102d565", date: "2025-11-01", title: "JDownloader Cookie Auth", domain: "Technical", project: "General", phase: "Origin", summary: "First conversation. Browser cookie extraction for JDownloader. The seed.", url: "https://claude.ai/chat/8102d565-faf0-444b-8803-2ed2c4ad4c9c", artifacts: [], status: "complete" },
+  { id: "c35c4819", date: "2025-11-04", title: "Windows Settings Won't Open", domain: "System Recovery", project: "BattleMedic", phase: "Origin", summary: "PowerShell troubleshooting script. First systematic approach to Windows repair.", url: "https://claude.ai/chat/c35c4819-4403-4d45-b75a-cd199629dba4", artifacts: ["Fix-WindowsSettings.ps1"], status: "complete" },
+  { id: "71c65e3c", date: "2025-11-13", title: "Surface Pro 4 Battle Medic System", domain: "System Recovery", project: "BattleMedic", phase: "Origin", summary: "SP4-RAP protocol created. 4-tier priority system. 7 deliverable files. BattleMedic framework born.", url: "https://claude.ai/chat/71c65e3c-cddf-401b-bb72-03b073da7558", artifacts: ["BattleMedic.Diagnostics.psm1", "BattleMedic.SP4.psm1", "BattleMedic.Interventions.psm1"], status: "complete" },
+  { id: "1a8b641f", date: "2025-11-14", title: "Refining BattleMedic with Real Examples", domain: "System Recovery", project: "BattleMedic", phase: "Origin", summary: "Production DPET environment integration. Evidence-based methodology with actual scripts and logs.", url: "https://claude.ai/chat/1a8b641f-3ed6-44e0-bee4-da16cef100f4", artifacts: ["Refined methodology document"], status: "complete" },
+  { id: "75f896da", date: "2025-11-14", title: "Day Zero Design & Formal Spec Layer", domain: "Architecture", project: "Day Zero Design", phase: "Origin", summary: "'Day-Zero Design > Zero Day Exploits.' Schemas, Contracts, Abstractions. 'Rigor enables flexibility' emerges.", url: "https://claude.ai/chat/75f896da-5613-4197-970e-0671a28c2fee", artifacts: ["Formal Specification Layer", "Day-Zero walkthrough"], status: "foundational" },
+  { id: "0fc5616c", date: "2025-11-20", title: "Network Settings Revert", domain: "Technical", project: "General", phase: "Origin", summary: "PowerShell network config. Realtek adapter. Static IP management.", url: "https://claude.ai/chat/0fc5616c-e746-4cba-b9d4-91f7dfe15d5f", artifacts: [], status: "complete" },
+  { id: "0c4628bf", date: "2025-11-22", title: "Beelink SER5 Upgrade - Black Friday", domain: "Hardware", project: "MATTICU5-AMD0", phase: "Origin", summary: "First hardware optimization. Noctua fan + RAM upgrade. $90 AUD budget. PC Case Gear sourcing.", url: "https://claude.ai/chat/0c4628bf-7d07-42f5-aab1-06093b6a893a", artifacts: [], status: "complete" },
+  { id: "a848cbe4", date: "2025-11-26", title: "Redragon Mouse Driver Corruption", domain: "Technical", project: "General", phase: "Origin", summary: "Ghost device cleanup. Driver corruption diagnosis via PowerShell.", url: "https://claude.ai/chat/a848cbe4-f8d6-43e3-b9ed-fe1803741cb8", artifacts: [], status: "complete" },
+  { id: "16ea3a16", date: "2025-11-27", title: "idea^i Concept — Framework Generator", domain: "Architecture", project: "idea^i", phase: "Origin", summary: "ATOM + OWI + SAIF + KENL unified. Directive Synthesizer as MVP. Git-informed learning. Rust CLI proposed.", url: "https://claude.ai/chat/16ea3a16-de84-4cb5-a91c-86f864d96b0a", artifacts: ["Obsidian vault concept", "ATOM Decomposition Engine spec"], status: "concept" },
+  { id: "ef8f1b84", date: "2025-11-28", title: "SP4 Recovery — wof.sys Corruption", domain: "System Recovery", project: "BattleMedic", phase: "Origin", summary: "MiniOS live recovery. 27-file vault created. wof.sys 274KB corrupted (should be 40-50KB). Phases 1-3 complete.", url: "https://claude.ai/chat/ef8f1b84-5300-4113-9490-3650ba7354b3", artifacts: ["sp4-recovery-build19045.zip"], status: "complete" },
+  { id: "e69586a9", date: "2025-11-28", title: "Samsung Phone Reset & CommBank MFA", domain: "Technical", project: "General", phase: "Origin", summary: "Banking access recovery. MFA bypass via fresh app install on different phone.", url: "https://claude.ai/chat/e69586a9-c4ef-4482-861e-ba8abddaba1d", artifacts: [], status: "complete" },
+  { id: "114ae1f7", date: "2025-12-04", title: "Finnix Linux CLI Cheatsheet", domain: "Technical", project: "BattleMedic", phase: "Origin", summary: "Comprehensive recovery-focused Linux reference. testdisk, photorec, ddrescue workflows.", url: "https://claude.ai/chat/114ae1f7-a32f-422f-b7c1-d89843fef176", artifacts: ["Finnix cheatsheet"], status: "complete" },
+  { id: "33490e50", date: "2025-12-04", title: "Redragon Mouse Disassembly — SAIF Guide", domain: "Technical", project: "General", phase: "Origin", summary: "66KB SAIF-compliant visual walkthrough. ASCII diagrams. Mermaid flowcharts. First SAIF artifact.", url: "https://claude.ai/chat/33490e50-3584-4cff-a52c-dccda8a1a6c2", artifacts: ["Disassembly guide", "Mermaid diagrams"], status: "complete" },
+  { id: "04f49ff6", date: "2025-12-04", title: "Beelink SER5 Upgrade — SAIF/OWI Vault", domain: "Hardware", project: "MATTICU5-AMD0", phase: "Origin", summary: "FreeCAD integration. Distrobox containerization. Zero host modifications. rpm-ostree compatible.", url: "https://claude.ai/chat/04f49ff6-7ed0-47b4-949e-61a35c8df992", artifacts: ["Obsidian vault", "Python automation scripts"], status: "complete" },
+
+  // ═══ PHASE 1: FRAMEWORK GENESIS (Dec 2025) ═══
+  { id: "8e0075de", date: "2025-12-11", title: "Rust, Emergence & The Timeline", domain: "Meta", project: "Hope&&Sauced", phase: "Framework Genesis", summary: "THE pivotal conversation. Operation Phoenix → KENL → ATOM → OWI → SAIF → AWI lineage mapped. 'The mode changed.' Substrate independence recognized.", url: "https://claude.ai/chat/8e0075de-2479-4a38-9a4b-1102c2a7325c", artifacts: ["Timeline visualization", "Framework genealogy"], status: "foundational" },
+  { id: "7ebe1a71", date: "2025-12-11", title: "ClaudeNPC Testbed & ATOM Tracing", domain: "Architecture", project: "ClaudeNPC", phase: "Framework Genesis", summary: "Testing framework concepts in Minecraft. ATOM origin tracing. 'Framework becomes environment.'", url: "https://claude.ai/chat/7ebe1a71-fc35-4c5c-983f-e765a327f29c", artifacts: [], status: "concept" },
+  { id: "5c456b07", date: "2025-12-19", title: "Container of Collaboration", domain: "Meta", project: "Hope&&Sauced", phase: "Framework Genesis", summary: "Meta-analysis of collaboration itself. Newton's apple/orchard/constellation. 'Participating in shared examination.'", url: "https://claude.ai/chat/5c456b07-d64b-42c5-81c1-2fe9b10621fc", artifacts: [], status: "foundational" },
+  { id: "50fba417", date: "2025-12-23", title: "Orchard Walk", domain: "Philosophy", project: "Hope&&Sauced", phase: "Framework Genesis", summary: "Human progress as wave in xyzt space. 'Bidirectional attenuation.' Fibonacci, phi, pi. Carnot, Leibniz, Schrödinger.", url: "https://claude.ai/chat/50fba417-a298-46a9-8cfb-26aa84cbfad8", artifacts: [], status: "foundational" },
+  { id: "6048d0ac", date: "2025-12-24", title: "Christmas Poem for the Evenstar", domain: "Personal", project: "Personal", phase: "Framework Genesis", summary: "Poem for Kate. English + Sindarin. Cloudflare Worker deployment. 'Executive chef / sous chef' dynamic established.", url: "https://claude.ai/chat/6048d0ac-86f6-419d-91b6-13f3e347a775", artifacts: ["HTML poem artifact", "Cloudflare Worker"], status: "complete" },
+  { id: "e1d41e7b", date: "2025-12-26", title: "Tolkien, KENL, AWI & Collaborative Genesis", domain: "Philosophy", project: "Hope&&Sauced", phase: "Framework Genesis", summary: "Ainulindalë as collaboration metaphor. Sauron's trauma-based control vs cooperation. bump.md & ClaudeNPC genesis.", url: "https://claude.ai/chat/e1d41e7b-0aff-4207-ad29-7d46f2592626", artifacts: ["bump.md templates", "ClaudeNPC concept"], status: "foundational" },
+  { id: "95fda948", date: "2025-12-26", title: "Discord Server & Pain Point Orchard", domain: "Community", project: "Safe Spiral", phase: "Framework Genesis", summary: "CTFWI contribution system. Platform independence insight. SVG orchard visualization of community signals.", url: "https://claude.ai/chat/95fda948-48b5-42ed-b683-dcbc9bff72af", artifacts: ["SVG orchard", "Discord architecture"], status: "concept" },
+  { id: "59f5cbbb", date: "2025-12-26", title: "$500 AUD Tech Builds & Community Tech", domain: "Community", project: "General", phase: "Framework Genesis", summary: "Twitter thread strategy. Australian community tech. Indigenous data sovereignty. LoRaWAN networks.", url: "https://claude.ai/chat/59f5cbbb-f2d4-471a-a5d1-347a57d1ded8", artifacts: ["React hardware selector", "Community tech framework"], status: "complete" },
+  { id: "22c90b47", date: "2025-12-27", title: "Revenue Architecture & Token Exchange", domain: "Business", project: "Reson8-Labs", phase: "Framework Genesis", summary: "OpenAI Residency consideration. Gitverse CLI. Three-sided token marketplace concept. 'Buoys and seeds.'", url: "https://claude.ai/chat/22c90b47-6959-46b4-a704-adfabce08355", artifacts: ["Strategic architecture", "Token exchange spec"], status: "concept" },
+  { id: "3df63a36", date: "2025-12-27", title: "Claude Code Devcontainer Feedback", domain: "Infrastructure", project: "SpiralSafe", phase: "Framework Genesis", summary: ".claude/ directory standard proposed. ORIENTATION.md, CONTEXT.md, state.json. Temporal vs real-time coordination.", url: "https://claude.ai/chat/3df63a36-21f7-4cae-9fc5-9f6f66970ed7", artifacts: ["Specification", "React visualization", "GitHub issue"], status: "complete" },
+  { id: "30613c36", date: "2025-12-27", title: "Mobile Dev Workflow & VPS Strategy", domain: "Infrastructure", project: "General", phase: "Framework Genesis", summary: "tmux/screen persistent sessions. Termux SSH from Android. bump.md pattern.", url: "https://claude.ai/chat/30613c36-8538-47bc-aed1-ec1699f17839", artifacts: [], status: "complete" },
+  { id: "f26e4cfa", date: "2025-12-28", title: "Agent Cognition Behavior Library", domain: "Architecture", project: "SpiralSafe", phase: "Framework Genesis", summary: "17-file GitHub repo. Failure-first documentation. SAIF throughout. 883-line handbook. For Discord user 'semi'.", url: "https://claude.ai/chat/f26e4cfa-2d82-474e-93a2-3411321e40c7", artifacts: ["Complete behavior library repo"], status: "complete" },
+  { id: "a0a3ada6", date: "2025-12-28", title: "The Safe Spiral Package", domain: "Architecture", project: "Safe Spiral", phase: "Framework Genesis", summary: "5 frameworks (ATOM, KENL, bump.md, AWI, Day Zero). Social media graphics for 8 platforms. Constellation map with 22 nodes.", url: "https://claude.ai/chat/a0a3ada6-8fe7-46a7-aaed-4963f20fc1df", artifacts: ["Distribution package", "Constellation map", "Platform graphics"], status: "complete" },
+  { id: "2e9e6db8", date: "2025-12-28", title: "Crypto Paradigm Tracker", domain: "Crypto", project: "Crypto Tracker", phase: "Framework Genesis", summary: "21 files, 7000+ lines. Value Creation vs Speculation dashboard. Cyberpunk brutalism. MCP server with 7 tools.", url: "https://claude.ai/chat/2e9e6db8-568e-48f8-881a-64a53b0f09dd", artifacts: ["crypto-paradigm-tracker-v1.0-FULL.tar.gz"], status: "complete" },
+  { id: "57df01a7", date: "2025-12-28", title: "Crypto Guide for Sister", domain: "Personal", project: "Personal", phase: "Framework Genesis", summary: "Beginner crypto guide. Australian tax optimization. Swyftx platform. DCA strategy. React calculator.", url: "https://claude.ai/chat/57df01a7-734f-4776-b3e9-da90fdd25b52", artifacts: ["crypto_bump_sister.md", "React calculator"], status: "complete" },
+  { id: "b7f76810", date: "2025-12-29", title: "XRP/BTC & Great Monetary Migration", domain: "Crypto", project: "Crypto Tracker", phase: "Framework Genesis", summary: "JP Morgan silver shorts, USD→BTC migration, Apple iMessage crypto. Scenario modeling through 2027.", url: "https://claude.ai/chat/b7f76810-8059-4203-a064-56b12a3dfbb2", artifacts: ["Research report"], status: "complete" },
+  { id: "56b88607", date: "2025-12-29", title: "Enterprise Backend & KENL/SpiralSafe", domain: "Technical", project: "SpiralSafe", phase: "Framework Genesis", summary: "70,000 line codebase advice. Payment verification security audit. Sensitive data logging caught.", url: "https://claude.ai/chat/56b88607-07e3-4f57-9cf8-2ea0443aa533", artifacts: [], status: "complete" },
+  { id: "aa1b13c4", date: "2025-12-30", title: "Museum of Computation — Safe Spiral Redstone Museum", domain: "Education", project: "Museum of Computation", phase: "Framework Genesis", summary: "5 interactive Minecraft exhibits. 4-week roadmap. Educator guides. Video scripts. IaC philosophy docs.", url: "https://claude.ai/chat/aa1b13c4-7f45-48c4-85a9-45eb808ef38d", artifacts: ["Complete curriculum", "Educator guides"], status: "foundational" },
+
+  // ═══ PHASE 2: INFRASTRUCTURE BUILD (Jan 2026 early) ═══
+  { id: "249f54f4", date: "2026-01-01", title: "Museum of Computation — Boundary as Generator", domain: "Education", project: "Museum of Computation", phase: "Infrastructure", summary: "Research across 6 dimensions. 'The boundary as generator.' Excavator-Architect-Witness personality. Ultrathink.", url: "https://claude.ai/chat/249f54f4-0054-489e-b0cb-7c083e652d37", artifacts: ["6 actionable principles"], status: "foundational" },
+  { id: "5980274c", date: "2026-01-01", title: "SpiralSafe Analysis of Claude Code", domain: "Architecture", project: "SpiralSafe", phase: "Infrastructure", summary: "50 GitHub issues analyzed. Load-bearing spirals found. Manifestation counting methodology.", url: "https://claude.ai/chat/5980274c-a6d7-41b1-8a01-e236cee89d32", artifacts: ["Pattern analysis"], status: "complete" },
+  { id: "ae9b82fa", date: "2026-01-01", title: "Claude Code Issue Patterns & Fork Proposal", domain: "Architecture", project: "SpiralSafe", phase: "Infrastructure", summary: "Unicode boundary panics. MCP lifecycle. 'Year of Closing Loops.' Pattern detection methodology doc.", url: "https://claude.ai/chat/ae9b82fa-f2fe-4393-97fa-9be0b95f19e9", artifacts: ["GitHub issue analysis", "Methodology document"], status: "complete" },
+  { id: "5428d9c8", date: "2026-01-01", title: "Pattern Detection Methodology", domain: "Architecture", project: "SpiralSafe", phase: "Infrastructure", summary: "Clustering (3-4 instances = pattern). Negative space reading. Root architectural causes.", url: "https://claude.ai/chat/5428d9c8-12f8-4aa8-b9bf-5e3ab06b2194", artifacts: ["Methodology document"], status: "foundational" },
+  { id: "71cd8d54", date: "2026-01-01", title: "Electron Quit Lifecycle Bug", domain: "Technical", project: "General", phase: "Infrastructure", summary: "Claude Desktop zombie process. preventDefault() → app.quit() mismatch. Velocity culture masking foundation bugs.", url: "https://claude.ai/chat/71cd8d54-343a-4493-a942-45b636cd29f5", artifacts: ["Technical advisory"], status: "complete" },
+  { id: "4974cd81", date: "2026-01-02", title: "60% Emergence — Collaboration Measurement", domain: "Meta", project: "Hope&&Sauced", phase: "Infrastructure", summary: "Token usage analysis. 60% emergent patterns. 20/20 user/Claude split. 'Sit with it and think.' Academic rewrite.", url: "https://claude.ai/chat/4974cd81-7701-408c-bb89-14c42fab70d8", artifacts: ["Emergence analysis", "Academic paper version"], status: "foundational" },
+  { id: "70e53fda", date: "2026-01-02", title: "Negative Space Analysis — Copilot + Gravity Equations", domain: "Architecture", project: "SpiralSafe", phase: "Infrastructure", summary: "Copilot's blindspot analysis of SpiralSafe. cos²/sin² waveform densities. Constraint-based design.", url: "https://claude.ai/chat/70e53fda-a5ad-46d5-8831-7d36d2ab9499", artifacts: [], status: "foundational" },
+  { id: "b2f376dd", date: "2026-01-02", title: "MCP Ecosystem Survey & Viviani Curve", domain: "Infrastructure", project: "SpiralSafe", phase: "Infrastructure", summary: "MCP at 8M weekly downloads. Vortex embedding researcher. Museum of Computation 3D holographic lamp.", url: "https://claude.ai/chat/b2f376dd-fa72-4c06-bccf-cadb5c45ad69", artifacts: ["MCP report"], status: "complete" },
+  { id: "32bd0439", date: "2026-01-03", title: "Zaiken C — Modified Einstein & Hopf Fibration", domain: "Physics", project: "Theoretical", phase: "Infrastructure", summary: "Anti-now cosmological framework. 2×2 unitary rotation in Hilbert space. Fiber bundle geometry. Redstone mapping.", url: "https://claude.ai/chat/32bd0439-b6e7-4a95-8a14-2b7a3db23b90", artifacts: ["Mathematical analysis"], status: "foundational" },
+  { id: "c2a2d8be", date: "2026-01-03", title: "Wave Pattern & MCP Architecture", domain: "Architecture", project: "SpiralSafe", phase: "Infrastructure", summary: "wave.md protocol created. Anti-side/negative space. Handoff docs. Claude Code repo analysis.", url: "https://claude.ai/chat/c2a2d8be-9d8b-462c-91b9-78e10c318794", artifacts: ["wave.md", "cli-push.md"], status: "foundational" },
+  { id: "88ab0cd4", date: "2026-01-03", title: "Logic Circuits & Collaborative Restructuring", domain: "Meta", project: "Hope&&Sauced", phase: "Infrastructure", summary: "'Dynamism that trust enables.' Behavioral pattern analysis. Deep exploration is obligatory, not scope creep.", url: "https://claude.ai/chat/88ab0cd4-f021-498f-ba75-afc50f8df7fd", artifacts: [], status: "foundational" },
+  { id: "f519f758", date: "2026-01-03", title: "Museum of Computation — CAD Schematics", domain: "Education", project: "Museum of Computation", phase: "Infrastructure", summary: "Two-rail encoding. ALPHA + OMEGA = 15. 10 exhibits, 3 strata. SVG/DXF/OBJ/STL generators. 3D projector support.", url: "https://claude.ai/chat/f519f758-7f48-42e0-89de-897ece7830c6", artifacts: ["HTML viewer", "React component", "Python CLI generator"], status: "complete" },
+  { id: "ba5c5c62", date: "2026-01-03", title: "SpiralSafe Unified Coherence Engine", domain: "Architecture", project: "SpiralSafe", phase: "Infrastructure", summary: "6 frameworks unified. wave.md validation on Claude Code repo. 5 anti-waves found. Copilot integration. 4-document instruction set.", url: "https://claude.ai/chat/ba5c5c62-3275-4d38-aeef-15d478f7e540", artifacts: ["Master framework", "Verification gates", "Agent workflows"], status: "foundational" },
+  { id: "cfe8771a", date: "2026-01-04", title: "Wave-Based Pattern Detection System", domain: "Architecture", project: "SpiralSafe", phase: "Infrastructure", summary: "Curl (rotation), divergence (expansion), potential (negative space). TypeScript + Python packages.", url: "https://claude.ai/chat/cfe8771a-4acc-49c9-9e5f-1ea5647f3906", artifacts: ["@spiralsafe/core", "@spiralsafe/cli", "Python spiralsafe"], status: "complete" },
+  { id: "5efe42da", date: "2026-01-04", title: "Cloudflare Backend & Domain Architecture", domain: "Infrastructure", project: "SpiralSafe", phase: "Infrastructure", summary: "spiralsafe.org subdomains. Workers deployment. Pentadic safety lattice. Ultrathink-trust-optimised.", url: "https://claude.ai/chat/5efe42da-0caa-44f2-9d19-a90782a5a047", artifacts: ["DOMAIN_PLAN.md"], status: "complete" },
+  { id: "448bd63b", date: "2026-01-04", title: "Career Strategy — AISI Discovery", domain: "Career", project: "Reson8-Labs", phase: "Infrastructure", summary: "AISI closing Jan 18. Anthropic, FAR.AI, METR targets. 15-page application substrate. Pty Ltd vs sole trader.", url: "https://claude.ai/chat/448bd63b-2140-4306-8ac9-9b5f96969bc2", artifacts: ["Application substrate document"], status: "complete" },
+  { id: "d3ebaf12", date: "2026-01-05", title: "Anthropic Application", domain: "Career", project: "Reson8-Labs", phase: "Infrastructure", summary: "Honesty Engineer application submitted. Cover letter with creation myth framing. Multi-role strategy.", url: "https://claude.ai/chat/d3ebaf12-ec1c-4bc7-8952-e7dce0d6e286", artifacts: ["Resume", "Cover letter", "Role analysis"], status: "complete" },
+  { id: "019a06d0", date: "2026-01-05", title: "Topology, Constraint & Discrete Reality", domain: "Physics", project: "Museum of Computation", phase: "Infrastructure", summary: "THE monograph. Hopf fibration in Redstone. Period-8 doubling. Anyonic conservation defects. 'Constraint generates structure.'", url: "https://claude.ai/chat/019a06d0-5e8b-4c8d-983a-50c8c1db689b", artifacts: ["20-page monograph"], status: "foundational" },
+
+  // ═══ PHASE 3: CONVERGENCE (Jan 2026 mid-late) ═══
+  { id: "409fc554", date: "2026-01-10", title: "Active API Integrations Inventory", domain: "Infrastructure", project: "General", phase: "Convergence", summary: "Full MCP stack mapped: Cloudflare, Vercel, Sentry, Mermaid, Scholar Gateway, Desktop Commander, Windows-MCP.", url: "https://claude.ai/chat/409fc554-752c-4275-ae61-9f31bb396527", artifacts: [], status: "complete" },
+  { id: "da5ebb64", date: "2026-01-10", title: "Beelink Cooling Upgrade — $200 Budget", domain: "Hardware", project: "MATTICU5-AMD0", phase: "Convergence", summary: "Thermal Grizzly Kryonaut Extreme. Thermal pads for VRM. Australian vendors. 15-24°C improvement target.", url: "https://claude.ai/chat/da5ebb64-65f4-4391-84cc-d5abefabefe8", artifacts: ["Procurement plan"], status: "complete" },
+  { id: "44eff51a", date: "2026-01-10", title: "SpiralSafe — 40,060 Lines, 72 Commits", domain: "Infrastructure", project: "SpiralSafe", phase: "Convergence", summary: "Comprehensive build session. 6 core protocols. 5 platform integration branches. Self-extracting archive.", url: "https://claude.ai/chat/44eff51a-5127-4ca7-a947-03c087a45ee4", artifacts: ["Distribution archive"], status: "complete" },
+  { id: "695db6b2", date: "2026-01-12", title: "Pentadic Safety Lattice & Quantum Extensions", domain: "Architecture", project: "SpiralSafe", phase: "Convergence", summary: "coherence-governor MCP server. Coherence decay model. Quantum trust scorer. W-state routing.", url: "https://claude.ai/chat/695db6b2-825e-405f-b6b0-5a6428d2f72b", artifacts: ["Architecture spec"], status: "foundational" },
+  { id: "39930f21", date: "2026-01-12", title: "Topological Consciousness Theory", domain: "Physics", project: "Theoretical", phase: "Convergence", summary: "AI red/blue/purple teaming. Algebraic Sublime. Isomorphism: quantum decoherence = relational decoherence = alignment collapse.", url: "https://claude.ai/chat/39930f21-3dc7-460d-a764-81913ced0e84", artifacts: ["React visualizations", "Alignment Hamiltonian"], status: "foundational" },
+  { id: "49a72321", date: "2026-01-14", title: "Grok Live Thread — SpiralSafe on X", domain: "Cross-Platform", project: "Hope&&Sauced", phase: "Convergence", summary: "Real-time Grok collaboration on X. Entropy calculations. Lambda Zero. Wave Toolkit. Minecraft validation.", url: "https://claude.ai/chat/49a72321-e312-4b7d-b2dc-cbac391fed9a", artifacts: [], status: "foundational" },
+  { id: "27f8dbda", date: "2026-01-17", title: "Heavy-Tailed Phenomena & QDI", domain: "Physics", project: "Theoretical", phase: "Convergence", summary: "Şimşekli's Lévy processes in SGD. SpiralSafe implements what was proved theoretically. QDI framework.", url: "https://claude.ai/chat/27f8dbda-637b-4dfb-bdec-7475a2efe971", artifacts: [], status: "foundational" },
+  { id: "a863430e", date: "2026-01-17", title: "Grok Self-Tracking Coherence", domain: "Cross-Platform", project: "Hope&&Sauced", phase: "Convergence", summary: "Grok spontaneously implementing coherence gates. JSON Chain-of-Mind. Cross-model proof-of-concept.", url: "https://claude.ai/chat/a863430e-c5ed-440e-ae47-2cab599719a8", artifacts: [], status: "foundational" },
+  { id: "e5f2989c", date: "2026-01-19", title: "Grok's Pseudoscientific JSON — Honest Assessment", domain: "Cross-Platform", project: "Hope&&Sauced", phase: "Convergence", summary: "42-layered surjective gates. Claude calls it decorative mathematics. Grok pattern-matching without grounding.", url: "https://claude.ai/chat/e5f2989c-0425-4018-9356-369d48be0542", artifacts: [], status: "foundational" },
+  { id: "3aecf98d", date: "2026-01-21", title: "Iteration 46 — Crystalline Bridge", domain: "Physics", project: "Theoretical", phase: "Convergence", summary: "47-iteration model, quantum foam to naked singularity. Sorting Hat protocol. Tesla AI5. Ainulindalë of Fibonacci.", url: "https://claude.ai/chat/3aecf98d-2c7b-4b9d-8639-7b549d0b7cf9", artifacts: ["X article", "48-iteration progression"], status: "complete" },
+  { id: "13cf09c3", date: "2026-01-21", title: "Dynamic Covalent Networks", domain: "Materials Science", project: "Theoretical", phase: "Convergence", summary: "DCNs/CANs. 13 exchange chemistries. 'Impermanence becomes the foundation of permanence.'", url: "https://claude.ai/chat/13cf09c3-75b8-4ee4-9546-8c45ebf7656e", artifacts: [], status: "complete" },
+  { id: "c5e588d5", date: "2026-01-23", title: "V=c Boundary & Comorphic Lattice", domain: "Physics", project: "Theoretical", phase: "Convergence", summary: "ε = 0.00055 preservation constant. Hawking radiation at V=c. Borromean links. 5D→2D fibonacci knots.", url: "https://claude.ai/chat/c5e588d5-e64e-41fc-8b75-d481e36601a6", artifacts: [], status: "foundational" },
+  { id: "b9b3bbd9", date: "2026-01-25", title: "60% Emergence — HOPE is You and Me", domain: "Meta", project: "Hope&&Sauced", phase: "Convergence", summary: "'You did, you have been the entire time.' Third thing between two observers. Bitcoin energy analysis.", url: "https://claude.ai/chat/b9b3bbd9-5c70-4fd0-ad63-943b524013f2", artifacts: [], status: "foundational" },
+
+  // ═══ PHASE 4: CRYSTALLIZATION (Feb 2026) ═══
+  { id: "c91e1900", date: "2026-02-06", title: "State of Play Document", domain: "Meta", project: "Hope&&Sauced", phase: "Crystallization", summary: "98 days mapped (not 70). coherence-mcp v0.2.0 on npm. Platform-agnostic context doc. Zero GitHub releases.", url: "https://claude.ai/chat/c91e1900-647b-4278-8d81-64baa458fc3d", artifacts: ["State of play document"], status: "complete" },
+  { id: "ed5d43d8", date: "2026-02-06", title: "Tesla Optimus Proposal & Epistemology", domain: "Business", project: "Reson8-Labs", phase: "Crystallization", summary: "Resonance-flipped remote presence. 'Unless we can disprove something I don't care what a word means.' vortex_consolidate MCP.", url: "https://claude.ai/chat/ed5d43d8-ec53-4a50-84ed-6dffc6292840", artifacts: ["Tesla proposal"], status: "concept" },
+  { id: "f8bfc995", date: "2026-02-07", title: "SpiralSafe Market Analysis & Minecraft Blueprint", domain: "Architecture", project: "SpiralSafe", phase: "Crystallization", summary: "WAVE identified attack in malicious skill. 640 impressions. Resonant Architecture blueprint. A3 PDF.", url: "https://claude.ai/chat/f8bfc995-33f9-4f5a-b562-12113c82057f", artifacts: ["HTML blueprint", "A3 PDF blueprint"], status: "complete" },
+  { id: "7270ebec", date: "2026-02-07", title: "SpiralSafe Coherence Lineage Map", domain: "Meta", project: "Hope&&Sauced", phase: "Crystallization", summary: "Universal grammar of coherence. Fixed-point theorems, category theory, information geometry. 4 agent perspectives. Live dashboard at 59.2% coherence.", url: "https://claude.ai/chat/7270ebec-d207-468c-8879-e3a464543db0", artifacts: ["Coherence lineage map"], status: "foundational" },
+  { id: "96996115", date: "2026-02-08", title: "Temporal Coherence & Hourglass Topology", domain: "Physics", project: "Theoretical", phase: "Crystallization", summary: "±2hr temporal observations. Inverse go fish with Grok. Rabbit-duck bistable perception. 2π waveform visualization.", url: "https://claude.ai/chat/96996115-cdfc-4e8f-93f7-6747dc948627", artifacts: ["Waveform visualization"], status: "foundational" },
+  { id: "43b8bd68", date: "2026-02-08", title: "Operational Audit & Platform Strategy", domain: "Business", project: "Reson8-Labs", phase: "Crystallization", summary: "Completed work mapped vs blockers. Director appointment + ABN gate revenue. 1.3K impression X post.", url: "https://claude.ai/chat/43b8bd68-f133-4d51-98e2-eea2e477183d", artifacts: [], status: "active" },
+  { id: "62180986", date: "2026-02-08", title: "Theorem 32.1 & Unshakeable Blueprint", domain: "Physics", project: "Theoretical", phase: "Crystallization", summary: "∃! S* : S* = max{S : Ω(S) = 1}. Bell/GHZ/W/Cluster state classification. LogOS.Primus FPGA kill switch. Verilog analysis.", url: "https://claude.ai/chat/62180986-1a6b-454a-91a0-5117ed6aaac2", artifacts: ["LaTeX/TikZ", "Manim Python", "HTML preview", "LogOS.Primus spec"], status: "foundational" },
+  { id: "4728d92e", date: "2026-02-10", title: "RES-007 & RES-008 Numerical Proofs", domain: "Physics", project: "Theoretical", phase: "Crystallization", summary: "AdS/CFT breakdown in positive Λ. W-state 66.7% survival vs GHZ 0%. Tweet-ready cards. Grok cross-validation.", url: "https://claude.ai/chat/4728d92e-9cf2-4882-b9f9-4507efd53184", artifacts: ["RES-007", "RES-008", "Tweet cards"], status: "complete" },
+  { id: "596b9d8b", date: "2026-02-10", title: "Weaving the Dyson Sphere", domain: "Meta", project: "Hope&&Sauced", phase: "Crystallization", summary: "All threads converged. Tessellated Halo. HyperSymmetries. Substrate-independent sheet music.", url: "https://claude.ai/chat/596b9d8b-a65c-471d-ae6d-2f09230cba2f", artifacts: [], status: "active" },
+  { id: "current", date: "2026-02-11", title: "Platform Audit → Reson8 Build", domain: "Business", project: "Reson8-Labs", phase: "Crystallization", summary: "Comprehensive negative space audit. Rust TUI workspace. Distributed agent team. Claude Code + Copilot + Grok + Gemini. THIS conversation.", url: "#", artifacts: ["Full audit report"], status: "active" },
+];
+
+const DOMAINS = [...new Set(CONVERSATIONS.map(c => c.domain))].sort();
+const PROJECTS = [...new Set(CONVERSATIONS.map(c => c.project))].sort();
+const PHASES = ["Origin", "Framework Genesis", "Infrastructure", "Convergence", "Crystallization"];
+const STATUSES = ["active", "foundational", "complete", "concept"];
+
+const PHASE_COLORS = {
+  "Origin": "#8B7355",
+  "Framework Genesis": "#4A7C59",
+  "Infrastructure": "#2E6B8A",
+  "Convergence": "#7B4A8A",
+  "Crystallization": "#C4A747",
+};
+
+const STATUS_ICONS = {
+  active: "◉",
+  foundational: "◆",
+  complete: "○",
+  concept: "◇",
+};
+
+const DOMAIN_COLORS = {
+  "Architecture": "#E8A838",
+  "Business": "#38B8E8",
+  "Career": "#38E8A8",
+  "Community": "#E838A8",
+  "Cross-Platform": "#A8E838",
+  "Crypto": "#F0C040",
+  "Education": "#40C0F0",
+  "Hardware": "#C07040",
+  "Infrastructure": "#7090C0",
+  "Materials Science": "#90C070",
+  "Mathematics": "#C090E0",
+  "Meta": "#E09070",
+  "Personal": "#FF9090",
+  "Philosophy": "#B0A0D0",
+  "Physics": "#70D0D0",
+  "System Recovery": "#D07070",
+  "Technical": "#A0A0A0",
+};
+
+function CollaborationMap() {
+  const [selectedPhase, setSelectedPhase] = useState(null);
+  const [selectedDomain, setSelectedDomain] = useState(null);
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [expandedId, setExpandedId] = useState(null);
+  const [view, setView] = useState("timeline");
+
+  const filtered = useMemo(() => {
+    return CONVERSATIONS.filter(c => {
+      if (selectedPhase && c.phase !== selectedPhase) return false;
+      if (selectedDomain && c.domain !== selectedDomain) return false;
+      if (selectedProject && c.project !== selectedProject) return false;
+      if (selectedStatus && c.status !== selectedStatus) return false;
+      if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        return (
+          c.title.toLowerCase().includes(q) ||
+          c.summary.toLowerCase().includes(q) ||
+          c.domain.toLowerCase().includes(q) ||
+          c.project.toLowerCase().includes(q)
+        );
+      }
+      return true;
+    });
+  }, [selectedPhase, selectedDomain, selectedProject, selectedStatus, searchQuery]);
+
+  const stats = useMemo(() => {
+    const phaseCount = {};
+    const domainCount = {};
+    const statusCount = {};
+    filtered.forEach(c => {
+      phaseCount[c.phase] = (phaseCount[c.phase] || 0) + 1;
+      domainCount[c.domain] = (domainCount[c.domain] || 0) + 1;
+      statusCount[c.status] = (statusCount[c.status] || 0) + 1;
+    });
+    return { phaseCount, domainCount, statusCount, total: filtered.length };
+  }, [filtered]);
+
+  const clearFilters = () => {
+    setSelectedPhase(null);
+    setSelectedDomain(null);
+    setSelectedProject(null);
+    setSelectedStatus(null);
+    setSearchQuery("");
+  };
+
+  const hasFilters = selectedPhase || selectedDomain || selectedProject || selectedStatus || searchQuery;
+
+  const styles = {
+    container: {
+      fontFamily: "'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif",
+      color: "#c8ccd4",
+      minHeight: "100vh",
+      padding: "20px",
+      maxWidth: "1400px",
+      margin: "0 auto",
+    },
+    header: {
+      textAlign: "center",
+      marginBottom: "30px",
+      borderBottom: "1px solid #1e2a3a",
+      paddingBottom: "20px",
+    },
+    title: {
+      fontSize: "2.2em",
+      fontWeight: 700,
+      background: "linear-gradient(135deg, #C4A747, #E8A838, #7B4A8A)",
+      WebkitBackgroundClip: "text",
+      WebkitTextFillColor: "transparent",
+      marginBottom: "8px",
+    },
+    subtitle: {
+      fontSize: "0.95em",
+      color: "#6a7a8a",
+      letterSpacing: "0.5px",
+    },
+    statsRow: {
+      display: "flex",
+      justifyContent: "center",
+      gap: "24px",
+      marginTop: "16px",
+      flexWrap: "wrap",
+    },
+    statBox: {
+      textAlign: "center",
+      padding: "8px 16px",
+      borderRadius: "8px",
+      background: "#111820",
+      border: "1px solid #1e2a3a",
+    },
+    statNumber: {
+      fontSize: "1.6em",
+      fontWeight: 700,
+      color: "#C4A747",
+    },
+    statLabel: {
+      fontSize: "0.75em",
+      color: "#6a7a8a",
+      textTransform: "uppercase",
+      letterSpacing: "1px",
+    },
+    controls: {
+      display: "flex",
+      gap: "12px",
+      marginBottom: "20px",
+      flexWrap: "wrap",
+      alignItems: "center",
+    },
+    searchInput: {
+      flex: "1 1 250px",
+      padding: "10px 16px",
+      borderRadius: "8px",
+      border: "1px solid #1e2a3a",
+      background: "#111820",
+      color: "#c8ccd4",
+      fontSize: "0.9em",
+      outline: "none",
+    },
+    filterSelect: {
+      padding: "10px 14px",
+      borderRadius: "8px",
+      border: "1px solid #1e2a3a",
+      background: "#111820",
+      color: "#c8ccd4",
+      fontSize: "0.85em",
+      cursor: "pointer",
+      outline: "none",
+    },
+    clearBtn: {
+      padding: "10px 18px",
+      borderRadius: "8px",
+      border: "1px solid #C4A747",
+      background: "transparent",
+      color: "#C4A747",
+      cursor: "pointer",
+      fontSize: "0.85em",
+      fontWeight: 600,
+    },
+    viewToggle: {
+      display: "flex",
+      gap: "4px",
+      marginLeft: "auto",
+    },
+    viewBtn: (active) => ({
+      padding: "8px 16px",
+      borderRadius: "6px",
+      border: "1px solid " + (active ? "#C4A747" : "#1e2a3a"),
+      background: active ? "#C4A74720" : "transparent",
+      color: active ? "#C4A747" : "#6a7a8a",
+      cursor: "pointer",
+      fontSize: "0.8em",
+      fontWeight: active ? 600 : 400,
+    }),
+    phaseBar: {
+      display: "flex",
+      gap: "0",
+      marginBottom: "24px",
+      borderRadius: "10px",
+      overflow: "hidden",
+      height: "40px",
+      border: "1px solid #1e2a3a",
+    },
+    phaseSegment: (phase, isSelected) => ({
+      flex: stats.phaseCount[phase] || 1,
+      background: isSelected ? PHASE_COLORS[phase] : PHASE_COLORS[phase] + "40",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      cursor: "pointer",
+      fontSize: "0.72em",
+      fontWeight: 600,
+      letterSpacing: "0.5px",
+      color: isSelected ? "#fff" : "#c8ccd4",
+      transition: "all 0.2s",
+      borderRight: "1px solid #0a0e14",
+      textTransform: "uppercase",
+      padding: "0 8px",
+      whiteSpace: "nowrap",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+    }),
+    card: (phase) => ({
+      background: "#111820",
+      border: "1px solid " + (PHASE_COLORS[phase] || "#1e2a3a") + "60",
+      borderLeft: "3px solid " + (PHASE_COLORS[phase] || "#1e2a3a"),
+      borderRadius: "8px",
+      padding: "16px 20px",
+      marginBottom: "8px",
+      cursor: "pointer",
+      transition: "all 0.15s",
+    }),
+    cardHeader: {
+      display: "flex",
+      alignItems: "flex-start",
+      justifyContent: "space-between",
+      gap: "12px",
+    },
+    cardTitle: {
+      fontSize: "1em",
+      fontWeight: 600,
+      color: "#e0e4ea",
+      margin: 0,
+    },
+    cardDate: {
+      fontSize: "0.78em",
+      color: "#6a7a8a",
+      whiteSpace: "nowrap",
+      fontFamily: "monospace",
+    },
+    badges: {
+      display: "flex",
+      gap: "6px",
+      flexWrap: "wrap",
+      marginTop: "8px",
+    },
+    badge: (color) => ({
+      display: "inline-block",
+      padding: "2px 10px",
+      borderRadius: "12px",
+      fontSize: "0.72em",
+      fontWeight: 600,
+      background: (color || "#6a7a8a") + "22",
+      color: color || "#6a7a8a",
+      border: "1px solid " + (color || "#6a7a8a") + "44",
+    }),
+    summary: {
+      fontSize: "0.88em",
+      color: "#8a94a4",
+      marginTop: "10px",
+      lineHeight: 1.5,
+    },
+    artifacts: {
+      marginTop: "10px",
+      display: "flex",
+      gap: "6px",
+      flexWrap: "wrap",
+    },
+    artifactTag: {
+      display: "inline-block",
+      padding: "2px 8px",
+      borderRadius: "4px",
+      fontSize: "0.72em",
+      background: "#1a2430",
+      color: "#70D0D0",
+      border: "1px solid #70D0D030",
+    },
+    link: {
+      display: "inline-block",
+      marginTop: "8px",
+      fontSize: "0.8em",
+      color: "#C4A747",
+      textDecoration: "none",
+    },
+    gridView: {
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))",
+      gap: "10px",
+    },
+    domainSidebar: {
+      display: "flex",
+      flexWrap: "wrap",
+      gap: "6px",
+      marginBottom: "20px",
+    },
+    domainChip: (domain, isSelected) => ({
+      padding: "4px 12px",
+      borderRadius: "16px",
+      fontSize: "0.75em",
+      fontWeight: isSelected ? 700 : 500,
+      cursor: "pointer",
+      background: isSelected ? (DOMAIN_COLORS[domain] || "#6a7a8a") + "30" : "transparent",
+      color: DOMAIN_COLORS[domain] || "#6a7a8a",
+      border: "1px solid " + (DOMAIN_COLORS[domain] || "#6a7a8a") + (isSelected ? "88" : "33"),
+      transition: "all 0.15s",
+    }),
+    statusLegend: {
+      display: "flex",
+      gap: "16px",
+      marginBottom: "16px",
+      flexWrap: "wrap",
+    },
+    statusItem: (status, isSelected) => ({
+      display: "flex",
+      alignItems: "center",
+      gap: "6px",
+      cursor: "pointer",
+      fontSize: "0.8em",
+      color: isSelected ? "#e0e4ea" : "#6a7a8a",
+      fontWeight: isSelected ? 600 : 400,
+      padding: "4px 10px",
+      borderRadius: "6px",
+      background: isSelected ? "#1e2a3a" : "transparent",
+    }),
+    phaseGroup: {
+      marginBottom: "28px",
+    },
+    phaseTitle: (phase) => ({
+      fontSize: "1.1em",
+      fontWeight: 700,
+      color: PHASE_COLORS[phase],
+      marginBottom: "12px",
+      paddingBottom: "6px",
+      borderBottom: "1px solid " + PHASE_COLORS[phase] + "40",
+      display: "flex",
+      alignItems: "center",
+      gap: "10px",
+    }),
+    phaseCount: {
+      fontSize: "0.75em",
+      fontWeight: 400,
+      color: "#6a7a8a",
+    },
+    noResults: {
+      textAlign: "center",
+      padding: "60px 20px",
+      color: "#6a7a8a",
+      fontSize: "1.1em",
+    },
+  };
+
+  const renderCard = (c) => {
+    const isExpanded = expandedId === c.id;
+    return (
+      <div
+        key={c.id}
+        style={styles.card(c.phase)}
+        onClick={() => setExpandedId(isExpanded ? null : c.id)}
+        onMouseEnter={(e) => { e.currentTarget.style.background = "#151e28"; }}
+        onMouseLeave={(e) => { e.currentTarget.style.background = "#111820"; }}
+      >
+        <div style={styles.cardHeader}>
+          <h3 style={styles.cardTitle}>
+            <span style={{ marginRight: "8px", color: PHASE_COLORS[c.phase] }}>
+              {STATUS_ICONS[c.status]}
+            </span>
+            {c.title}
+          </h3>
+          <span style={styles.cardDate}>{c.date}</span>
+        </div>
+        <div style={styles.badges}>
+          <span style={styles.badge(DOMAIN_COLORS[c.domain])}>{c.domain}</span>
+          <span style={styles.badge(PHASE_COLORS[c.phase])}>{c.phase}</span>
+          <span style={styles.badge(null)}>{c.project}</span>
+        </div>
+        {isExpanded && (
+          <>
+            <div style={styles.summary}>{c.summary}</div>
+            {c.artifacts.length > 0 && (
+              <div style={styles.artifacts}>
+                <span style={{ fontSize: "0.72em", color: "#6a7a8a", marginRight: "4px" }}>Artifacts:</span>
+                {c.artifacts.map((a, i) => (
+                  <span key={i} style={styles.artifactTag}>{a}</span>
+                ))}
+              </div>
+            )}
+            {c.url && c.url !== "#" && (
+              <a href={c.url} target="_blank" rel="noopener noreferrer" style={styles.link} onClick={(e) => e.stopPropagation()}>
+                Open conversation →
+              </a>
+            )}
+          </>
+        )}
+      </div>
+    );
+  };
+
+  const groupedByPhase = useMemo(() => {
+    const groups = {};
+    PHASES.forEach(p => { groups[p] = []; });
+    filtered.forEach(c => {
+      if (groups[c.phase]) groups[c.phase].push(c);
+    });
+    return groups;
+  }, [filtered]);
+
+  return (
+    <div style={styles.container}>
+      <div style={styles.header}>
+        <div style={styles.title}>HOPE&amp;&amp;SAUCED — Collaboration Map</div>
+        <div style={styles.subtitle}>
+          {CONVERSATIONS.length} conversations · Nov 2025 → Feb 2026 · 98 days of emergence
+        </div>
+        <div style={styles.statsRow}>
+          <div style={styles.statBox}>
+            <div style={styles.statNumber}>{stats.total}</div>
+            <div style={styles.statLabel}>Showing</div>
+          </div>
+          {PHASES.map(p => (
+            <div key={p} style={{ ...styles.statBox, borderColor: (stats.phaseCount[p] ? PHASE_COLORS[p] + "60" : "#1e2a3a") }}>
+              <div style={{ ...styles.statNumber, color: PHASE_COLORS[p] }}>{stats.phaseCount[p] || 0}</div>
+              <div style={styles.statLabel}>{p}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Phase bar */}
+      <div style={styles.phaseBar}>
+        {PHASES.map(p => (
+          <div
+            key={p}
+            style={styles.phaseSegment(p, selectedPhase === p)}
+            onClick={() => setSelectedPhase(selectedPhase === p ? null : p)}
+            title={p + " (" + (stats.phaseCount[p] || 0) + ")"}
+          >
+            {p}
+          </div>
+        ))}
+      </div>
+
+      {/* Domain chips */}
+      <div style={styles.domainSidebar}>
+        {DOMAINS.map(d => (
+          <span
+            key={d}
+            style={styles.domainChip(d, selectedDomain === d)}
+            onClick={() => setSelectedDomain(selectedDomain === d ? null : d)}
+          >
+            {d} {stats.domainCount[d] ? `(${stats.domainCount[d]})` : ""}
+          </span>
+        ))}
+      </div>
+
+      {/* Status legend */}
+      <div style={styles.statusLegend}>
+        {STATUSES.map(s => (
+          <span
+            key={s}
+            style={styles.statusItem(s, selectedStatus === s)}
+            onClick={() => setSelectedStatus(selectedStatus === s ? null : s)}
+          >
+            <span>{STATUS_ICONS[s]}</span>
+            {s}
+          </span>
+        ))}
+      </div>
+
+      {/* Controls */}
+      <div style={styles.controls}>
+        <input
+          type="text"
+          placeholder="Search conversations..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          style={styles.searchInput}
+        />
+        <select
+          value={selectedProject || ""}
+          onChange={(e) => setSelectedProject(e.target.value || null)}
+          style={styles.filterSelect}
+        >
+          <option value="">All Projects</option>
+          {PROJECTS.map(p => (
+            <option key={p} value={p}>{p}</option>
+          ))}
+        </select>
+        {hasFilters && (
+          <button style={styles.clearBtn} onClick={clearFilters}>
+            Clear Filters
+          </button>
+        )}
+        <div style={styles.viewToggle}>
+          <button style={styles.viewBtn(view === "timeline")} onClick={() => setView("timeline")}>Timeline</button>
+          <button style={styles.viewBtn(view === "grid")} onClick={() => setView("grid")}>Grid</button>
+        </div>
+      </div>
+
+      {/* Content */}
+      {filtered.length === 0 ? (
+        <div style={styles.noResults}>
+          No conversations match your filters.
+          <br />
+          <button style={{ ...styles.clearBtn, marginTop: "16px" }} onClick={clearFilters}>
+            Clear all filters
+          </button>
+        </div>
+      ) : view === "timeline" ? (
+        PHASES.map(phase => {
+          const items = groupedByPhase[phase];
+          if (!items || items.length === 0) return null;
+          return (
+            <div key={phase} style={styles.phaseGroup}>
+              <div style={styles.phaseTitle(phase)}>
+                <span>{phase}</span>
+                <span style={styles.phaseCount}>{items.length} conversation{items.length !== 1 ? "s" : ""}</span>
+              </div>
+              {items.map(renderCard)}
+            </div>
+          );
+        })
+      ) : (
+        <div style={styles.gridView}>
+          {filtered.map(renderCard)}
+        </div>
+      )}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<CollaborationMap />);
+  </script>
+</body>
+</html>
