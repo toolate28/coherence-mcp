@@ -13,6 +13,13 @@ import { checkOpsHealth as realCheckOpsHealth, getOpsStatus as realGetOpsStatus,
 import { validateWAVE } from "./wave/validator.js";
 import { waveCoherenceCheck } from "./tools/wave-check.js";
 import { validateExploit } from "./tools/anamnesis-validator.js";
+// Adapters — Gemini, open-weight LLMs, Android, Windows
+import { translateForGemini, checkCoherenceViaGemini, } from "./adapters/gemini.js";
+import { generate as openweightGenerate, checkCoherenceViaOpenWeight, listModels as openweightListModels, } from "./adapters/openweight.js";
+import { listDevices as androidListDevices, sendToolIntent as androidSendToolIntent, generateAndroidScaffold, } from "./adapters/android.js";
+import { invokeToolViaPowerShell, checkNamedPipe, generateWindowsScaffold, } from "./adapters/windows.js";
+// Vortex Bridge — cross-platform content translation protocol
+import { bridgeTranslate, bridgeVerify, getPlatformInfo, listPlatforms, } from "./lib/vortex-bridge.js";
 // Create server instance
 const server = new Server({
     name: "coherence-mcp",
@@ -368,6 +375,177 @@ const TOOLS = [
             required: ["baseThreshold"],
         },
     },
+    // ═══ Gemini API Tools ═══
+    {
+        name: "gemini_translate",
+        description: "Translate content for Google Gemini consumption via the Gemini API. Strips platform-specific noise, preserves semantic content, and reformats for Gemini's multimodal/scale strengths. Requires GEMINI_API_KEY.",
+        inputSchema: {
+            type: "object",
+            properties: {
+                content: { type: "string", description: "Content to translate for Gemini" },
+                metadata: { type: "object", description: "Optional metadata context for translation" },
+                model: { type: "string", description: "Gemini model (default: gemini-2.0-flash)" },
+            },
+            required: ["content"],
+        },
+    },
+    {
+        name: "gemini_check_coherence",
+        description: "Run a coherence check on content via Google Gemini API. The model scores content 0-100 and returns analysis. Requires GEMINI_API_KEY.",
+        inputSchema: {
+            type: "object",
+            properties: {
+                content: { type: "string", description: "Content to check for coherence" },
+                model: { type: "string", description: "Gemini model (default: gemini-2.0-flash)" },
+            },
+            required: ["content"],
+        },
+    },
+    // ═══ Open-Weight LLM Tools (Llama, DeepSeek, Qwen, Mistral) ═══
+    {
+        name: "openweight_generate",
+        description: "Generate a completion from a locally-hosted open-weight model (Llama, DeepSeek, Qwen, Mistral) via OpenAI-compatible API (Ollama, vLLM, llama.cpp). Set OPENWEIGHT_BASE_URL (default: http://localhost:11434/v1).",
+        inputSchema: {
+            type: "object",
+            properties: {
+                prompt: { type: "string", description: "User prompt for the model" },
+                systemPrompt: { type: "string", description: "Optional system prompt" },
+                model: { type: "string", description: "Model name (default: llama3.2). Examples: deepseek-r1, qwen2.5, mistral" },
+            },
+            required: ["prompt"],
+        },
+    },
+    {
+        name: "openweight_check_coherence",
+        description: "Run a coherence check on content via a local open-weight model. Returns score (0-100) and analysis. Requires a running Ollama/vLLM endpoint.",
+        inputSchema: {
+            type: "object",
+            properties: {
+                content: { type: "string", description: "Content to check for coherence" },
+                model: { type: "string", description: "Model name (default: llama3.2)" },
+            },
+            required: ["content"],
+        },
+    },
+    {
+        name: "openweight_list_models",
+        description: "List available models at the open-weight endpoint (Ollama, vLLM, llama.cpp server, LM Studio).",
+        inputSchema: {
+            type: "object",
+            properties: {},
+        },
+    },
+    // ═══ Vortex Bridge Tools — Cross-Platform Translation Protocol ═══
+    {
+        name: "vortex_translate",
+        description: "Translate content between AI platforms (Claude, Grok, Gemini, Llama, DeepSeek, Qwen, Mistral) through the vortex bridge. Strips platform-specific noise, preserves semantic coherence, and logs translation provenance in the ATOM trail.",
+        inputSchema: {
+            type: "object",
+            properties: {
+                content: { type: "string", description: "Content to translate" },
+                source: {
+                    type: "string",
+                    enum: ["claude", "grok", "gemini", "llama", "deepseek", "qwen", "mistral", "qdi", "quantum-redstone", "spiralsafe", "vortex-bridges", "reson8-labs", "hope-ai-npc-suite", "human", "generic"],
+                    description: "Source platform",
+                },
+                target: {
+                    type: "string",
+                    enum: ["claude", "grok", "gemini", "llama", "deepseek", "qwen", "mistral", "qdi", "quantum-redstone", "spiralsafe", "vortex-bridges", "reson8-labs", "hope-ai-npc-suite", "human", "generic"],
+                    description: "Target platform",
+                },
+                coherenceThreshold: {
+                    type: "number",
+                    description: "Minimum coherence score (0-100) for faithful translation (default: 60)",
+                },
+            },
+            required: ["content", "source", "target"],
+        },
+    },
+    {
+        name: "vortex_verify",
+        description: "Verify coherence between source content and a translation. Checks semantic preservation, structural fidelity, and noise removal. Use after any cross-platform hop.",
+        inputSchema: {
+            type: "object",
+            properties: {
+                sourceContent: { type: "string", description: "Original source content" },
+                translatedContent: { type: "string", description: "Translated content to verify" },
+                threshold: { type: "number", description: "Coherence threshold (default: 60)" },
+            },
+            required: ["sourceContent", "translatedContent"],
+        },
+    },
+    {
+        name: "vortex_platforms",
+        description: "List all supported platforms in the vortex bridge with their capabilities and bridge characteristics.",
+        inputSchema: {
+            type: "object",
+            properties: {
+                platform: {
+                    type: "string",
+                    enum: ["claude", "grok", "gemini", "llama", "deepseek", "qwen", "mistral", "qdi", "quantum-redstone", "spiralsafe", "vortex-bridges", "reson8-labs", "hope-ai-npc-suite", "human", "generic"],
+                    description: "Optional: get info for a specific platform. If omitted, lists all.",
+                },
+            },
+        },
+    },
+    // ═══ Android SDK Tools ═══
+    {
+        name: "android_bridge",
+        description: "Communicate with Android devices via ADB. List connected devices or send MCP tool invocations via broadcast intents to the coherence-mcp Android client app.",
+        inputSchema: {
+            type: "object",
+            properties: {
+                action: {
+                    type: "string",
+                    enum: ["list_devices", "send_intent"],
+                    description: "Action to perform",
+                },
+                toolName: { type: "string", description: "MCP tool name (for send_intent)" },
+                toolArgs: { type: "object", description: "MCP tool arguments (for send_intent)" },
+                deviceId: { type: "string", description: "Optional: target specific device" },
+            },
+            required: ["action"],
+        },
+    },
+    {
+        name: "android_scaffold",
+        description: "Generate a Kotlin/Android project scaffold for a coherence-mcp client app. Includes OkHttp client, BroadcastReceiver for intent-based invocation, and build.gradle.kts.",
+        inputSchema: {
+            type: "object",
+            properties: {
+                packageName: { type: "string", description: "Android package name (default: org.spiralsafe.coherencemcp)" },
+            },
+        },
+    },
+    // ═══ Windows SDK Tools ═══
+    {
+        name: "windows_bridge",
+        description: "Communicate with Windows systems via PowerShell. Invoke MCP tools through PowerShell HTTP requests or check named-pipe availability for local IPC.",
+        inputSchema: {
+            type: "object",
+            properties: {
+                action: {
+                    type: "string",
+                    enum: ["invoke_tool", "check_pipe"],
+                    description: "Action to perform",
+                },
+                toolName: { type: "string", description: "MCP tool name (for invoke_tool)" },
+                toolArgs: { type: "object", description: "MCP tool arguments (for invoke_tool)" },
+                serverUrl: { type: "string", description: "Server URL (default: http://localhost:3000)" },
+            },
+            required: ["action"],
+        },
+    },
+    {
+        name: "windows_scaffold",
+        description: "Generate a .NET (C#) project scaffold for a Windows coherence-mcp client. Includes HttpClient JSON-RPC wrapper, named-pipe transport, and PowerShell module.",
+        inputSchema: {
+            type: "object",
+            properties: {
+                projectName: { type: "string", description: "Project name (default: CoherenceMcpClient)" },
+            },
+        },
+    },
     // ... [Include remaining tools from original: scripts_run, awi_intent_request, discord_post, mc_execCommand, mc_query, grok_collab, grok_metrics]
 ];
 // Legacy script allow-list associated with the former scripts_run tool.
@@ -664,6 +842,127 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                             }, null, 2),
                         },
                     ],
+                };
+            }
+            // ═══ Gemini API Handlers ═══
+            case "gemini_translate": {
+                const { content, metadata, model } = args;
+                const result = await translateForGemini(content, metadata ?? {}, model ? { model } : undefined);
+                return {
+                    content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+                };
+            }
+            case "gemini_check_coherence": {
+                const { content, model } = args;
+                const result = await checkCoherenceViaGemini(content, model ? { model } : undefined);
+                return {
+                    content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+                };
+            }
+            // ═══ Open-Weight LLM Handlers ═══
+            case "openweight_generate": {
+                const { prompt, systemPrompt, model } = args;
+                const result = await openweightGenerate(prompt, systemPrompt, model ? { model } : undefined);
+                return {
+                    content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+                };
+            }
+            case "openweight_check_coherence": {
+                const { content, model } = args;
+                const result = await checkCoherenceViaOpenWeight(content, model ? { model } : undefined);
+                return {
+                    content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+                };
+            }
+            case "openweight_list_models": {
+                const result = await openweightListModels();
+                return {
+                    content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+                };
+            }
+            // ═══ Vortex Bridge Handlers ═══
+            case "vortex_translate": {
+                const { content, source, target, coherenceThreshold } = args;
+                const result = await bridgeTranslate({
+                    content,
+                    source: source,
+                    target: target,
+                    config: coherenceThreshold != null ? { coherenceThreshold } : undefined,
+                });
+                return {
+                    content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+                };
+            }
+            case "vortex_verify": {
+                const { sourceContent, translatedContent, threshold } = args;
+                const result = await bridgeVerify(sourceContent, translatedContent, threshold);
+                return {
+                    content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+                };
+            }
+            case "vortex_platforms": {
+                const { platform } = args;
+                if (platform) {
+                    const info = getPlatformInfo(platform);
+                    return {
+                        content: [{ type: "text", text: JSON.stringify(info, null, 2) }],
+                    };
+                }
+                const platforms = listPlatforms().map((p) => getPlatformInfo(p));
+                return {
+                    content: [{ type: "text", text: JSON.stringify(platforms, null, 2) }],
+                };
+            }
+            // ═══ Android SDK Handlers ═══
+            case "android_bridge": {
+                const { action, toolName, toolArgs, deviceId } = args;
+                if (action === "list_devices") {
+                    const result = await androidListDevices(deviceId ? { deviceId } : undefined);
+                    return {
+                        content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+                    };
+                }
+                if (action === "send_intent") {
+                    if (!toolName)
+                        throw new Error("toolName is required for send_intent action");
+                    const result = await androidSendToolIntent(toolName, toolArgs ?? {}, deviceId ? { deviceId } : undefined);
+                    return {
+                        content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+                    };
+                }
+                throw new Error(`Unknown android_bridge action: ${action}`);
+            }
+            case "android_scaffold": {
+                const { packageName } = args;
+                const scaffold = generateAndroidScaffold(packageName);
+                return {
+                    content: [{ type: "text", text: JSON.stringify(scaffold, null, 2) }],
+                };
+            }
+            // ═══ Windows SDK Handlers ═══
+            case "windows_bridge": {
+                const { action, toolName, toolArgs, serverUrl } = args;
+                if (action === "invoke_tool") {
+                    if (!toolName)
+                        throw new Error("toolName is required for invoke_tool action");
+                    const result = await invokeToolViaPowerShell(toolName, toolArgs ?? {}, serverUrl);
+                    return {
+                        content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+                    };
+                }
+                if (action === "check_pipe") {
+                    const result = await checkNamedPipe();
+                    return {
+                        content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+                    };
+                }
+                throw new Error(`Unknown windows_bridge action: ${action}`);
+            }
+            case "windows_scaffold": {
+                const { projectName } = args;
+                const scaffold = generateWindowsScaffold(projectName);
+                return {
+                    content: [{ type: "text", text: JSON.stringify(scaffold, null, 2) }],
                 };
             }
             // [Keep remaining tool implementations from original for now: scripts_run, awi_intent_request, etc.]
