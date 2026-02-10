@@ -27,6 +27,28 @@ import { validateWAVE } from "./wave/validator.js";
 import { waveCoherenceCheck } from "./tools/wave-check.js";
 import { validateExploit } from "./tools/anamnesis-validator.js";
 
+// Adapters — Gemini, open-weight LLMs, Android, Windows
+import {
+  translateForGemini,
+  extractFromGemini,
+  checkCoherenceViaGemini,
+} from "./adapters/gemini.js";
+import {
+  generate as openweightGenerate,
+  checkCoherenceViaOpenWeight,
+  listModels as openweightListModels,
+} from "./adapters/openweight.js";
+import {
+  listDevices as androidListDevices,
+  sendToolIntent as androidSendToolIntent,
+  generateAndroidScaffold,
+} from "./adapters/android.js";
+import {
+  invokeToolViaPowerShell,
+  checkNamedPipe,
+  generateWindowsScaffold,
+} from "./adapters/windows.js";
+
 // Create server instance
 const server = new Server(
   {
