@@ -192,7 +192,7 @@ export async function checkCoherenceViaOpenWeight(
 ): Promise<OpenWeightCoherenceResult> {
   const systemPrompt = [
     "You are a coherence analysis engine for the SpiralSafe/coherence-mcp system.",
-    "Analyse the following content for coherence. Return ONLY a JSON object with:",
+    "Analyze the following content for coherence. Return ONLY a JSON object with:",
     '  { "score": <number 0-100>, "analysis": "<brief explanation>" }',
     "Do NOT include any other text outside the JSON.",
   ].join("\n");
