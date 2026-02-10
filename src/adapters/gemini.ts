@@ -104,7 +104,7 @@ export async function translateForGemini(
     "You are a cross-platform content translator for the coherence-mcp system.",
     "Translate the following content so it is optimised for consumption by Google Gemini.",
     "Preserve all semantic meaning and structural relationships.",
-    "Strip any platform-specific formatting artefacts.",
+    "Strip any platform-specific formatting artifacts.",
     metadata && Object.keys(metadata).length > 0
       ? `\nMetadata context: ${JSON.stringify(metadata)}`
       : "",
@@ -203,7 +203,7 @@ export async function checkCoherenceViaGemini(
 
   const prompt = [
     "You are a coherence analysis engine for the SpiralSafe/coherence-mcp system.",
-    "Analyse the following content for coherence. Return ONLY a JSON object with:",
+    "Analyze the following content for coherence. Return ONLY a JSON object with:",
     '  { "score": <number 0-100>, "analysis": "<brief explanation>" }',
     "Do NOT include any other text outside the JSON.",
     `\n---\n${content}`,
