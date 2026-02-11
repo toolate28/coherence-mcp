@@ -39,6 +39,65 @@ export const WAVE_MINIMUM = 60;
 export const WAVE_HIGH = 80;
 export const WAVE_CRITICAL = 99;
 
+// Blending weights for doc-code alignment vs WAVE analysis scores.
+// Alignment is weighted more heavily because WAVE alone analyses combined text,
+// not the relationship between doc and code.
+const SEMANTIC_WAVE_WEIGHT = 0.3;
+const SEMANTIC_ALIGN_WEIGHT = 0.7;
+const STRUCTURAL_WAVE_WEIGHT = 0.35;
+const STRUCTURAL_ALIGN_WEIGHT = 0.65;
+
+// Overall score component weights
+const OVERALL_SEMANTIC_WEIGHT = 0.40;
+const OVERALL_STRUCTURAL_WEIGHT = 0.35;
+const OVERALL_CONSISTENCY_WEIGHT = 0.25;
+
+/**
+ * Extract significant words from text for concept comparison
+ */
+function extractConcepts(text: string): Set<string> {
+  const words = text.toLowerCase().match(/\b\w{4,}\b/g) || [];
+  const stopWords = new Set([
+    'this', 'that', 'with', 'from', 'have', 'been', 'were', 'would', 'could',
+    'should', 'will', 'what', 'when', 'where', 'which', 'their', 'there',
+    'these', 'those', 'about', 'into', 'through', 'during', 'before', 'after',
+    'above', 'below', 'between', 'under', 'again', 'further', 'then', 'once',
+    'function', 'return', 'const', 'class', 'true', 'false', 'null',
+  ]);
+  return new Set(words.filter(w => !stopWords.has(w)));
+}
+
+/**
+ * Measure concept overlap between documentation and code
+ * Uses exact and prefix matching to approximate stemming.
+ * Returns a 0-100 alignment score
+ */
+function measureDocCodeAlignment(documentation: string, code: string): number {
+  const docConcepts = extractConcepts(documentation);
+  const codeConcepts = extractConcepts(code);
+
+  if (docConcepts.size === 0 || codeConcepts.size === 0) return 0;
+
+  const codeArr = [...codeConcepts];
+  let matches = 0;
+
+  for (const dc of docConcepts) {
+    for (const cc of codeArr) {
+      if (dc === cc) { matches++; break; }
+      // Prefix matching: approximate stem equivalence
+      const minLen = Math.min(dc.length, cc.length);
+      if (minLen >= 4 && (dc.startsWith(cc.substring(0, minLen)) || cc.startsWith(dc.substring(0, minLen)))) {
+        matches += 0.7;
+        break;
+      }
+    }
+  }
+
+  const smaller = Math.min(docConcepts.size, codeConcepts.size);
+  const ratio = matches / smaller;
+  return Math.round(Math.min(100, ratio * 100));
+}
+
 /**
  * Calculate coherence scores between documentation and code
  */
@@ -48,21 +107,39 @@ export async function calculateCoherence(
 ): Promise<CoherenceScore> {
   const combinedContent = `${documentation}\n\n${code}`;
   const result = await validateWAVE(combinedContent, WAVE_MINIMUM);
-  
+
+  // Measure direct doc-code concept alignment
+  const alignment = measureDocCodeAlignment(documentation, code);
+
+  // Blend WAVE semantic score with doc-code alignment (alignment-dominant)
+  const semantic = Math.round(result.semantic * SEMANTIC_WAVE_WEIGHT + alignment * SEMANTIC_ALIGN_WEIGHT);
+
+  // Structural score: penalize when doc and code share no concepts
+  const structural = Math.round(result.structure * STRUCTURAL_WAVE_WEIGHT + alignment * STRUCTURAL_ALIGN_WEIGHT);
+
+  // Overall weighted: consistency is dampened by alignment — internal
+  // consistency of unrelated texts is meaningless for doc-code coherence.
+  const alignmentRatio = alignment / 100;
+  const overall = Math.round(
+    semantic * OVERALL_SEMANTIC_WEIGHT +
+    structural * OVERALL_STRUCTURAL_WEIGHT +
+    result.consistency * alignmentRatio * OVERALL_CONSISTENCY_WEIGHT
+  );
+
   // Calculate temporal coherence (version/date alignment)
   const temporal = calculateTemporalCoherence(documentation, code);
-  
+
   // Calculate Fibonacci-weighted score
   const fibonacci_weighted = calculateFibonacciWeighted(
-    result.structure,
-    result.semantic,
+    structural,
+    semantic,
     temporal
   );
-  
+
   return {
-    overall: result.overall,
-    structural: result.structure,
-    semantic: result.semantic,
+    overall,
+    structural,
+    semantic,
     temporal,
     fibonacci_weighted
   };
@@ -180,6 +257,24 @@ export async function validateCoherence(
     severity: v.severity === 'info' ? 'low' : v.severity === 'warning' ? 'medium' : v.severity === 'critical' ? 'critical' : 'high',
     suggestion: v.suggestion
   }));
+
+  // Add alignment-based recommendations when scores are below threshold
+  if (score.semantic < threshold) {
+    recommendations.push({
+      category: 'semantic',
+      message: 'Documentation and code share few common concepts',
+      severity: score.semantic < 30 ? 'critical' : 'high',
+      suggestion: 'Ensure documentation terminology matches the code identifiers and domain'
+    });
+  }
+  if (score.structural < threshold) {
+    recommendations.push({
+      category: 'structural',
+      message: 'Documentation structure does not align with code structure',
+      severity: score.structural < 30 ? 'critical' : 'high',
+      suggestion: 'Document each public function/class and mirror the code organisation'
+    });
+  }
   
   return {
     score,
