@@ -116,16 +116,32 @@ export async function fetchUrl(
  * the semantic content, not perfect rendering.
  */
 function stripHtml(html: string): string {
-  return html
-    .replace(/<script[\s\S]*?<\/script>/gi, "")
-    .replace(/<style[\s\S]*?<\/style>/gi, "")
-    .replace(/<[^>]+>/g, " ")
-    .replace(/&amp;/g, "&")
+  let text = html;
+
+  // Repeatedly strip <script> and <style> blocks to handle nested / malformed cases
+  let prev: string;
+  do {
+    prev = text;
+    text = text.replace(/<script[\s\S]*?<\s*\/\s*script[^>]*>/gi, "");
+  } while (text !== prev);
+
+  do {
+    prev = text;
+    text = text.replace(/<style[\s\S]*?<\s*\/\s*style\s*>/gi, "");
+  } while (text !== prev);
+
+  // Strip remaining HTML tags
+  text = text.replace(/<[^>]+>/g, " ");
+
+  // Decode common HTML entities — decode &amp; last to avoid double-unescaping
+  text = text
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
     .replace(/&nbsp;/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+    .replace(/&amp;/g, "&");
+
+  // Collapse whitespace
+  return text.replace(/\s+/g, " ").trim();
 }

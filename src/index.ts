@@ -599,8 +599,8 @@ const TOOLS: Tool[] = [
     },
   },
   // ═══ Industry Connector Tools ═══
-  // Standard integrations universally available on Claude connectors page
-  // and other MCP platforms (Slack, GitHub, Jira, Postgres, Fetch).
+  // Common integrations for popular external services
+  // (Slack, GitHub, Jira, Postgres, Fetch).
 
   {
     name: "slack_notify",
