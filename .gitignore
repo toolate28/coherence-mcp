@@ -1,6 +1,9 @@
 node_modules/
 build/
 dist/
+
+# Rust
+orchestrator/target/
 *.log
 .DS_Store
 .env
