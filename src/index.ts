@@ -57,6 +57,17 @@ import {
   listPlatforms,
 } from "./lib/vortex-bridge.js";
 
+// Industry-standard connectors
+import { slackSend, formatCoherenceAlert } from "./connectors/slack.js";
+import {
+  githubGetFile,
+  githubPostStatus,
+  githubCreateIssue,
+} from "./connectors/github.js";
+import { jiraCreateIssue, jiraSearch } from "./connectors/jira.js";
+import { postgresQuery, postgresStore } from "./connectors/postgres.js";
+import { fetchUrl } from "./connectors/fetch.js";
+
 // Create server instance
 const server = new Server(
   {
@@ -587,7 +598,193 @@ const TOOLS: Tool[] = [
       },
     },
   },
-  // ... [Include remaining tools from original: scripts_run, awi_intent_request, discord_post, mc_execCommand, mc_query, grok_collab, grok_metrics]
+  // ═══ Industry Connector Tools ═══
+  // Standard integrations universally available on Claude connectors page
+  // and other MCP platforms (Slack, GitHub, Jira, Postgres, Fetch).
+
+  {
+    name: "slack_notify",
+    description:
+      "Send a notification to Slack via Incoming Webhook. Use for coherence alerts, WAVE results, and gate transition events. Requires SLACK_WEBHOOK_URL env var.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        message: { type: "string", description: "Message text to send" },
+        score: {
+          type: "number",
+          description: "Optional WAVE coherence score — triggers rich formatting",
+        },
+        threshold: {
+          type: "number",
+          description: "Optional coherence threshold for pass/fail display",
+        },
+        source: {
+          type: "string",
+          description: "Optional source identifier (file, PR, etc.)",
+        },
+      },
+      required: ["message"],
+    },
+  },
+  {
+    name: "github_file",
+    description:
+      "Fetch a file from a GitHub repository for coherence analysis. Returns decoded text content. Requires GITHUB_TOKEN env var.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        owner: { type: "string", description: "Repository owner" },
+        repo: { type: "string", description: "Repository name" },
+        path: { type: "string", description: "File path within the repository" },
+        ref: {
+          type: "string",
+          description: "Optional git ref (branch, tag, SHA)",
+        },
+      },
+      required: ["owner", "repo", "path"],
+    },
+  },
+  {
+    name: "github_status",
+    description:
+      "Post a coherence check status on a GitHub commit/PR. Appears in PR checks. Requires GITHUB_TOKEN env var.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        owner: { type: "string", description: "Repository owner" },
+        repo: { type: "string", description: "Repository name" },
+        sha: { type: "string", description: "Commit SHA to post status on" },
+        state: {
+          type: "string",
+          enum: ["success", "failure", "pending", "error"],
+          description: "Status state",
+        },
+        description: {
+          type: "string",
+          description: "Status description (e.g. 'WAVE score: 85%')",
+        },
+      },
+      required: ["owner", "repo", "sha", "state", "description"],
+    },
+  },
+  {
+    name: "github_issue",
+    description:
+      "Create a GitHub issue for a coherence violation or gate failure. Requires GITHUB_TOKEN env var.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        owner: { type: "string", description: "Repository owner" },
+        repo: { type: "string", description: "Repository name" },
+        title: { type: "string", description: "Issue title" },
+        body: { type: "string", description: "Issue body (markdown)" },
+        labels: {
+          type: "array",
+          items: { type: "string" },
+          description: "Optional labels (default: ['coherence'])",
+        },
+      },
+      required: ["owner", "repo", "title", "body"],
+    },
+  },
+  {
+    name: "jira_create",
+    description:
+      "Create a Jira issue for a coherence finding. Requires JIRA_URL, JIRA_EMAIL, JIRA_TOKEN env vars.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        projectKey: { type: "string", description: "Jira project key (e.g. COH)" },
+        summary: { type: "string", description: "Issue summary" },
+        description: { type: "string", description: "Issue description" },
+        issueType: {
+          type: "string",
+          description: "Issue type (default: Bug)",
+        },
+        labels: {
+          type: "array",
+          items: { type: "string" },
+          description: "Labels (default: ['coherence'])",
+        },
+      },
+      required: ["projectKey", "summary", "description"],
+    },
+  },
+  {
+    name: "jira_search",
+    description:
+      "Search Jira issues using JQL. Requires JIRA_URL, JIRA_EMAIL, JIRA_TOKEN env vars.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        jql: {
+          type: "string",
+          description: "JQL query (e.g. 'labels = coherence AND status != Done')",
+        },
+        maxResults: {
+          type: "number",
+          description: "Maximum results to return (default: 10)",
+        },
+      },
+      required: ["jql"],
+    },
+  },
+  {
+    name: "postgres_query",
+    description:
+      "Execute a read query against a PostgreSQL endpoint (PostgREST/Supabase). Requires POSTGRES_URL env var.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        query: { type: "string", description: "SQL query or RPC function name" },
+        params: {
+          type: "array",
+          description: "Optional query parameters",
+        },
+      },
+      required: ["query"],
+    },
+  },
+  {
+    name: "postgres_store",
+    description:
+      "Store a coherence result or ATOM entry in a PostgreSQL table via REST. Requires POSTGRES_URL env var.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        table: { type: "string", description: "Target table name" },
+        data: {
+          type: "object",
+          description: "Record to insert (key-value pairs)",
+        },
+      },
+      required: ["table", "data"],
+    },
+  },
+  {
+    name: "fetch_url",
+    description:
+      "Fetch content from a URL for coherence analysis. Supports HTML (auto-extracts text), JSON, Markdown, and plain text. No configuration required.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        url: { type: "string", description: "URL to fetch" },
+        maxLength: {
+          type: "number",
+          description: "Maximum content length in characters (default: 100000)",
+        },
+        extractText: {
+          type: "boolean",
+          description: "Strip HTML tags for text-only output (default: true)",
+        },
+        headers: {
+          type: "object",
+          description: "Optional HTTP headers to include",
+        },
+      },
+      required: ["url"],
+    },
+  },
 ];
 
 // Legacy script allow-list associated with the former scripts_run tool.
@@ -1122,6 +1319,139 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         const scaffold = generateWindowsScaffold(projectName);
         return {
           content: [{ type: "text", text: JSON.stringify(scaffold, null, 2) }],
+        };
+      }
+
+      // ═══ Industry Connector Handlers ═══
+
+      case "slack_notify": {
+        const { message, score, threshold, source } = args as {
+          message: string;
+          score?: number;
+          threshold?: number;
+          source?: string;
+        };
+        let result;
+        if (score != null && threshold != null) {
+          const slackMsg = formatCoherenceAlert({
+            score,
+            threshold,
+            source: source ?? "coherence-mcp",
+            details: message,
+          });
+          result = await slackSend(slackMsg);
+        } else {
+          result = await slackSend({ text: message });
+        }
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      }
+
+      case "github_file": {
+        const { owner, repo, path, ref } = args as {
+          owner: string;
+          repo: string;
+          path: string;
+          ref?: string;
+        };
+        const result = await githubGetFile(owner, repo, path, ref);
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      }
+
+      case "github_status": {
+        const { owner, repo, sha, state, description } = args as {
+          owner: string;
+          repo: string;
+          sha: string;
+          state: "success" | "failure" | "pending" | "error";
+          description: string;
+        };
+        const result = await githubPostStatus(owner, repo, sha, state, description);
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      }
+
+      case "github_issue": {
+        const { owner, repo, title, body, labels } = args as {
+          owner: string;
+          repo: string;
+          title: string;
+          body: string;
+          labels?: string[];
+        };
+        const result = await githubCreateIssue(owner, repo, title, body, labels);
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      }
+
+      case "jira_create": {
+        const { projectKey, summary, description, issueType, labels } = args as {
+          projectKey: string;
+          summary: string;
+          description: string;
+          issueType?: string;
+          labels?: string[];
+        };
+        const result = await jiraCreateIssue({
+          projectKey,
+          summary,
+          description,
+          issueType,
+          labels,
+        });
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      }
+
+      case "jira_search": {
+        const { jql, maxResults } = args as {
+          jql: string;
+          maxResults?: number;
+        };
+        const result = await jiraSearch(jql, maxResults);
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      }
+
+      case "postgres_query": {
+        const { query, params } = args as {
+          query: string;
+          params?: unknown[];
+        };
+        const result = await postgresQuery(query, params);
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      }
+
+      case "postgres_store": {
+        const { table, data } = args as {
+          table: string;
+          data: Record<string, unknown>;
+        };
+        const result = await postgresStore(table, data);
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      }
+
+      case "fetch_url": {
+        const { url, maxLength, extractText, headers: hdrs } = args as {
+          url: string;
+          maxLength?: number;
+          extractText?: boolean;
+          headers?: Record<string, string>;
+        };
+        const result = await fetchUrl(url, { maxLength, extractText, headers: hdrs });
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
         };
       }
 
