@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reson8 Centre</title>
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --surface: #1a1a1a;
+    --surface2: #242424;
+    --border: #333;
+    --text: #e0e0e0;
+    --muted: #888;
+    --accent: #c8a04a;
+    --accent-dim: #a0803a;
+    --green: #4ade80;
+    --amber: #fbbf24;
+    --red: #f87171;
+    --cyan: #67e8f9;
+    --purple: #c084fc;
+    --blue: #60a5fa;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px;
+  }
+
+  /* ── Top Bar: Token Tally ── */
+  .token-bar {
+    width: 100%;
+    max-width: 720px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .token-bar .model-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .model-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .model-opus .model-dot { background: var(--purple); }
+  .model-sonnet .model-dot { background: var(--blue); }
+  .model-haiku .model-dot { background: var(--green); }
+
+  .token-gauge {
+    flex: 1;
+    height: 6px;
+    background: var(--surface2);
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+  }
+  .token-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.8s ease, background 0.5s ease;
+  }
+  .token-fill.healthy { background: linear-gradient(90deg, var(--green), var(--cyan)); }
+  .token-fill.caution { background: linear-gradient(90deg, var(--amber), #f59e0b); }
+  .token-fill.critical { background: linear-gradient(90deg, var(--red), #ef4444); }
+
+  .token-stats {
+    font-size: 10px;
+    color: var(--muted);
+    white-space: nowrap;
+    min-width: 80px;
+    text-align: right;
+  }
+  .token-stats .count { color: var(--text); font-weight: 600; }
+
+  /* ── Handoff Zone ── */
+  .handoff-zone {
+    width: 100%;
+    max-width: 720px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+  }
+  .handoff-header {
+    font-size: 10px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .handoff-models {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+  }
+  .handoff-card {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+  .handoff-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-1px);
+  }
+  .handoff-card.active {
+    border-color: var(--accent);
+    box-shadow: 0 0 12px rgba(200, 160, 74, 0.15);
+  }
+  .handoff-card .h-name {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .handoff-card .h-role {
+    font-size: 9px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .handoff-card .h-optimal {
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    display: inline-block;
+  }
+  .optimal-now { background: rgba(74, 222, 128, 0.15); color: var(--green); }
+  .optimal-next { background: rgba(251, 191, 36, 0.15); color: var(--amber); }
+  .optimal-reserve { background: rgba(96, 165, 250, 0.15); color: var(--blue); }
+  .handoff-card .h-tokens {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .handoff-card .h-tokens span { color: var(--text); }
+
+  /* ── Coherence Ring ── */
+  .centre-ring {
+    width: 100%;
+    max-width: 720px;
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .wave-widget {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+  }
+  .wave-widget .w-label {
+    font-size: 9px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 6px;
+  }
+  .wave-widget .w-value {
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .wave-widget .w-bar {
+    height: 3px;
+    background: var(--surface2);
+    border-radius: 2px;
+    margin-top: 6px;
+    overflow: hidden;
+  }
+  .wave-widget .w-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 1s ease;
+  }
+
+  /* ── Phase Tracker (Micro → Macro) ── */
+  .phase-track {
+    width: 100%;
+    max-width: 720px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+  }
+  .phase-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .phase-header .p-title {
+    font-size: 10px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .phase-header .p-progress {
+    font-size: 10px;
+    color: var(--muted);
+  }
+  .phase-list {
+    display: flex;
+    gap: 4px;
+  }
+  .phase-pip {
+    flex: 1;
+    height: 28px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+  .phase-pip:hover {
+    transform: scaleY(1.15);
+  }
+  .phase-pip .pip-tooltip {
+    display: none;
+    position: absolute;
+    bottom: 110%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 9px;
+    color: var(--text);
+    white-space: nowrap;
+    z-index: 10;
+  }
+  .phase-pip:hover .pip-tooltip { display: block; }
+  .pip-done { background: rgba(74, 222, 128, 0.2); color: var(--green); border: 1px solid rgba(74, 222, 128, 0.3); }
+  .pip-active { background: rgba(200, 160, 74, 0.2); color: var(--accent); border: 1px solid rgba(200, 160, 74, 0.4); animation: pulse 2s infinite; }
+  .pip-blocked { background: rgba(248, 113, 113, 0.15); color: var(--red); border: 1px solid rgba(248, 113, 113, 0.3); }
+  .pip-pending { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+
+  /* ── Conservation / Fixed Point ── */
+  .conservation {
+    width: 100%;
+    max-width: 720px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .cons-equation {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--cyan);
+    white-space: nowrap;
+  }
+  .cons-equation .alpha { color: var(--green); }
+  .cons-equation .omega { color: var(--purple); }
+  .cons-equation .equals { color: var(--muted); }
+  .cons-equation .sum { color: var(--accent); }
+  .cons-status {
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+  .cons-hold { background: rgba(74, 222, 128, 0.15); color: var(--green); }
+  .cons-violated { background: rgba(248, 113, 113, 0.15); color: var(--red); }
+  .cons-desc {
+    flex: 1;
+    font-size: 9px;
+    color: var(--muted);
+    text-align: right;
+  }
+
+  /* ── Quick Links ── */
+  .quick-links {
+    width: 100%;
+    max-width: 720px;
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .q-link {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px;
+    text-align: center;
+    text-decoration: none;
+    color: var(--text);
+    font-size: 10px;
+    transition: all 0.2s ease;
+  }
+  .q-link:hover {
+    border-color: var(--accent);
+    background: var(--surface2);
+  }
+  .q-link .q-icon { font-size: 16px; margin-bottom: 2px; }
+
+  /* ── Micro-Macro Footer ── */
+  .micro-macro {
+    width: 100%;
+    max-width: 720px;
+    text-align: center;
+    padding: 8px;
+    font-size: 9px;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+  }
+  .micro-macro .mm-principle {
+    color: var(--accent-dim);
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══ TOKEN TALLY BAR ═══ -->
+<div class="token-bar" id="tokenBar">
+  <div class="model-indicator model-opus" id="modelIndicator">
+    <div class="model-dot"></div>
+    <span>Opus 4.6</span>
+  </div>
+  <div class="token-gauge">
+    <div class="token-fill healthy" id="tokenFill" style="width: 62%"></div>
+  </div>
+  <div class="token-stats">
+    <span class="count" id="tokenCount">~124K</span> / 200K
+  </div>
+</div>
+
+<!-- ═══ HANDOFF OPTIMIZER ═══ -->
+<div class="handoff-zone">
+  <div class="handoff-header">Model Handoff Optimizer</div>
+  <div class="handoff-models" id="handoffModels">
+    <div class="handoff-card active" onclick="selectModel('opus')">
+      <div class="h-name" style="color: var(--purple)">Opus</div>
+      <div class="h-role">Architecture / Proofs / First-contact</div>
+      <div class="h-optimal optimal-now">Active</div>
+      <div class="h-tokens">Cost: <span>$15/1M</span> in | <span>$75/1M</span> out</div>
+    </div>
+    <div class="handoff-card" onclick="selectModel('sonnet')">
+      <div class="h-name" style="color: var(--blue)">Sonnet</div>
+      <div class="h-role">Implementation / Iteration / Code</div>
+      <div class="h-optimal optimal-next">Handoff at ~70%</div>
+      <div class="h-tokens">Cost: <span>$3/1M</span> in | <span>$15/1M</span> out</div>
+    </div>
+    <div class="handoff-card" onclick="selectModel('haiku')">
+      <div class="h-name" style="color: var(--green)">Haiku</div>
+      <div class="h-role">Validation / Formatting / Bulk ops</div>
+      <div class="h-optimal optimal-reserve">Reserve</div>
+      <div class="h-tokens">Cost: <span>$0.25/1M</span> in | <span>$1.25/1M</span> out</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ WAVE COHERENCE RING ═══ -->
+<div class="centre-ring">
+  <div class="wave-widget">
+    <div class="w-label">Curl</div>
+    <div class="w-value" style="color: var(--green)">0.25</div>
+    <div class="w-bar"><div class="w-bar-fill" style="width: 25%; background: var(--green)"></div></div>
+  </div>
+  <div class="wave-widget">
+    <div class="w-label">Divergence</div>
+    <div class="w-value" style="color: var(--cyan)">0.21</div>
+    <div class="w-bar"><div class="w-bar-fill" style="width: 21%; background: var(--cyan)"></div></div>
+  </div>
+  <div class="wave-widget">
+    <div class="w-label">Potential</div>
+    <div class="w-value" style="color: var(--accent)">0.72</div>
+    <div class="w-bar"><div class="w-bar-fill" style="width: 72%; background: var(--accent)"></div></div>
+  </div>
+  <div class="wave-widget">
+    <div class="w-label">Entropy</div>
+    <div class="w-value" style="color: var(--purple)">0.58</div>
+    <div class="w-bar"><div class="w-bar-fill" style="width: 58%; background: var(--purple)"></div></div>
+  </div>
+</div>
+
+<!-- ═══ 6-PHASE TRACKER ═══ -->
+<div class="phase-track">
+  <div class="phase-header">
+    <span class="p-title">Critical Path — Micro → Macro</span>
+    <span class="p-progress">Phase 4 of 6</span>
+  </div>
+  <div class="phase-list">
+    <div class="phase-pip pip-blocked">
+      <span>1</span>
+      <div class="pip-tooltip">Gate Unblock — ASIC/DIN (Blocked: phone)</div>
+    </div>
+    <div class="phase-pip pip-pending">
+      <span>2</span>
+      <div class="pip-tooltip">Entity Formation — Reson8-Labs Pty Ltd</div>
+    </div>
+    <div class="phase-pip pip-pending">
+      <span>3</span>
+      <div class="pip-tooltip">Financial Activation — Bank/Stripe/R&D</div>
+    </div>
+    <div class="phase-pip pip-active">
+      <span>4</span>
+      <div class="pip-tooltip">Revenue Ignition — X Article (NOW)</div>
+    </div>
+    <div class="phase-pip pip-pending">
+      <span>5</span>
+      <div class="pip-tooltip">Technical Manifest — coherence-mcp deploy</div>
+    </div>
+    <div class="phase-pip pip-pending">
+      <span>6</span>
+      <div class="pip-tooltip">QRC/Orbital Integration</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CONSERVATION LAW ═══ -->
+<div class="conservation">
+  <div class="cons-equation">
+    <span class="alpha">α</span>
+    <span class="equals"> + </span>
+    <span class="omega">ω</span>
+    <span class="equals"> = </span>
+    <span class="sum" id="consSum">15</span>
+  </div>
+  <div class="cons-status cons-hold" id="consStatus">CONSERVED</div>
+  <div class="cons-desc">Fibonacci normalisation · residual &lt; 0.001</div>
+</div>
+
+<!-- ═══ QUICK LINKS ═══ -->
+<div class="quick-links">
+  <a class="q-link" href="reson8-dashboard.html">
+    <div class="q-icon">📊</div>
+    Full Dashboard
+  </a>
+  <a class="q-link" href="https://github.com/toolated/coherence-mcp" target="_blank">
+    <div class="q-icon">⚡</div>
+    coherence-mcp
+  </a>
+  <a class="q-link" href="https://github.com/toolated/hope-ai-npc-suite" target="_blank">
+    <div class="q-icon">🎮</div>
+    NPC Suite
+  </a>
+  <a class="q-link" href="https://spiralsafe.org" target="_blank">
+    <div class="q-icon">🌀</div>
+    SpiralSafe
+  </a>
+</div>
+
+<!-- ═══ MICRO-MACRO FOOTER ═══ -->
+<div class="micro-macro">
+  <div class="mm-principle">The structure at the token level is the structure at the network level.</div>
+  <div style="margin-top: 4px;">
+    Micro-Macro Isomorphism · Reson8-Labs · <span id="sessionTime"></span>
+  </div>
+</div>
+
+<script>
+// ── Token simulation (in real use, this would read from session API) ──
+const SESSION = {
+  model: 'opus',
+  tokenLimit: 200000,
+  tokensUsed: 124000,
+  sessionStart: Date.now() - (2.5 * 60 * 60 * 1000), // 2.5hr ago
+  wave: { curl: 0.25, divergence: 0.21, potential: 0.72, entropy: 0.58 },
+  conservation: { alpha: 8, omega: 7 },
+  phase: 4
+};
+
+// ── Handoff thresholds (the micro-macro principle in action) ──
+// Same fibonacci ratios that govern the tensor govern the handoff points
+const HANDOFF = {
+  opus_to_sonnet: 0.70,   // 70% context → switch to implementation mode
+  sonnet_to_haiku: 0.88,  // 88% context → switch to validation mode
+  critical_reserve: 0.95  // 95% → emergency compact
+};
+
+function updateTokenBar() {
+  const pct = SESSION.tokensUsed / SESSION.tokenLimit;
+  const fill = document.getElementById('tokenFill');
+  const count = document.getElementById('tokenCount');
+
+  fill.style.width = (pct * 100) + '%';
+  fill.className = 'token-fill ' + (
+    pct < HANDOFF.opus_to_sonnet ? 'healthy' :
+    pct < HANDOFF.sonnet_to_haiku ? 'caution' : 'critical'
+  );
+
+  count.textContent = '~' + Math.round(SESSION.tokensUsed / 1000) + 'K';
+
+  // Handoff recommendation
+  const cards = document.querySelectorAll('.handoff-card');
+  cards.forEach(c => c.classList.remove('active'));
+
+  if (pct < HANDOFF.opus_to_sonnet) {
+    cards[0].classList.add('active');
+    cards[0].querySelector('.h-optimal').textContent = 'Active';
+    cards[0].querySelector('.h-optimal').className = 'h-optimal optimal-now';
+    cards[1].querySelector('.h-optimal').textContent = 'Handoff at ~70%';
+    cards[1].querySelector('.h-optimal').className = 'h-optimal optimal-next';
+  } else if (pct < HANDOFF.sonnet_to_haiku) {
+    cards[1].classList.add('active');
+    cards[1].querySelector('.h-optimal').textContent = 'Active';
+    cards[1].querySelector('.h-optimal').className = 'h-optimal optimal-now';
+    cards[0].querySelector('.h-optimal').textContent = 'Complete';
+    cards[0].querySelector('.h-optimal').className = 'h-optimal optimal-reserve';
+    cards[2].querySelector('.h-optimal').textContent = 'Handoff at ~88%';
+    cards[2].querySelector('.h-optimal').className = 'h-optimal optimal-next';
+  } else {
+    cards[2].classList.add('active');
+    cards[2].querySelector('.h-optimal').textContent = 'Active';
+    cards[2].querySelector('.h-optimal').className = 'h-optimal optimal-now';
+  }
+}
+
+function selectModel(model) {
+  // In production, this would trigger actual model switch via API
+  console.log('Handoff requested →', model);
+}
+
+// Simulate slow token drain
+setInterval(() => {
+  SESSION.tokensUsed = Math.min(SESSION.tokenLimit, SESSION.tokensUsed + Math.floor(Math.random() * 800));
+  updateTokenBar();
+}, 5000);
+
+// Session clock
+function updateClock() {
+  const elapsed = Date.now() - SESSION.sessionStart;
+  const hrs = Math.floor(elapsed / 3600000);
+  const mins = Math.floor((elapsed % 3600000) / 60000);
+  document.getElementById('sessionTime').textContent =
+    `Session: ${hrs}h ${mins}m`;
+}
+setInterval(updateClock, 10000);
+updateClock();
+
+// Conservation check
+const sum = SESSION.conservation.alpha + SESSION.conservation.omega;
+document.getElementById('consSum').textContent = sum;
+if (sum !== 15) {
+  document.getElementById('consStatus').textContent = 'VIOLATED';
+  document.getElementById('consStatus').className = 'cons-status cons-violated';
+}
+
+// Init
+updateTokenBar();
+</script>
+</body>
+</html>

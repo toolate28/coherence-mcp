@@ -68,11 +68,31 @@ import { jiraCreateIssue, jiraSearch } from "./connectors/jira.js";
 import { postgresQuery, postgresStore } from "./connectors/postgres.js";
 import { fetchUrl } from "./connectors/fetch.js";
 
+// Grok / xAI API connector
+import {
+  grokGenerate,
+  grokCheckCoherence,
+  grokListModels,
+  grokTranslate,
+} from "./connectors/grok.js";
+
+// Integrate Protocol — outside-in onboarding as self-completing coherence
+import { integrate, getNetworkState } from "./lib/integrate.js";
+
+// Minecraft — RCON, NPC pipeline, conservation verifier
+import {
+  rconExec,
+  mcQuery,
+  npcCommand,
+  conservationVerify,
+  conservationVerifyFromServer,
+} from "./connectors/minecraft.js";
+
 // Create server instance
 const server = new Server(
   {
     name: "coherence-mcp",
-    version: "0.2.0",
+    version: "0.3.0",
   },
   {
     capabilities: {
@@ -487,6 +507,53 @@ const TOOLS: Tool[] = [
       properties: {},
     },
   },
+  // ═══ Grok / xAI API Tools ═══
+  {
+    name: "grok_generate",
+    description: "Generate a chat completion via xAI's Grok API. Uses the OpenAI-compatible endpoint at api.x.ai/v1. Requires XAI_API_KEY env var. Get one at https://console.x.ai/",
+    inputSchema: {
+      type: "object",
+      properties: {
+        prompt: { type: "string", description: "User prompt for Grok" },
+        systemPrompt: { type: "string", description: "Optional system prompt" },
+        model: { type: "string", description: "Model name (default: grok-3). Options: grok-3, grok-3-mini, grok-2" },
+      },
+      required: ["prompt"],
+    },
+  },
+  {
+    name: "grok_check_coherence",
+    description: "Run a coherence check on content via xAI's Grok. Returns score (0-100) and WAVE-dimensional analysis. Requires XAI_API_KEY env var.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        content: { type: "string", description: "Content to check for coherence" },
+        model: { type: "string", description: "Model name (default: grok-3)" },
+      },
+      required: ["content"],
+    },
+  },
+  {
+    name: "grok_list_models",
+    description: "List available models at the xAI API endpoint. Requires XAI_API_KEY env var.",
+    inputSchema: {
+      type: "object",
+      properties: {},
+    },
+  },
+  {
+    name: "grok_translate",
+    description: "Translate content for Grok consumption. Strips platform-specific noise, preserves semantic coherence, reformats for Grok's reasoning and real-time data strengths. Requires XAI_API_KEY env var.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        content: { type: "string", description: "Content to translate for Grok" },
+        metadata: { type: "object", description: "Optional metadata context for translation" },
+        model: { type: "string", description: "Grok model (default: grok-3)" },
+      },
+      required: ["content"],
+    },
+  },
   // ═══ Vortex Bridge Tools — Cross-Platform Translation Protocol ═══
   {
     name: "vortex_translate",
@@ -783,6 +850,161 @@ const TOOLS: Tool[] = [
         },
       },
       required: ["url"],
+    },
+  },
+  // ═══ Minecraft / NPC Pipeline Tools ═══
+  // Bidirectional communication with Minecraft servers.
+  // Requires MC_RCON_HOST, MC_RCON_PORT, MC_RCON_PASSWORD env vars.
+
+  {
+    name: "mc_exec",
+    description:
+      "Execute a command on a Minecraft server via RCON. Returns the server response. Use for any Minecraft command (tp, give, scoreboard, data get, etc.). Requires MC_RCON_PASSWORD env var.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        command: {
+          type: "string",
+          description: "Minecraft command to execute (without leading /)",
+        },
+      },
+      required: ["command"],
+    },
+  },
+  {
+    name: "mc_query",
+    description:
+      "Query Minecraft server status — returns online player count, max players, and player list. Requires MC_RCON_PASSWORD env var.",
+    inputSchema: {
+      type: "object",
+      properties: {},
+    },
+  },
+  {
+    name: "mc_npc",
+    description:
+      "Control AI NPCs in Minecraft via the hope-ai-npc-suite pipeline. Actions: spawn, despawn, move, say, interact, query, scoreboard. Each action routes through RCON with NPC-specific formatting and ATOM trail logging.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        action: {
+          type: "string",
+          enum: ["spawn", "despawn", "move", "say", "interact", "query", "scoreboard"],
+          description: "NPC action to perform",
+        },
+        npcId: {
+          type: "string",
+          description: "NPC identifier (CustomName). Required for most actions.",
+        },
+        target: {
+          type: "string",
+          description: "Target entity/player for interact action",
+        },
+        message: {
+          type: "string",
+          description: "Message for say action",
+        },
+        position: {
+          type: "object",
+          properties: {
+            x: { type: "number" },
+            y: { type: "number" },
+            z: { type: "number" },
+          },
+          description: "World coordinates for spawn/move actions",
+        },
+        data: {
+          type: "object",
+          description: "Additional data (e.g. {objective, value} for scoreboard)",
+        },
+      },
+      required: ["action"],
+    },
+  },
+  {
+    name: "mc_conservation_verify",
+    description:
+      "Verify the conservation law ALPHA + OMEGA = 15 (quantum-redstone normalisation constraint). Can verify locally with provided values or query from the Minecraft server scoreboard. Maps to Tensor Axis 2 (Constraints) points 16-20.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        alpha: {
+          type: "number",
+          description: "ALPHA value (creation/input energy). If omitted, queries server.",
+        },
+        omega: {
+          type: "number",
+          description: "OMEGA value (completion/output energy). If omitted, queries server.",
+        },
+        tolerance: {
+          type: "number",
+          description: "Acceptable residual (default: 0.001)",
+        },
+        fromServer: {
+          type: "boolean",
+          description: "If true, query ALPHA/OMEGA from Minecraft scoreboard",
+        },
+      },
+    },
+  },
+
+  // ═══ Integrate Protocol Tools ═══
+  // Outside-in onboarding as self-completing coherence.
+  // The act of integrating IS the coherence.
+
+  {
+    name: "integrate",
+    description:
+      "Integrate an entity into the coherence network. Entities: individual (collaborator), entity (org/company), repo (git), resource (API/service/model), platform (X/Telegram/Signal). The onboarding process IS the coherence — WAVE scoring, isomorphism mapping, and ATOM trail creation happen as a single self-completing pipeline. Entities with WAVE > 70% snap in automatically.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        kind: {
+          type: "string",
+          enum: ["individual", "entity", "repo", "resource", "platform"],
+          description: "What kind of thing is being integrated",
+        },
+        name: {
+          type: "string",
+          description: "Human-readable name",
+        },
+        origin: {
+          type: "string",
+          description: "Where this entity currently lives (URL, handle, address)",
+        },
+        capabilities: {
+          type: "array",
+          items: { type: "string" },
+          description: "What the entity brings — capabilities, content, signal",
+        },
+        connections: {
+          type: "array",
+          items: { type: "string" },
+          description: "Existing connections — who/what does this entity already touch?",
+        },
+        platformContext: {
+          type: "object",
+          description: "Platform-specific context (e.g. {x: '@handle', telegram: 'groupId'})",
+        },
+        intent: {
+          type: "string",
+          description: "What the entity needs — what it's looking for in the network",
+        },
+        context: {
+          type: "string",
+          description: "Free-form context for WAVE analysis",
+        },
+      },
+      required: ["kind", "name", "origin"],
+    },
+  },
+  {
+    name: "network_state",
+    description:
+      "Get the current state of the coherence network — node count, total coherence, integration history, breakdown by entity kind. Use to monitor network health and integration progress.",
+    inputSchema: {
+      type: "object",
+      properties: {},
     },
   },
 ];
@@ -1202,6 +1424,47 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         };
       }
 
+      // ═══ Grok / xAI Handlers ═══
+
+      case "grok_generate": {
+        const { prompt, systemPrompt, model } = args as {
+          prompt: string;
+          systemPrompt?: string;
+          model?: string;
+        };
+        const result = await grokGenerate(prompt, systemPrompt, model ? { model } : undefined);
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      }
+
+      case "grok_check_coherence": {
+        const { content, model } = args as { content: string; model?: string };
+        const result = await grokCheckCoherence(content, model ? { model } : undefined);
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      }
+
+      case "grok_list_models": {
+        const result = await grokListModels();
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      }
+
+      case "grok_translate": {
+        const { content, metadata, model } = args as {
+          content: string;
+          metadata?: Record<string, unknown>;
+          model?: string;
+        };
+        const result = await grokTranslate(content, metadata ?? {}, model ? { model } : undefined);
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      }
+
       // ═══ Vortex Bridge Handlers ═══
 
       case "vortex_translate": {
@@ -1455,7 +1718,103 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         };
       }
 
-      // [Keep remaining tool implementations from original for now: scripts_run, awi_intent_request, etc.]
+      // ═══ Minecraft / NPC Pipeline Handlers ═══
+
+      case "mc_exec": {
+        const { command } = args as { command: string };
+        const result = await rconExec(command);
+        if (result.ok) {
+          await realTrackAtom(
+            `MC RCON: ${command}`,
+            [],
+            ["MC", "RCON", "EXEC"],
+            "EXEC"
+          ).catch(() => {});
+        }
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      }
+
+      case "mc_query": {
+        const result = await mcQuery();
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      }
+
+      case "mc_npc": {
+        const npcArgs = args as {
+          action: "spawn" | "despawn" | "move" | "say" | "interact" | "query" | "scoreboard";
+          npcId?: string;
+          target?: string;
+          message?: string;
+          position?: { x: number; y: number; z: number };
+          data?: Record<string, unknown>;
+        };
+        const result = await npcCommand(npcArgs);
+        if (result.ok) {
+          await realTrackAtom(
+            `NPC ${npcArgs.action}: ${npcArgs.npcId || "unknown"}`,
+            [],
+            ["NPC", "MC", npcArgs.action.toUpperCase()],
+            "NPC"
+          ).catch(() => {});
+        }
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      }
+
+      case "mc_conservation_verify": {
+        const { alpha, omega, tolerance, fromServer } = args as {
+          alpha?: number;
+          omega?: number;
+          tolerance?: number;
+          fromServer?: boolean;
+        };
+        let result;
+        if (fromServer || (alpha == null && omega == null)) {
+          result = await conservationVerifyFromServer();
+        } else {
+          result = conservationVerify(alpha ?? 0, omega ?? 0, tolerance);
+        }
+        await realTrackAtom(
+          `Conservation verify: A=${result.alpha} O=${result.omega} sum=${result.sum} ${result.normalised ? "PASS" : "FAIL"}`,
+          [],
+          ["CONSERVATION", "VERIFY", result.normalised ? "PASS" : "FAIL"],
+          "VERIFY"
+        ).catch(() => {});
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      }
+
+      // ═══ Integrate Protocol Handlers ═══
+
+      case "integrate": {
+        const intReq = args as {
+          kind: "individual" | "entity" | "repo" | "resource" | "platform";
+          name: string;
+          origin: string;
+          capabilities?: string[];
+          connections?: string[];
+          platformContext?: Record<string, string>;
+          intent?: string;
+          context?: string;
+        };
+        const result = await integrate(intReq);
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      }
+
+      case "network_state": {
+        const state = getNetworkState();
+        return {
+          content: [{ type: "text", text: JSON.stringify(state, null, 2) }],
+        };
+      }
 
       default:
         throw new Error(`Unknown tool: ${name}`);

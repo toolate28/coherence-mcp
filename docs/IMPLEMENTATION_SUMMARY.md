@@ -242,7 +242,7 @@ npm run test:coverage          # Generate coverage report
 ### CLI Usage
 ```bash
 # Installed as binary
-npm install -g @hopeandsauced/coherence-mcp
+npm install -g @toolated/coherence-mcp
 
 # Use CLI commands
 coherence-mcp fibonacci assign "Component" 95
@@ -297,8 +297,8 @@ The implementation provides a mathematically rigorous, exponentially sensitive w
 ## Contact
 
 For questions or issues:
-- **Repository**: https://github.com/toolate28/coherence-mcp
-- **Issues**: https://github.com/toolate28/coherence-mcp/issues
+- **Repository**: https://github.com/toolated/coherence-mcp
+- **Issues**: https://github.com/toolated/coherence-mcp/issues
 - **Documentation**: See `docs/FIBONACCI_WEIGHTING.md`
 
 ---

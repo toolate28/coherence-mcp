@@ -1,18 +1,35 @@
 {
-  "name": "@hopeandsauced/coherence-mcp",
-  "version": "0.2.0",
-  "description": "MCP server that surfaces coherence, governance, and safety primitives: Wave/Bump validation, ATOM trail + gates, .context.yaml packing, AWI intent scaffolding, cross-AI collaboration (@grok), and docs/search across the SpiralSafe corpus.",
+  "name": "@toolated/coherence-mcp",
+  "version": "0.3.1",
+  "description": "MCP server for coherence validation across AI systems. WAVE scoring, ATOM trail provenance, Fibonacci weighting, cross-platform translation (Claude/Grok/Gemini/Llama), and industry connectors (Slack/GitHub/Jira/Postgres). Conservation law: alpha + omega = 15.",
   "type": "module",
+  "main": "build/index.js",
   "bin": {
-    "coherence-mcp": "build/index.js"
+    "coherence-mcp": "build/index.js",
+    "coherence-mcp-setup": "build/setup.js"
+  },
+  "files": [
+    "build/",
+    "docs/ATOM_AUTH.md",
+    "docs/HOPE_NPC_PLAY.md",
+    "docs/LAMBDA_ZERO_IMPLEMENTATION.md",
+    "docs/CSEP_PROTOCOL.md",
+    "docs/FIBONACCI_WEIGHTING.md",
+    "docs/quick-start.md",
+    "docs/testing-suite.md",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/toolate28/coherence-mcp.git"
+    "url": "git+https://github.com/toolated/coherence-mcp.git"
   },
   "homepage": "https://spiralsafe.org",
   "bugs": {
-    "url": "https://github.com/toolate28/coherence-mcp/issues"
+    "url": "https://github.com/toolated/coherence-mcp/issues"
   },
   "scripts": {
     "build": "tsc",
@@ -20,20 +37,26 @@
     "watch": "tsc --watch",
     "bench": "python3 scripts/benchmark.py",
     "bench:chaos": "python3 scripts/benchmark.py --iterations 10 --chaos-mode",
-    "prepublishOnly": "npm run build",
+    "prepublishOnly": "npm run build && npm test",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"
   },
   "keywords": [
     "mcp",
+    "model-context-protocol",
     "coherence",
-    "governance",
-    "safety",
-    "spiralsafe",
-    "grok",
+    "wave-protocol",
+    "ai-safety",
     "multi-agent",
-    "wave-protocol"
+    "cross-platform",
+    "fibonacci",
+    "atom-trail",
+    "spiralsafe",
+    "governance",
+    "claude",
+    "grok",
+    "gemini"
   ],
   "author": "Hope&&Sauced <toolated@pm.me>",
   "license": "MIT",

@@ -205,13 +205,13 @@ jobs:
           ### Installation
 
           ```bash
-          npm install @hopeandsauced/coherence-mcp@${{ needs.validate.outputs.version }}
+          npm install @toolated/coherence-mcp@${{ needs.validate.outputs.version }}
           ```
 
           Or use with npx:
 
           ```bash
-          npx @hopeandsauced/coherence-mcp@${{ needs.validate.outputs.version }}
+          npx @toolated/coherence-mcp@${{ needs.validate.outputs.version }}
           ```
 
           ### Verification
@@ -220,10 +220,10 @@ jobs:
 
           ```bash
           # Download checksums
-          curl -LO https://github.com/toolate28/coherence-mcp/releases/download/v${{ needs.validate.outputs.version }}/SHA256SUMS.txt
+          curl -LO https://github.com/toolated/coherence-mcp/releases/download/v${{ needs.validate.outputs.version }}/SHA256SUMS.txt
 
           # Verify package
-          npm pack @hopeandsauced/coherence-mcp@${{ needs.validate.outputs.version }}
+          npm pack @toolated/coherence-mcp@${{ needs.validate.outputs.version }}
           sha256sum -c SHA256SUMS.txt
           ```
 
@@ -239,7 +239,7 @@ jobs:
 
           ### SpiralSafe Ecosystem
 
-          This release is part of the SpiralSafe ecosystem. See the [README](https://github.com/toolate28/coherence-mcp#readme) for full documentation.
+          This release is part of the SpiralSafe ecosystem. See the [README](https://github.com/toolated/coherence-mcp#readme) for full documentation.
 
           ---
           *~ Hope&&Sauced*
@@ -273,10 +273,10 @@ jobs:
             -H "Authorization: Bearer $SPIRALSAFE_API_TOKEN" \
             -H "Content-Type: application/json" \
             -d '{
-              "package": "@hopeandsauced/coherence-mcp",
+              "package": "@toolated/coherence-mcp",
               "version": "${{ needs.validate.outputs.version }}",
-              "repository": "toolate28/coherence-mcp",
-              "release_url": "https://github.com/toolate28/coherence-mcp/releases/tag/v${{ needs.validate.outputs.version }}"
+              "repository": "toolated/coherence-mcp",
+              "release_url": "https://github.com/toolated/coherence-mcp/releases/tag/v${{ needs.validate.outputs.version }}"
             }' \
             https://api.spiralsafe.org/v1/releases/notify || echo "SpiralSafe notification skipped (API unavailable)"
 

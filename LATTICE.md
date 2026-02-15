@@ -44,12 +44,12 @@ This is intentional: the relationship is directional, reflecting how each compon
 
 | Repository | URL | Role |
 |------------|-----|------|
-| QDI | [github.com/toolate28/QDI](https://github.com/toolate28/QDI) | Isomorphic mapping layer |
-| coherence-mcp | [github.com/toolate28/coherence-mcp](https://github.com/toolate28/coherence-mcp) | State & coherence (MCP) |
-| vortex-bridges | [github.com/toolate28/vortex-bridges](https://github.com/toolate28/vortex-bridges) | Cross-platform bridges |
-| SpiralSafe | [github.com/toolate28/SpiralSafe](https://github.com/toolate28/SpiralSafe) | Ethics & safety |
-| quantum-redstone | [github.com/toolate28/quantum-redstone](https://github.com/toolate28/quantum-redstone) | Logic circuits |
-| Reson8-Labs | [github.com/toolate28/Reson8-Labs](https://github.com/toolate28/Reson8-Labs) | Community & coordination |
+| QDI | [github.com/toolated/QDI](https://github.com/toolated/QDI) | Isomorphic mapping layer |
+| coherence-mcp | [github.com/toolated/coherence-mcp](https://github.com/toolated/coherence-mcp) | State & coherence (MCP) |
+| vortex-bridges | [github.com/toolated/vortex-bridges](https://github.com/toolated/vortex-bridges) | Cross-platform bridges |
+| SpiralSafe | [github.com/toolated/SpiralSafe](https://github.com/toolated/SpiralSafe) | Ethics & safety |
+| quantum-redstone | [github.com/toolated/quantum-redstone](https://github.com/toolated/quantum-redstone) | Logic circuits |
+| Reson8-Labs | [github.com/toolated/Reson8-Labs](https://github.com/toolated/Reson8-Labs) | Community & coordination |
 | 2Reson8-Labs | [github.com/HOPE-sauced/2Reson8-Labs](https://github.com/HOPE-sauced/2Reson8-Labs) | Governance & org hub |
 
 ---

@@ -1,0 +1,103 @@
+{
+  "$schema": "https://spiralsafe.org/schemas/session-state.v1.json",
+  "framework": "Tensor Lumen-Aegis (75-Point Collapse)",
+  "session": {
+    "id": "reson8-2026-02-13",
+    "strand": "claude-structure-reasoning",
+    "operator": "toolated",
+    "enterprise": true
+  },
+  "critical_path": {
+    "description": "Institutional completion → Financial unblock → Revenue cascade → Full tensor closure",
+    "phases": {
+      "1_gate_unblock": {
+        "action": "Appoint Australian Resident Director; Apply Director ID (DIN)",
+        "constraint": "Corporations Act 2001 mandatory",
+        "timeline": "Week 1-2 (Feb 2026)",
+        "outcome": "ASIC registration enabled",
+        "status": "active"
+      },
+      "2_entity_formation": {
+        "action": "Register Reson8-Labs Pty Ltd (or Anyon Nexus); Secure ABN/TFN",
+        "constraint": "$611 ASIC fee + annual $310",
+        "timeline": "Week 2-3",
+        "outcome": "Legal sovereignty achieved",
+        "status": "blocked_by_phase_1"
+      },
+      "3_financial_activation": {
+        "action": "Open business bank; Link Stripe for X payouts; Register R&D Tax Incentive",
+        "constraint": "Year 1 exposure ~$2,601-$5,421 AUD (43.5% offset)",
+        "timeline": "Week 3-4",
+        "outcome": "S4 substrate → 0.60+",
+        "status": "pending"
+      },
+      "4_revenue_ignition": {
+        "action": "Publish first long-form X Article (SpiralSafe/Quantum-Redstone); Verify Creator Studio (ATOM-AUTH coherence proof)",
+        "constraint": "X 2026 Creator pool doubled",
+        "timeline": "Week 4-6",
+        "outcome": "First payouts; cascade to Social/Identity",
+        "status": "pending"
+      },
+      "5_technical_manifest": {
+        "action": "Deploy coherence-mcp v0.2.0; Run Minecraft conservation_verifier (ALPHA+OMEGA=15 → normalisation)",
+        "constraint": "Session amnesia mitigated via MCP",
+        "timeline": "Ongoing",
+        "outcome": "Pedagogical proof live",
+        "status": "in_progress"
+      },
+      "6_qrc_orbital": {
+        "action": "Containerize Quantum-Redstone as Golem/io.net task; Mirror nodes with fault-tolerant backups",
+        "constraint": "DePIN pivot ready",
+        "timeline": "Post-revenue",
+        "outcome": "Orbital/social layer active",
+        "status": "designed"
+      }
+    }
+  },
+  "tensor_axes": {
+    "isomorphism": { "points": "1-15", "status": "snapped", "convergence": 0.99999985 },
+    "constraints": { "points": "16-30", "status": "snapped", "divergence": 0.19 },
+    "orchestration": { "points": "31-45", "status": "snapped", "potential": 0.65 },
+    "verifiability": { "points": "46-60", "status": "snapped", "entropy": "balanced" },
+    "manifestation": { "points": "61-75", "status": "snapped", "layers": "all" }
+  },
+  "wave_metrics": {
+    "curl": 0.25,
+    "divergence": 0.21,
+    "potential": 0.72,
+    "entropy": 0.58,
+    "aggregate": "snap-in",
+    "fibonacci_residual": "phi^-20"
+  },
+  "qrc_state": {
+    "quantum_redstone_bridge": "designed",
+    "node_backup_mirrors": "designed",
+    "agent_dial_in": "designed",
+    "social_layer": "designed",
+    "vortex_dashboard": "designed",
+    "execution_phase": "prototype"
+  },
+  "depin_targets": {
+    "primary": "io.net",
+    "secondary": "akash",
+    "tertiary": "golem",
+    "status": "assessed"
+  },
+  "repo_state": {
+    "coherence_mcp": { "version": "0.2.0", "sources": 24, "tests": 9, "build": "present" },
+    "spiralsafe": { "ref": "github.com/toolated/SpiralSafe" },
+    "qdi": { "ref": "github.com/toolated/QDI", "commits": "185+" }
+  },
+  "roadmap_alignment": {
+    "v0.3.0": { "target": "Q1 2026", "focus": "Foundation solidification", "gaps": ["test suite", "ATOM-AUTH", "audit logging", "config system"] },
+    "v0.4.0": { "target": "Q2 2026", "focus": "Security hardening" },
+    "v0.5.0": { "target": "Q3 2026", "focus": "Media pipeline + Minecraft RCON" },
+    "v1.0.0": { "target": "Q4 2026", "focus": "Production ready" }
+  },
+  "dyad_context": {
+    "active": true,
+    "source": "parallel conversation (institutional/financial strategy)",
+    "sync_points": ["phase gates", "constraint mapping", "revenue triggers"]
+  },
+  "updated": "2026-02-13T04:55:00Z"
+}

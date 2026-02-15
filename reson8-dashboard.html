@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reson8-Labs — Operational Dashboard</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --border: #1e1e2e;
+    --text: #c8c8d8;
+    --dim: #666680;
+    --accent: #6ea8fe;
+    --green: #4ade80;
+    --amber: #fbbf24;
+    --red: #f87171;
+    --purple: #a78bfa;
+    --cyan: #22d3ee;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    background: var(--bg);
+    color: var(--text);
+    padding: 16px;
+    line-height: 1.5;
+    font-size: 13px;
+  }
+  h1 { font-size: 18px; color: var(--accent); margin-bottom: 4px; }
+  h2 { font-size: 14px; color: var(--cyan); margin: 16px 0 8px; letter-spacing: 1px; text-transform: uppercase; }
+  .subtitle { color: var(--dim); font-size: 11px; margin-bottom: 16px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px;
+  }
+  .card-title { font-size: 11px; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .status { display: inline-block; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: 600; }
+  .status-active { background: #166534; color: var(--green); }
+  .status-blocked { background: #7f1d1d; color: var(--red); }
+  .status-pending { background: #78350f; color: var(--amber); }
+  .status-done { background: #1e3a5f; color: var(--accent); }
+  .status-snapped { background: #1a1a3e; color: var(--purple); }
+  .status-designed { background: #1a2e3e; color: var(--cyan); }
+  .metric { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px solid var(--border); }
+  .metric:last-child { border: none; }
+  .metric-label { color: var(--dim); }
+  .metric-value { color: var(--text); font-weight: 600; }
+  .metric-value.good { color: var(--green); }
+  .metric-value.warn { color: var(--amber); }
+  .pipeline { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; padding: 4px 0; }
+  .pipe-node { background: var(--border); padding: 3px 8px; border-radius: 3px; font-size: 11px; }
+  .pipe-node.mc { background: #1a3a1a; color: var(--green); border: 1px solid #2d5a2d; }
+  .pipe-node.rcon { background: #3a2a1a; color: var(--amber); border: 1px solid #5a4a2d; }
+  .pipe-node.npc { background: #1a2a3a; color: var(--cyan); border: 1px solid #2d4a5a; }
+  .pipe-node.atom { background: #2a1a3a; color: var(--purple); border: 1px solid #4a2d5a; }
+  .pipe-arrow { color: var(--dim); font-size: 10px; }
+  .tool-list { display: flex; flex-wrap: wrap; gap: 4px; }
+  .tool-tag { background: var(--border); padding: 2px 6px; border-radius: 3px; font-size: 10px; color: var(--dim); }
+  .tool-tag.new { border: 1px solid var(--green); color: var(--green); }
+  .full-width { grid-column: 1 / -1; }
+  .phase-row { display: flex; gap: 8px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); }
+  .phase-row:last-child { border: none; }
+  .phase-num { color: var(--accent); font-weight: 700; min-width: 20px; }
+  .phase-name { min-width: 140px; font-weight: 600; }
+  .phase-detail { flex: 1; color: var(--dim); font-size: 11px; }
+  .tensor-row { display: flex; gap: 4px; align-items: center; padding: 4px 0; }
+  .tensor-bar { height: 6px; border-radius: 3px; background: var(--purple); }
+  .tensor-label { min-width: 100px; font-size: 11px; }
+  .tensor-pts { color: var(--dim); font-size: 10px; min-width: 50px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th { text-align: left; color: var(--dim); font-size: 10px; text-transform: uppercase; padding: 4px 8px; border-bottom: 1px solid var(--border); }
+  td { padding: 4px 8px; border-bottom: 1px solid var(--border); }
+</style>
+</head>
+<body>
+
+<h1>Reson8-Labs Operational Dashboard</h1>
+<div class="subtitle">Tensor Lumen-Aegis (75-Point Collapse) | coherence-mcp v0.2.0 | toolated | 2026-02-13</div>
+
+<h2>Critical Path — 6 Phase Pipeline</h2>
+<div class="card full-width">
+  <div class="phase-row">
+    <span class="phase-num">1</span>
+    <span class="phase-name">Gate Unblock</span>
+    <span class="status status-active">ACTIVE</span>
+    <span class="phase-detail">Resident Director + DIN → ASIC registration</span>
+  </div>
+  <div class="phase-row">
+    <span class="phase-num">2</span>
+    <span class="phase-name">Entity Formation</span>
+    <span class="status status-blocked">BLOCKED</span>
+    <span class="phase-detail">Reson8-Labs Pty Ltd → ABN/TFN ($611 + $310/yr)</span>
+  </div>
+  <div class="phase-row">
+    <span class="phase-num">3</span>
+    <span class="phase-name">Financial Activation</span>
+    <span class="status status-pending">PENDING</span>
+    <span class="phase-detail">Bank + Stripe + R&D Tax (43.5% offset)</span>
+  </div>
+  <div class="phase-row">
+    <span class="phase-num">4</span>
+    <span class="phase-name">Revenue Ignition</span>
+    <span class="status status-pending">PENDING</span>
+    <span class="phase-detail">X Article + Creator Studio (ATOM-AUTH proof)</span>
+  </div>
+  <div class="phase-row">
+    <span class="phase-num">5</span>
+    <span class="phase-name">Technical Manifest</span>
+    <span class="status status-active">IN PROGRESS</span>
+    <span class="phase-detail">coherence-mcp deploy + conservation_verifier</span>
+  </div>
+  <div class="phase-row">
+    <span class="phase-num">6</span>
+    <span class="phase-name">QRC / Orbital</span>
+    <span class="status status-designed">DESIGNED</span>
+    <span class="phase-detail">Golem/io.net containers + fault-tolerant mirrors</span>
+  </div>
+</div>
+
+<h2>Tensor Axes (75 Points)</h2>
+<div class="grid">
+  <div class="card">
+    <div class="tensor-row"><span class="tensor-label">Isomorphism</span><span class="tensor-pts">1-15</span><div class="tensor-bar" style="width:100%"></div><span class="status status-snapped">SNAPPED</span></div>
+    <div class="tensor-row"><span class="tensor-label">Constraints</span><span class="tensor-pts">16-30</span><div class="tensor-bar" style="width:100%"></div><span class="status status-snapped">SNAPPED</span></div>
+    <div class="tensor-row"><span class="tensor-label">Orchestration</span><span class="tensor-pts">31-45</span><div class="tensor-bar" style="width:100%"></div><span class="status status-snapped">SNAPPED</span></div>
+    <div class="tensor-row"><span class="tensor-label">Verifiability</span><span class="tensor-pts">46-60</span><div class="tensor-bar" style="width:100%"></div><span class="status status-snapped">SNAPPED</span></div>
+    <div class="tensor-row"><span class="tensor-label">Manifestation</span><span class="tensor-pts">61-75</span><div class="tensor-bar" style="width:100%"></div><span class="status status-snapped">SNAPPED</span></div>
+  </div>
+  <div class="card">
+    <div class="card-title">WAVE Metrics</div>
+    <div class="metric"><span class="metric-label">Curl</span><span class="metric-value good">0.25</span></div>
+    <div class="metric"><span class="metric-label">Divergence</span><span class="metric-value good">0.21</span></div>
+    <div class="metric"><span class="metric-label">Potential</span><span class="metric-value good">0.72</span></div>
+    <div class="metric"><span class="metric-label">Entropy</span><span class="metric-value good">0.58</span></div>
+    <div class="metric"><span class="metric-label">Fibonacci Residual</span><span class="metric-value good">φ⁻²⁰ (6.6e-5)</span></div>
+    <div class="metric"><span class="metric-label">Aggregate</span><span class="metric-value good">SNAP-IN (&gt;70%)</span></div>
+  </div>
+</div>
+
+<h2>Minecraft / NPC Pipeline</h2>
+<div class="card full-width">
+  <div class="card-title">Bidirectional Data Flow</div>
+  <div class="pipeline">
+    <span class="pipe-node">coherence-mcp</span>
+    <span class="pipe-arrow">→</span>
+    <span class="pipe-node rcon">RCON (25575)</span>
+    <span class="pipe-arrow">→</span>
+    <span class="pipe-node mc">Minecraft Server</span>
+    <span class="pipe-arrow">→</span>
+    <span class="pipe-node npc">NPC Suite</span>
+    <span class="pipe-arrow">→</span>
+    <span class="pipe-node atom">ATOM Trail</span>
+  </div>
+  <div class="pipeline" style="margin-top: 4px;">
+    <span class="pipe-node atom">ATOM Trail</span>
+    <span class="pipe-arrow">→</span>
+    <span class="pipe-node">WAVE Scorer</span>
+    <span class="pipe-arrow">→</span>
+    <span class="pipe-node">Vortex Bridge</span>
+    <span class="pipe-arrow">→</span>
+    <span class="pipe-node mc">Minecraft (scoreboard)</span>
+    <span class="pipe-arrow">→</span>
+    <span class="pipe-node rcon">Conservation (α+ω=15)</span>
+  </div>
+  <div style="margin-top: 12px;">
+    <div class="card-title">MCP Tools (4 new)</div>
+    <div class="tool-list">
+      <span class="tool-tag new">mc_exec</span>
+      <span class="tool-tag new">mc_query</span>
+      <span class="tool-tag new">mc_npc</span>
+      <span class="tool-tag new">mc_conservation_verify</span>
+    </div>
+  </div>
+  <div style="margin-top: 12px;">
+    <div class="card-title">NPC Actions</div>
+    <div class="tool-list">
+      <span class="tool-tag">spawn</span>
+      <span class="tool-tag">despawn</span>
+      <span class="tool-tag">move</span>
+      <span class="tool-tag">say</span>
+      <span class="tool-tag">interact</span>
+      <span class="tool-tag">query</span>
+      <span class="tool-tag">scoreboard</span>
+    </div>
+  </div>
+</div>
+
+<h2>Tool Inventory</h2>
+<div class="grid">
+  <div class="card">
+    <div class="card-title">Core (existing)</div>
+    <div class="tool-list">
+      <span class="tool-tag">wave_coherence_check</span>
+      <span class="tool-tag">wave_analyze</span>
+      <span class="tool-tag">wave_validate</span>
+      <span class="tool-tag">bump_validate</span>
+      <span class="tool-tag">context_pack</span>
+      <span class="tool-tag">atom_track</span>
+      <span class="tool-tag">gate_intention_to_execution</span>
+      <span class="tool-tag">gate_execution_to_learning</span>
+      <span class="tool-tag">docs_search</span>
+      <span class="tool-tag">fibonacci_weight</span>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Connectors (existing + new)</div>
+    <div class="tool-list">
+      <span class="tool-tag">slack_notify</span>
+      <span class="tool-tag">github_file</span>
+      <span class="tool-tag">github_status</span>
+      <span class="tool-tag">github_issue</span>
+      <span class="tool-tag">jira_create</span>
+      <span class="tool-tag">jira_search</span>
+      <span class="tool-tag">postgres_query</span>
+      <span class="tool-tag">postgres_store</span>
+      <span class="tool-tag">fetch_url</span>
+      <span class="tool-tag new">mc_exec</span>
+      <span class="tool-tag new">mc_query</span>
+      <span class="tool-tag new">mc_npc</span>
+      <span class="tool-tag new">mc_conservation_verify</span>
+    </div>
+  </div>
+</div>
+
+<h2>Agent Orchestration</h2>
+<div class="grid">
+  <div class="card">
+    <div class="card-title">Sub-Agents</div>
+    <div class="metric"><span class="metric-label">Explore</span><span class="metric-value">Phase 5, 6</span></div>
+    <div class="metric"><span class="metric-label">Plan</span><span class="metric-value">Phase 5, 6</span></div>
+    <div class="metric"><span class="metric-label">Bash</span><span class="metric-value">Phase 5</span></div>
+    <div class="metric"><span class="metric-label">General</span><span class="metric-value">Phase 1-4, 6</span></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Skills (11 loaded)</div>
+    <div class="tool-list">
+      <span class="tool-tag">docx</span>
+      <span class="tool-tag">pdf</span>
+      <span class="tool-tag">pptx</span>
+      <span class="tool-tag">xlsx</span>
+      <span class="tool-tag">canvas-design</span>
+      <span class="tool-tag">theme-factory</span>
+      <span class="tool-tag">mcp-builder</span>
+      <span class="tool-tag">coherence-check</span>
+      <span class="tool-tag">skill-creator</span>
+      <span class="tool-tag">internal-comms</span>
+      <span class="tool-tag">slack-gif-creator</span>
+    </div>
+  </div>
+</div>
+
+<h2>Environment</h2>
+<div class="grid-3">
+  <div class="card">
+    <div class="card-title">Repo</div>
+    <div class="metric"><span class="metric-label">Version</span><span class="metric-value">0.2.0</span></div>
+    <div class="metric"><span class="metric-label">Sources</span><span class="metric-value">25 TS</span></div>
+    <div class="metric"><span class="metric-label">Build</span><span class="metric-value good">Clean</span></div>
+    <div class="metric"><span class="metric-label">Branch</span><span class="metric-value">main</span></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Runtime</div>
+    <div class="metric"><span class="metric-label">Node</span><span class="metric-value">v22.22.0</span></div>
+    <div class="metric"><span class="metric-label">Python</span><span class="metric-value">3.10.12</span></div>
+    <div class="metric"><span class="metric-label">TS</span><span class="metric-value">5.9.3</span></div>
+    <div class="metric"><span class="metric-label">Shell</span><span class="metric-value good">R8 profile</span></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Cycles</div>
+    <div class="metric"><span class="metric-label">/compact</span><span class="metric-value good">Wired</span></div>
+    <div class="metric"><span class="metric-label">/update</span><span class="metric-value good">Wired</span></div>
+    <div class="metric"><span class="metric-label">manifest()</span><span class="metric-value good">Ready</span></div>
+    <div class="metric"><span class="metric-label">wave_check()</span><span class="metric-value good">Ready</span></div>
+  </div>
+</div>
+
+<div style="margin-top: 24px; color: var(--dim); font-size: 10px; text-align: center;">
+  Hope&&Sauced | Reson8-Labs | The Evenstar Guides Us
+</div>
+
+</body>
+</html>

@@ -8,10 +8,10 @@ This package is converging into the unified SpiralSafe ecosystem.
 
 | Repository | Purpose | Status |
 |------------|---------|--------|
-| [spiralsafe-mono](https://github.com/toolate28/spiralsafe-mono) | Core monorepo: Wave, ATOM, Ax packages | ✅ Active |
-| [QDI](https://github.com/toolate28/QDI) | Quantum Divide Initiative + quantum-ethics | ✅ Active |
-| [spiralsafe-metrics-e](https://github.com/spark/toolate28/spiralsafe-metrics-e) | Metrics Evaluator (Spark App) | ✅ Active |
-| [SpiralSafe](https://github.com/toolate28/SpiralSafe) | Theory/IP vault, hardware bridges | 📚 Reference |
+| [spiralsafe-mono](https://github.com/toolated/spiralsafe-mono) | Core monorepo: Wave, ATOM, Ax packages | ✅ Active |
+| [QDI](https://github.com/toolated/QDI) | Quantum Divide Initiative + quantum-ethics | ✅ Active |
+| [spiralsafe-metrics-e](https://github.com/spark/toolated/spiralsafe-metrics-e) | Metrics Evaluator (Spark App) | ✅ Active |
+| [SpiralSafe](https://github.com/toolated/SpiralSafe) | Theory/IP vault, hardware bridges | 📚 Reference |
 | coherence-mcp (this repo) | MCP server (legacy) | ⚠️ Converging |
 
 ## New Packages
@@ -62,7 +62,7 @@ spiralsafe-mono/
 
 ## Status
 
-This package (`@hopeandsauced/coherence-mcp`) remains functional with security updates, but new features land in the unified ecosystem.
+This package (`@toolated/coherence-mcp`) remains functional with security updates, but new features land in the unified ecosystem.
 
 ---
 

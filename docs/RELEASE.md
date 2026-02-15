@@ -135,18 +135,18 @@ Users can verify release signatures:
 # 1. Import the SpiralSafe signing key
 curl -s https://spiralsafe.org/.well-known/pgp-key.txt | gpg --import
 # Or from this repository:
-curl -s https://raw.githubusercontent.com/toolate28/coherence-mcp/main/.well-known/pgp-key.txt | gpg --import
+curl -s https://raw.githubusercontent.com/toolated/coherence-mcp/main/.well-known/pgp-key.txt | gpg --import
 
 # 2. Download the release artifacts
 VERSION="0.2.1"
-curl -LO "https://github.com/toolate28/coherence-mcp/releases/download/v${VERSION}/SHA256SUMS.txt"
-curl -LO "https://github.com/toolate28/coherence-mcp/releases/download/v${VERSION}/SHA256SUMS.txt.asc"
+curl -LO "https://github.com/toolated/coherence-mcp/releases/download/v${VERSION}/SHA256SUMS.txt"
+curl -LO "https://github.com/toolated/coherence-mcp/releases/download/v${VERSION}/SHA256SUMS.txt.asc"
 
 # 3. Verify the signature
 gpg --verify SHA256SUMS.txt.asc SHA256SUMS.txt
 
 # 4. Verify the package checksum
-npm pack @hopeandsauced/coherence-mcp@${VERSION}
+npm pack @toolated/coherence-mcp@${VERSION}
 sha256sum -c SHA256SUMS.txt
 ```
 
@@ -167,7 +167,7 @@ Releases are published with [npm provenance](https://docs.npmjs.com/generating-p
 
 Check provenance:
 ```bash
-npm audit signatures @hopeandsauced/coherence-mcp
+npm audit signatures @toolated/coherence-mcp
 ```
 
 ## SpiralSafe Synchronization
@@ -204,7 +204,7 @@ After releasing:
 - [ ] Verify NPM package published
 - [ ] Verify checksums are correct
 - [ ] Verify GPG signatures (if enabled)
-- [ ] Test installation: `npx @hopeandsauced/coherence-mcp@VERSION`
+- [ ] Test installation: `npx @toolated/coherence-mcp@VERSION`
 - [ ] Update SpiralSafe ecosystem docs (if needed)
 
 ## Troubleshooting

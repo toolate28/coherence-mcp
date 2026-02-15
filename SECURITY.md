@@ -16,8 +16,8 @@
 ### Where to Report
 
 Report security vulnerabilities to:
-- **Email:** security@safespiral.org (or directly to @toolate28 via GitHub)
-- **GitHub:** Use the [Security Advisories](https://github.com/toolate28/coherence-mcp/security/advisories/new) feature
+- **Email:** security@safespiral.org (or directly to @toolated via GitHub)
+- **GitHub:** Use the [Security Advisories](https://github.com/toolated/coherence-mcp/security/advisories/new) feature
 
 ### What to Include
 
@@ -109,7 +109,7 @@ When using coherence-mcp:
    # Import the SpiralSafe signing key
    curl -s https://spiralsafe.org/.well-known/pgp-key.txt | gpg --import
    # Or from this repository:
-   curl -s https://raw.githubusercontent.com/toolate28/coherence-mcp/main/.well-known/pgp-key.txt | gpg --import
+   curl -s https://raw.githubusercontent.com/toolated/coherence-mcp/main/.well-known/pgp-key.txt | gpg --import
 
    # Verify release signature
    gpg --verify SHA256SUMS.txt.asc SHA256SUMS.txt
@@ -129,8 +129,8 @@ All official releases are signed with GPG. To verify:
 2. **Download release checksums and signature**:
    ```bash
    VERSION="0.2.0"
-   curl -LO "https://github.com/toolate28/coherence-mcp/releases/download/v${VERSION}/SHA256SUMS.txt"
-   curl -LO "https://github.com/toolate28/coherence-mcp/releases/download/v${VERSION}/SHA256SUMS.txt.asc"
+   curl -LO "https://github.com/toolated/coherence-mcp/releases/download/v${VERSION}/SHA256SUMS.txt"
+   curl -LO "https://github.com/toolated/coherence-mcp/releases/download/v${VERSION}/SHA256SUMS.txt.asc"
    ```
 
 3. **Verify signature**:
@@ -140,7 +140,7 @@ All official releases are signed with GPG. To verify:
 
 4. **Verify package checksum**:
    ```bash
-   npm pack @hopeandsauced/coherence-mcp@${VERSION}
+   npm pack @toolated/coherence-mcp@${VERSION}
    sha256sum -c SHA256SUMS.txt
    ```
 
@@ -149,14 +149,14 @@ All official releases are signed with GPG. To verify:
 Releases include [npm provenance](https://docs.npmjs.com/generating-provenance-statements) attestations:
 
 ```bash
-npm audit signatures @hopeandsauced/coherence-mcp
+npm audit signatures @toolated/coherence-mcp
 ```
 
 ### Signing Key Fingerprint
 
 The official SpiralSafe signing key fingerprint is published at:
 - https://spiralsafe.org/.well-known/pgp-key.txt
-- https://github.com/toolate28/coherence-mcp/blob/main/.well-known/pgp-key.txt
+- https://github.com/toolated/coherence-mcp/blob/main/.well-known/pgp-key.txt
 
 Always verify the key fingerprint through multiple channels before trusting.
 
@@ -266,7 +266,7 @@ query_embedding = np.pad(
 - Test embedding quality with known reference vectors
 - Document embedding preprocessing pipelines clearly
 
-**Related:** This issue was identified in [SpiralSafe PR #117](https://github.com/toolate28/SpiralSafe/pull/117) in the Qiskit-DSPy hybrid integration experiments.
+**Related:** This issue was identified in [SpiralSafe PR #117](https://github.com/toolated/SpiralSafe/pull/117) in the Qiskit-DSPy hybrid integration experiments.
 
 ## Security Features
 
@@ -309,8 +309,8 @@ If a security incident is discovered:
 
 For security concerns:
 - **Email:** security@safespiral.org
-- **GitHub Security:** [Create Advisory](https://github.com/toolate28/coherence-mcp/security/advisories/new)
-- **Maintainer:** @toolate28
+- **GitHub Security:** [Create Advisory](https://github.com/toolated/coherence-mcp/security/advisories/new)
+- **Maintainer:** @toolated
 
 ## Acknowledgments
 

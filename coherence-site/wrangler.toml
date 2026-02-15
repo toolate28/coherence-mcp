@@ -1,0 +1,11 @@
+name = "coherence-articles"
+main = "src/index.js"
+compatibility_date = "2024-09-23"
+account_id = "3ddeb355f4954bb1ee4f9486b2908e7e"
+
+routes = [
+  { pattern = "coherence.toolated.online", custom_domain = true }
+]
+
+[assets]
+directory = "public"

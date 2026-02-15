@@ -13,7 +13,7 @@
  *   4. Verifies coherence between source and translated output
  *   5. Logs the translation in the ATOM trail for provenance
  *
- * Reference: https://github.com/toolate28/vortex-bridges
+ * Reference: https://github.com/toolated/vortex-bridges
  */
 
 import { analyzeWave } from "./wave-analysis.js";

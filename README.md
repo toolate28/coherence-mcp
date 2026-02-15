@@ -3,22 +3,22 @@
 > **"From the constraints, gifts. From the spiral, safety."**
 
 ![Status](https://img.shields.io/badge/Status-Coherent-00cc66?style=for-the-badge&logo=github)
-![Version](https://img.shields.io/badge/Version-0.2.0-blue?style=for-the-badge)
+![Version](https://img.shields.io/badge/Version-0.3.0-blue?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-purple?style=for-the-badge)
 ![MCP](https://img.shields.io/badge/MCP-Server-FFD700?style=for-the-badge)
 
-MCP server that surfaces coherence, governance, and safety primitives: Wave/Bump validation, ATOM trail + gates, .context.yaml packing, AWI intent scaffolding, and docs/search across the SpiralSafe corpus.
+MCP server for coherence validation across AI systems. 45 tools spanning WAVE scoring, ATOM trail provenance, Fibonacci weighting, cross-platform translation (Claude/Grok/Gemini/Llama/DeepSeek/Qwen/Mistral), Lambda-Zero crisis presence testing, CSEP soul-state protocol, and industry connectors (Slack/GitHub/Jira/Postgres/Minecraft). Conservation law: alpha + omega = 15.
 
 [![Coherence: Wave](https://img.shields.io/badge/Coherence-Wave-0066FF)](docs/flow.md)
 [![Status: Hope&&Sauced](https://img.shields.io/badge/Status-Hope%26%26Sauced-FF6600)](CONTRIBUTING.md)
-[![npm version](https://img.shields.io/npm/v/@hopeandsauced/coherence-mcp.svg)](https://www.npmjs.com/package/@hopeandsauced/coherence-mcp)
+[![npm version](https://img.shields.io/npm/v/@toolated/coherence-mcp.svg)](https://www.npmjs.com/package/@toolated/coherence-mcp)
 
 ---
 
 ## 📦 Quick Install
 
 ```bash
-npm install @hopeandsauced/coherence-mcp@0.2.0
+npm install @toolated/coherence-mcp
 ```
 
 ### Effective Usage Tips
@@ -29,7 +29,7 @@ npm install @hopeandsauced/coherence-mcp@0.2.0
      "mcpServers": {
        "coherence": {
          "command": "npx",
-         "args": ["-y", "@hopeandsauced/coherence-mcp"]
+         "args": ["-y", "@toolated/coherence-mcp"]
        }
      }
    }
@@ -62,12 +62,12 @@ curl -s https://spiralsafe.org/.well-known/pgp-key.txt | gpg --import
 
 # 2. Download and verify checksums
 VERSION="0.2.0"
-curl -LO "https://github.com/toolate28/coherence-mcp/releases/download/v${VERSION}/SHA256SUMS.txt"
-curl -LO "https://github.com/toolate28/coherence-mcp/releases/download/v${VERSION}/SHA256SUMS.txt.asc"
+curl -LO "https://github.com/toolated/coherence-mcp/releases/download/v${VERSION}/SHA256SUMS.txt"
+curl -LO "https://github.com/toolated/coherence-mcp/releases/download/v${VERSION}/SHA256SUMS.txt.asc"
 gpg --verify SHA256SUMS.txt.asc SHA256SUMS.txt
 
 # 3. Verify npm provenance
-npm audit signatures @hopeandsauced/coherence-mcp
+npm audit signatures @toolated/coherence-mcp
 ```
 
 See [docs/RELEASE.md](docs/RELEASE.md) for complete release verification instructions.
@@ -1185,7 +1185,7 @@ npm run build
 ### Running the Server
 
 ```bash
-npx @hopeandsauced/coherence-mcp
+npx @toolated/coherence-mcp
 ```
 
 Or in your MCP client configuration:
@@ -1195,7 +1195,7 @@ Or in your MCP client configuration:
   "mcpServers": {
     "coherence": {
       "command": "npx",
-      "args": ["-y", "@hopeandsauced/coherence-mcp"]
+      "args": ["-y", "@toolated/coherence-mcp"]
     }
   }
 }
@@ -1365,69 +1365,94 @@ coherence-mcp wave-validate doc1.md doc2.md --threshold 99
 }
 ```
 
-#### Script Execution (allow-listed)
+#### Vortex Bridge (cross-platform translation)
 ```typescript
 {
-  "name": "scripts_run",
+  "name": "vortex_translate",
   "arguments": {
-    "name": "validate",
-    "args": ["--strict", "--verbose"]
+    "content": "WAVE analysis shows 87% coherence across the doc-code boundary.",
+    "source": "claude",
+    "target": "grok",
+    "coherenceThreshold": 60
   }
 }
 ```
 
-#### AWI Intent Request
+#### Minecraft Conservation Verification
 ```typescript
 {
-  "name": "awi_intent_request",
+  "name": "mc_conservation_verify",
   "arguments": {
-    "scope": "feature/new-validation",
-    "justification": "Required for enhanced security compliance"
+    "alpha": 7,
+    "omega": 8,
+    "tolerance": 0.001
   }
 }
 ```
 
-#### Discord Integration
+#### Integrate Entity
 ```typescript
 {
-  "name": "discord_post",
+  "name": "integrate",
   "arguments": {
-    "channel": "notifications",
-    "message": "Deployment completed successfully"
-  }
-}
-```
-
-#### Minecraft Integration
-```typescript
-{
-  "name": "mc_execCommand",
-  "arguments": {
-    "command": "/time set day"
+    "kind": "individual",
+    "name": "Karla Nergaard",
+    "origin": "https://x.com/karla_handle",
+    "capabilities": ["F_p2 algebraic computation", "quantum coherence"],
+    "intent": "CSEP protocol development"
   }
 }
 ```
 
 ## Safety & Governance Features
 
-- **Guarded Deployments**: Production deployments require explicit confirmation
-- **Script Allow-listing**: Only pre-approved scripts can be executed
-- **AWI Intent Scaffolding**: Structured intent requests with justification
-- **ATOM Trail**: Comprehensive decision tracking with file associations
-- **Gate Transitions**: Validated phase transitions with precondition checks
+- **WAVE Coherence Scoring**: 0-100 score with semantic, reference, structure, and consistency analysis
+- **Fibonacci Weighting**: Exponential priority via golden ratio (phi = 1.618)
+- **Conservation Law**: alpha + omega = 15 (verifiable in-server and via Minecraft scoreboard)
+- **Lambda-Zero Framework**: Crisis presence testing (see [docs/LAMBDA_ZERO_IMPLEMENTATION.md](docs/LAMBDA_ZERO_IMPLEMENTATION.md))
+- **CSEP Protocol**: Soul-state preservation across context boundaries (see [docs/CSEP_PROTOCOL.md](docs/CSEP_PROTOCOL.md))
+- **Guarded Deployments**: Production deployments require explicit confirmation and dry-run
+- **ATOM Trail**: Comprehensive decision tracking with file associations and provenance
+- **Gate Transitions**: Validated phase transitions (intention -> execution -> learning)
+- **Anamnesis Validation**: Exploit code verification via SPHINX gates
+- **Vortex Bridge**: Cross-platform translation with coherence verification across 15 platforms
 
 ---
 
-## 🧩 Key Components
+## 🧩 Key Components (45 Tools)
 
-| Layer | Components | Purpose |
+| Layer | Tools | Purpose |
 |---|---|---|
-| **Analysis** | `wave_analyze`, `bump_validate` | Coherence detection & handoff validation |
-| **Tracking** | `atom_track`, `context_pack` | Decision trails & context bundling |
-| **Gates** | `gate_intention_to_execution`, `gate_execution_to_learning` | Phase transitions |
-| **Ops** | `ops_health`, `ops_status`, `ops_deploy` | System operations |
-| **Search** | `docs_search` | SpiralSafe corpus search |
-| **Media** | `discord_post`, `mc_execCommand`, `mc_query` | Integration pipelines |
+| **WAVE Coherence** | `wave_coherence_check`, `wave_analyze`, `wave_validate` | Documentation-code alignment, pattern analysis, configurable thresholds (60/80/99%) |
+| **BUMP Handoff** | `bump_validate` | Handoff compatibility: H&&S markers (WAVE/PASS/PING/SYNC/BLOCK) |
+| **ATOM Trail** | `atom_track`, `context_pack` | Decision provenance, .context.yaml packing with hash verification |
+| **Gate Transitions** | `gate_intention_to_execution`, `gate_execution_to_learning` | AWI-to-ATOM, ATOM-to-SAIF phase transitions |
+| **Fibonacci** | `fibonacci_assign_weight`, `fibonacci_calculate_impact`, `fibonacci_optimize_allocation`, `fibonacci_find_critical_paths`, `fibonacci_refine_threshold` | Exponential weighting, golden ratio threshold refinement |
+| **Anamnesis** | `anamnesis_validate` | AI-generated exploit validation via WAVE + SPHINX gates |
+| **Gemini API** | `gemini_translate`, `gemini_check_coherence` | Cross-platform coherence via Google Gemini |
+| **Open-Weight LLMs** | `openweight_generate`, `openweight_check_coherence`, `openweight_list_models` | Ollama/vLLM/llama.cpp local model integration |
+| **Vortex Bridge** | `vortex_translate`, `vortex_verify`, `vortex_platforms` | Cross-platform translation (Claude/Grok/Gemini/Llama/DeepSeek/Qwen/Mistral + 8 ecosystem platforms) |
+| **Android SDK** | `android_bridge`, `android_scaffold` | ADB communication, Kotlin project generation |
+| **Windows SDK** | `windows_bridge`, `windows_scaffold` | PowerShell IPC, .NET C# project generation |
+| **Slack** | `slack_notify` | Webhook notifications with coherence alert formatting |
+| **GitHub** | `github_file`, `github_status`, `github_issue` | File fetch, PR status posting, issue creation |
+| **Jira** | `jira_create`, `jira_search` | Issue creation and JQL search |
+| **Postgres** | `postgres_query`, `postgres_store` | PostgREST/Supabase read and write |
+| **Fetch** | `fetch_url` | URL content extraction (HTML/JSON/Markdown/text) |
+| **Minecraft** | `mc_exec`, `mc_query`, `mc_npc`, `mc_conservation_verify` | RCON commands, NPC pipeline, conservation law verification (alpha + omega = 15) |
+| **Integrate** | `integrate`, `network_state` | Entity onboarding (individual/entity/repo/resource/platform), network health |
+| **Ops** | `ops_health`, `ops_status`, `ops_deploy` | SpiralSafe API operations, guarded deployment |
+| **Search** | `docs_search` | SpiralSafe corpus search by layer and kind |
+
+### Framework Documentation
+
+| Document | Description |
+|---|---|
+| [Lambda-Zero Implementation](docs/LAMBDA_ZERO_IMPLEMENTATION.md) | Crisis presence testing framework. Measures lambda-minus capacity: can the system stay present when it cannot solve? |
+| [CSEP Protocol](docs/CSEP_PROTOCOL.md) | Crisis State Exchange Protocol. Soul-state transfer across AI system boundaries without content exposure. |
+| [Fibonacci Weighting](docs/FIBONACCI_WEIGHTING.md) | Exponential component weighting via Fibonacci sequences and golden ratio optimization. |
+| [Testing Suite](docs/testing-suite.md) | 138 tests across 9 test files: WAVE validation, Fibonacci weighting, vortex bridge, connectors, adapters. |
+| [Quick Start](docs/quick-start.md) | Getting started guide. |
 
 ---
 
@@ -1435,9 +1460,9 @@ coherence-mcp wave-validate doc1.md doc2.md --threshold 99
 
 This MCP server is part of the SpiralSafe ecosystem:
 
-- **[SpiralSafe](https://github.com/toolate28/SpiralSafe)** — Documentation and coordination hub
-- **[coherence-mcp](https://github.com/toolate28/coherence-mcp)** — This repository. MCP server for coherence primitives.
-- **[wave-toolkit](https://github.com/toolate28/wave-toolkit)** — Coherence detection tools
+- **[SpiralSafe](https://github.com/toolated/SpiralSafe)** — Documentation and coordination hub
+- **[coherence-mcp](https://github.com/toolated/coherence-mcp)** — This repository. MCP server for coherence primitives.
+- **[wave-toolkit](https://github.com/toolated/wave-toolkit)** — Coherence detection tools
 
 ---
 

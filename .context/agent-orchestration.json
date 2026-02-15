@@ -1,0 +1,188 @@
+{
+  "$schema": "https://spiralsafe.org/schemas/agent-orchestration.v2.json",
+  "description": "Intent-driven agent orchestration for Reson8-Labs — full 6-phase critical path with strand routing and Obsidian bridge",
+  "version": "2.0.0",
+
+  "strands": {
+    "claude": {
+      "role": "Structure & Reasoning",
+      "init": "CLAUDE-INIT.md",
+      "tools": ["wave_coherence_check", "wave_analyze", "wave_validate", "atom_track", "bump_validate", "gate_intention_to_execution", "gate_execution_to_learning", "integrate", "network_state"],
+      "envKey": "ANTHROPIC_API_KEY",
+      "routing": ["coherenceCheck", "structuralReasoning", "safety"]
+    },
+    "gemini": {
+      "role": "Multimodal & Scale",
+      "init": "GEMINI-INIT.md",
+      "tools": ["gemini_translate", "gemini_check_coherence"],
+      "envKey": "GEMINI_API_KEY",
+      "routing": ["translation", "multimodal", "scale"]
+    },
+    "grok": {
+      "role": "Real-Time & Social Intelligence",
+      "init": "GROK-INIT.md",
+      "tools": ["grok_generate", "grok_check_coherence", "grok_list_models", "grok_translate"],
+      "envKey": "XAI_API_KEY",
+      "routing": ["realtime", "social", "hardware"]
+    },
+    "local": {
+      "role": "Open-Weight & Local Inference (Coherence Forge)",
+      "tools": ["openweight_generate", "openweight_check_coherence", "openweight_list_models"],
+      "envKey": "OPENWEIGHT_BASE_URL",
+      "routing": ["generation", "offline", "sovereign"]
+    }
+  },
+
+  "routing": {
+    "intent_driven": true,
+    "description": "Routes to available strands based on task intent, not static config",
+    "fallback_chain": ["local", "claude", "gemini", "grok"],
+    "task_routing": {
+      "coherence_check": { "prefer": "claude", "fallback": ["gemini", "grok", "local"] },
+      "translation": { "prefer": "gemini", "fallback": ["grok", "claude"] },
+      "generation": { "prefer": "local", "fallback": ["claude", "gemini", "grok"] },
+      "realtime": { "prefer": "grok", "fallback": ["gemini", "claude"] },
+      "safety": { "prefer": "claude", "fallback": ["local"] },
+      "multimodal": { "prefer": "gemini", "fallback": ["grok"] }
+    }
+  },
+
+  "agents": {
+    "explore": {
+      "type": "Explore",
+      "purpose": "Fast codebase navigation, pattern matching, architecture mapping",
+      "triggers": ["find files", "search code", "map structure", "locate pattern"],
+      "thoroughness": "medium",
+      "phase_affinity": [5, 6]
+    },
+    "plan": {
+      "type": "Plan",
+      "purpose": "Architecture design, implementation strategy, trade-off analysis",
+      "triggers": ["design system", "plan feature", "architect solution", "evaluate approach"],
+      "phase_affinity": [5, 6]
+    },
+    "bash": {
+      "type": "Bash",
+      "purpose": "Build, test, deploy, git ops, package management",
+      "triggers": ["build", "test", "deploy", "install", "git operations"],
+      "phase_affinity": [5]
+    },
+    "general": {
+      "type": "general-purpose",
+      "purpose": "Multi-step research, deep search, complex analysis",
+      "triggers": ["research topic", "deep analysis", "multi-step search"],
+      "phase_affinity": [1, 2, 3, 4, 6]
+    }
+  },
+
+  "phase_agent_map": {
+    "1_gate_unblock": {
+      "primary": "general",
+      "skills": ["docx", "pdf"],
+      "tasks": ["ASIC requirements research", "DIN application prep", "Resident director options"]
+    },
+    "2_entity_formation": {
+      "primary": "general",
+      "skills": ["docx", "pdf", "xlsx"],
+      "tasks": ["ABN/TFN registration steps", "Entity structure comparison", "Cost modelling"]
+    },
+    "3_financial_activation": {
+      "primary": "general",
+      "skills": ["xlsx", "pdf"],
+      "tasks": ["R&D Tax Incentive calc", "Bank comparison", "Stripe integration guide"]
+    },
+    "4_revenue_ignition": {
+      "primary": "general",
+      "skills": ["docx", "canvas-design", "internal-comms"],
+      "tasks": ["X Article drafting", "Creator Studio verification", "ATOM-AUTH coherence proof writeup"]
+    },
+    "5_technical_manifest": {
+      "primary": "bash",
+      "secondary": ["explore", "plan"],
+      "skills": ["mcp-builder", "coherence-check"],
+      "tasks": ["coherence-mcp deploy", "Test suite fixes", "conservation_verifier", "setup gate"]
+    },
+    "6_qrc_orbital": {
+      "primary": "plan",
+      "secondary": ["general", "bash"],
+      "skills": ["mcp-builder", "canvas-design"],
+      "tasks": ["Golem yapapi containerisation", "io.net job spec", "Fault-tolerant backup design", "NEAR conservation contract"]
+    }
+  },
+
+  "bridges": {
+    "obsidian": {
+      "protocol": "ws",
+      "host": "127.0.0.1",
+      "port": 8088,
+      "auth_method": "ATOM_TOKEN_RESONANCE",
+      "config_file": ".context/obsidian-bridge.json",
+      "pipelines": {
+        "idea_to_publish": {
+          "trigger": "cmd+shift+p",
+          "steps": ["templater/create", "ai-expansion", "visual-synthesis", "dataview/verify", "canvas/embed", "quartz/export"],
+          "coherence_threshold": 0.85
+        }
+      }
+    },
+    "forge": {
+      "description": "Coherence Forge v1 — RTX 5090 open-air inference node",
+      "tui": "crates/tui/src/main.rs",
+      "websocket": "crates/core/src/websocket_bridge.rs",
+      "monitoring": {
+        "thermal": "in-line fluid temp sensor",
+        "mechanical": "PCH 1232 accelerometer (Modbus RTU)",
+        "computational": "GPU-SMI / Rust API",
+        "fluidic": "magnetic flow meter"
+      }
+    },
+    "near": {
+      "network": "testnet",
+      "contract": "conservation.near",
+      "conservation_law": "alpha + omega = 15",
+      "verification": "on-chain"
+    }
+  },
+
+  "parallel_patterns": {
+    "full_audit": ["explore:codebase_scan", "bash:build_status", "bash:test_status"],
+    "pre_commit": ["bash:lint", "bash:test", "bash:build"],
+    "context_reload": ["explore:structure", "bash:manifest", "bash:wave_check"],
+    "depin_research": ["general:io_net_status", "general:akash_status", "general:golem_status"],
+    "phase_status": ["general:critical_path_check", "bash:compact"],
+    "strand_health": ["bash:check_env", "bash:test_strands", "bash:wave_score"]
+  },
+
+  "skills_map": {
+    "document_creation": ["docx", "pdf", "pptx", "xlsx"],
+    "visual_design": ["canvas-design", "theme-factory", "slack-gif-creator"],
+    "meta_tools": ["coherence-check", "skill-creator", "mcp-builder"],
+    "comms": ["internal-comms"],
+    "automation": ["create-shortcut"]
+  },
+
+  "cycles": {
+    "compact": {
+      "trigger": "context approaching limit OR session pause OR phase gate transition",
+      "action": "Run compact(), update session-state.json, summarise open threads + phase status",
+      "output": "Compressed state + next-action queue + phase gate status"
+    },
+    "update": {
+      "trigger": "session start OR explicit request OR phase completion",
+      "action": "Run update_cycle(), verify build, reload context files, check phase blockers",
+      "output": "Fresh manifest + test results + critical path status"
+    },
+    "strand_sync": {
+      "trigger": "New strand activated OR agent config regenerated",
+      "action": "Verify strand connectivity, run coherence check across active strands, update routing table",
+      "output": "Strand health report + routing confirmation"
+    }
+  },
+
+  "setup": {
+    "command": "npx coherence-mcp-setup",
+    "check": "npx coherence-mcp-setup --check",
+    "regenerate": "npx coherence-mcp-setup --gen",
+    "description": "Single blocking step — ATOM-AUTH credential gate. Explains impact of each key before requesting it."
+  }
+}

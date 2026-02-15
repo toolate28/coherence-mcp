@@ -161,7 +161,7 @@ PRs will be reviewed for:
 
 Instead:
 - Email: security@safespiral.org
-- Use [GitHub Security Advisories](https://github.com/toolate28/coherence-mcp/security/advisories/new)
+- Use [GitHub Security Advisories](https://github.com/toolated/coherence-mcp/security/advisories/new)
 
 See [SECURITY.md](SECURITY.md) for more details.
 
@@ -219,7 +219,7 @@ Before adding a new dependency:
 
 ## Questions?
 
-- Open a [Discussion](https://github.com/toolate28/coherence-mcp/discussions)
+- Open a [Discussion](https://github.com/toolated/coherence-mcp/discussions)
 - Create an issue with the `question` label
 - Check existing documentation and issues first
 
@@ -239,10 +239,10 @@ This package is part of a larger ecosystem:
 
 | Repository | Purpose |
 |------------|---------|
-| [spiralsafe-mono](https://github.com/toolate28/spiralsafe-mono) | Core monorepo |
-| [SpiralSafe](https://github.com/toolate28/SpiralSafe) | Theory/IP vault |
-| [coherence-mcp](https://github.com/toolate28/coherence-mcp) | This repo — MCP server |
-| [QDI](https://github.com/toolate28/QDI) | Quantum Divide Initiative |
+| [spiralsafe-mono](https://github.com/toolated/spiralsafe-mono) | Core monorepo |
+| [SpiralSafe](https://github.com/toolated/SpiralSafe) | Theory/IP vault |
+| [coherence-mcp](https://github.com/toolated/coherence-mcp) | This repo — MCP server |
+| [QDI](https://github.com/toolated/QDI) | Quantum Divide Initiative |
 
 See [BRANDING.md](BRANDING.md) for styling guidelines.
 See [ROADMAP.md](ROADMAP.md) for planned features.

@@ -1,3 +1,5 @@
+import { geminiConfig, GeminiConfig } from "../config/gemini.js";
+
 /**
  * Gemini API Adapter
  *
@@ -10,12 +12,9 @@
 
 // ---------- types ----------
 
-export interface GeminiConfig {
-  apiKey: string;
-  model?: string;
-  baseUrl?: string;
-  timeout?: number;
-}
+// Re-exporting config type for backward compatibility if needed, 
+// though consumers should use imported config.
+export type { GeminiConfig };
 
 export interface GeminiTranslateResult {
   translatedContent: string;
@@ -40,18 +39,12 @@ export interface GeminiExtractResult {
   };
 }
 
-// ---------- constants ----------
-
-const DEFAULT_MODEL = "gemini-2.0-flash";
-const DEFAULT_BASE_URL = "https://generativelanguage.googleapis.com/v1beta";
-const DEFAULT_TIMEOUT = 30_000;
-
 // ---------- helpers ----------
 
 async function fetchWithTimeout(
   url: string,
   options: RequestInit = {},
-  timeout: number = DEFAULT_TIMEOUT,
+  timeout: number = geminiConfig.timeout,
 ): Promise<Response> {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeout);
@@ -69,19 +62,15 @@ async function fetchWithTimeout(
   }
 }
 
-function resolveConfig(overrides?: Partial<GeminiConfig>): GeminiConfig {
-  const apiKey = overrides?.apiKey || process.env.GEMINI_API_KEY || "";
-  if (!apiKey) {
+function getEffectiveConfig(overrides?: Partial<GeminiConfig>): GeminiConfig {
+  const config = { ...geminiConfig, ...overrides };
+
+  if (!config.apiKey) {
     throw new Error(
-      "Gemini API key is required. Set GEMINI_API_KEY environment variable or pass apiKey in config.",
+      "Gemini API key is required. Set GEMINI_API_KEY environment variable.",
     );
   }
-  return {
-    apiKey,
-    model: overrides?.model ?? DEFAULT_MODEL,
-    baseUrl: overrides?.baseUrl ?? DEFAULT_BASE_URL,
-    timeout: overrides?.timeout ?? DEFAULT_TIMEOUT,
-  };
+  return config;
 }
 
 // ---------- core functions ----------
@@ -97,7 +86,7 @@ export async function translateForGemini(
   metadata: Record<string, unknown> = {},
   config?: Partial<GeminiConfig>,
 ): Promise<GeminiTranslateResult> {
-  const cfg = resolveConfig(config);
+  const cfg = getEffectiveConfig(config);
   const url = `${cfg.baseUrl}/models/${cfg.model}:generateContent?key=${cfg.apiKey}`;
 
   const prompt = [
@@ -140,7 +129,7 @@ export async function translateForGemini(
 
   return {
     translatedContent: text,
-    model: cfg.model!,
+    model: cfg.model,
     timestamp: new Date().toISOString(),
   };
 }
@@ -198,7 +187,7 @@ export async function checkCoherenceViaGemini(
   content: string,
   config?: Partial<GeminiConfig>,
 ): Promise<GeminiCoherenceResult> {
-  const cfg = resolveConfig(config);
+  const cfg = getEffectiveConfig(config);
   const url = `${cfg.baseUrl}/models/${cfg.model}:generateContent?key=${cfg.apiKey}`;
 
   const prompt = [

@@ -399,5 +399,5 @@ F(20)/F(19) = 6765/4181 = 1.618...
 ## Support
 
 For issues or questions:
-- GitHub Issues: https://github.com/toolate28/coherence-mcp/issues
+- GitHub Issues: https://github.com/toolated/coherence-mcp/issues
 - Documentation: https://spiralsafe.org
