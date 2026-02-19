@@ -1007,6 +1007,84 @@ const TOOLS: Tool[] = [
       properties: {},
     },
   },
+  {
+    name: "gem_init",
+    description: "Initialize a Polymorphic Rendering Seed (Gem) for an Agentic Canvas. Dynamically configures rendering constraints for TSX, HTML, or Quantum Redstone substrates. Integrates with the Obsidian Bridge (ws://127.0.0.1:8088).",
+    inputSchema: {
+      type: "object",
+      properties: {
+        gem_manifest: {
+          type: "object",
+          properties: {
+            id: { type: "string" },
+            target_substrate: {
+              type: "object",
+              properties: {
+                file_path: { type: "string" },
+                mime_type: { type: "string" },
+                fallback_render: { type: "string" }
+              },
+              required: ["file_path"]
+            },
+            alpha_rail_config: {
+              type: "object",
+              properties: {
+                description: { type: "string" },
+                parser: { type: "string" },
+                live_reload: { type: "boolean" },
+                sandbox_level: { type: "string" }
+              }
+            },
+            omega_rail_config: {
+              type: "object",
+              properties: {
+                description: { type: "string" },
+                bridge_uri: { type: "string" },
+                sync_target: { type: "string" },
+                auto_generate_docs: { type: "boolean" },
+                tagging_mode: { type: "string" }
+              }
+            },
+            coherence_engine: {
+              type: "object",
+              properties: {
+                wave_threshold: { type: "number" },
+                on_desync: { type: "string" },
+                tri_weave_routing: {
+                  type: "object",
+                  properties: {
+                    structure_eval: { type: "string" },
+                    pulse_eval: { type: "string" },
+                    scale_eval: { type: "string" }
+                  }
+                }
+              }
+            }
+          },
+          required: ["id", "target_substrate"]
+        }
+      },
+      required: ["gem_manifest"]
+    }
+  },
+  {
+    name: "cleanroom_scour",
+    description: "Perform a hardened cleanroom audit on node data to extract protected cores (SpiralSafe, Vortex Bridge, etc.) from legacy noise. Uses regex signatures, structural DNA markers, and complexity heuristics to determine if logic should be integrated, quarantined, or archived.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        nodeData: {
+          type: "string",
+          description: "The raw text or code content of the node to audit"
+        },
+        nodeMeta: {
+          type: "object",
+          description: "Optional metadata associated with the node (timestamp, author, etc.)"
+        }
+      },
+      required: ["nodeData"]
+    }
+  }
 ];
 
 // Legacy script allow-list associated with the former scripts_run tool.
@@ -1813,6 +1891,58 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         const state = getNetworkState();
         return {
           content: [{ type: "text", text: JSON.stringify(state, null, 2) }],
+        };
+      }
+
+      case "gem_init": {
+        const { gem_manifest } = args as { gem_manifest: any };
+        
+        // Log the initialization event to the ATOM trail
+        await realTrackAtom(
+          `Initialize Gem: ${gem_manifest.id} for ${gem_manifest.target_substrate.file_path}`,
+          [gem_manifest.target_substrate.file_path],
+          ["GEM", "INIT", "VISUAL"],
+          "INIT"
+        ).catch(() => {});
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                status: "instantiated",
+                message: `Polymorphic Rendering Seed '${gem_manifest.id}' active.`,
+                config: gem_manifest,
+                bridge_status: gem_manifest.omega_rail_config?.bridge_uri ? "ready" : "not_configured"
+              }, null, 2),
+            },
+          ],
+        };
+      }
+
+      case "cleanroom_scour": {
+        const { nodeData, nodeMeta } = args as {
+          nodeData: string;
+          nodeMeta?: Record<string, any>;
+        };
+        const { auditNode } = await import("./lib/cleanroom.js");
+        const result = auditNode(nodeData, nodeMeta);
+        
+        // Log the scour event to the ATOM trail
+        await realTrackAtom(
+          `Cleanroom Scour Audit: ${result.action} - ${result.reason}`,
+          [],
+          ["CLEANROOM", "SCOUR", result.action],
+          "VERIFY"
+        ).catch(() => {});
+
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(result, null, 2),
+            },
+          ],
         };
       }
 

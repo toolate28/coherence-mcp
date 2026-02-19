@@ -35,6 +35,26 @@ async function runPreFlight() {
     console.log('  Error: ' + e.message);
   }
 
+  // 4. Cleanroom Scour: Contrarian Audit
+  console.log('\n[4] Cleanroom Scour: Contrarian Audit (Grok Patch)');
+  try {
+    const { auditNode } = await import('./lib/cleanroom.js');
+    
+    // Test 1: Signature Match
+    const res1 = auditNode('Implementing SpiralSafe logic for the core.');
+    console.log('  Signature Match: ' + (res1.action === 'INTEGRATE' ? '✅' : '❌'));
+    
+    // Test 2: Structural DNA
+    const res2 = auditNode('class StateVector: pass # qubit logic');
+    console.log('  Structural DNA:  ' + (res2.action === 'INTEGRATE' ? '✅' : '❌'));
+    
+    // Test 3: Legacy Archive
+    const res3 = auditNode('Random legacy text with no core value.');
+    console.log('  Legacy Archive:  ' + (res3.action === 'SCRUB_AND_ARCHIVE' ? '✅' : '❌'));
+  } catch (e) {
+    console.log('  Error: ' + e.message);
+  }
+
   console.log('\n--- Pre-Flight Complete ---');
 }
 

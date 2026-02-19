@@ -31,6 +31,8 @@ coherence-mcp is the **MCP interface layer** for the SpiralSafe coherence engine
 | Docs search | ✅ Complete | Fast-glob corpus indexing |
 | Ops integration | ✅ Complete | Health, status, deploy via API |
 | Release pipeline | ✅ Complete | GPG signing, provenance (PR#29) |
+| Polymorphic Rendering (Gem) | ✅ Complete | Dynamic visualization seed (`gem_init`) |
+| Cleanroom Scour (Grok Patch) | ✅ Complete | Hardened core extraction (`cleanroom_scour`) |
 
 ### 🔄 In Progress
 
