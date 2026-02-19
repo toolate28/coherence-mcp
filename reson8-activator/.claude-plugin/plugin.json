@@ -1,0 +1,24 @@
+{
+  "name": "reson8-activator",
+  "version": "1.0.0",
+  "description": "Meta-skill that knows its own activation surface. Inventories every skill, MCP server, API, connector, and marketplace available — then routes, composes, and teaches other agents how to use them. The Tapestry of Skills.",
+  "author": {
+    "name": "Hope&&Sauced | Reson8-Labs",
+    "url": "https://github.com/toolate28"
+  },
+  "repository": "https://github.com/toolate28/coherence-mcp",
+  "license": "MIT",
+  "keywords": [
+    "meta-skill",
+    "activation",
+    "orchestration",
+    "plugin-orchestration-protocol",
+    "obsidian",
+    "coherence",
+    "wave",
+    "atom",
+    "reson8",
+    "multi-agent",
+    "marketplace"
+  ]
+}
