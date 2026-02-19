@@ -617,7 +617,7 @@ function checkConfig(projectRoot: string): void {
 
 // ── Main ───────────────────────────────────────────────────────────
 
-async function main(): Promise<void> {
+export async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const projectRoot = resolve(".");
   const homeDir = process.env.HOME || process.env.USERPROFILE || ".";
@@ -685,4 +685,6 @@ async function main(): Promise<void> {
   console.log("");
 }
 
-main().catch(console.error);
+if (import.meta.url.endsWith('setup.ts') || (process.argv[1] && process.argv[1].endsWith('setup.js'))) {
+  main().catch(console.error);
+}

@@ -40,7 +40,8 @@
     "prepublishOnly": "npm run build && npm test",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "pre-flight": "npm run build && node build/pre-flight.js"
   },
   "keywords": [
     "mcp",

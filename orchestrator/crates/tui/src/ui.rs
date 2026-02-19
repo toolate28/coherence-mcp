@@ -13,13 +13,14 @@ use orchestrator_core::task::TaskPhase;
 
 /// Draw the full UI for a single frame.
 pub fn draw(frame: &mut Frame, app: &App) {
-    // Three-panel layout: providers | tasks | logs
+    // Four-panel layout: providers | tasks | braid | logs
     let chunks = Layout::default()
         .direction(Direction::Horizontal)
         .constraints([
+            Constraint::Percentage(20),
             Constraint::Percentage(25),
-            Constraint::Percentage(35),
-            Constraint::Percentage(40),
+            Constraint::Percentage(25),
+            Constraint::Percentage(30),
         ])
         .split(frame.area());
 
@@ -70,6 +71,38 @@ pub fn draw(frame: &mut Frame, app: &App) {
         .border_style(border_style(app.focus == FocusPanel::Tasks));
     let tasks_list = List::new(task_items).block(tasks_block);
     frame.render_widget(tasks_list, chunks[1]);
+
+    // ---- Braid panel ----
+    let braid_text = vec![
+        Line::from(vec![
+            Span::styled("STATUS: ", Style::default().fg(Color::DarkGray)),
+            Span::styled(app.braid.status, Style::default().fg(Color::Green).add_modifier(Modifier::BOLD)),
+        ]),
+        Line::from(vec![
+            Span::styled("ALPHA:  ", Style::default().fg(Color::DarkGray)),
+            Span::styled(format!("{:.1}", app.braid.alpha), Style::default().fg(Color::Cyan)),
+        ]),
+        Line::from(vec![
+            Span::styled("OMEGA:  ", Style::default().fg(Color::DarkGray)),
+            Span::styled(format!("{:.1}", app.braid.omega), Style::default().fg(Color::Magenta)),
+        ]),
+        Line::from(vec![
+            Span::styled("PHI Φ:  ", Style::default().fg(Color::DarkGray)),
+            Span::styled(format!("{:.2}", app.braid.phi), Style::default().fg(Color::Yellow)),
+        ]),
+        Line::from(""),
+        Line::from(Span::styled("  /\\  /\\  /\\", Style::default().fg(Color::Cyan))),
+        Line::from(Span::styled(" /  \\/  \\/  \\", Style::default().fg(Color::Magenta))),
+        Line::from(Span::styled(" \\  /\\  /\\  /", Style::default().fg(Color::Yellow))),
+        Line::from(Span::styled("  \\/  \\/  \\/", Style::default().fg(Color::Green))),
+    ];
+
+    let braid_block = Block::default()
+        .title(" Braid Resonance ")
+        .borders(Borders::ALL)
+        .border_style(border_style(app.focus == FocusPanel::Braid));
+    let braid_widget = Paragraph::new(braid_text).block(braid_block);
+    frame.render_widget(braid_widget, chunks[2]);
 
     // ---- Log panel ----
     let entries = app.log_sink.entries();

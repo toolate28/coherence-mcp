@@ -1838,22 +1838,55 @@ async function main() {
   const args = process.argv.slice(2);
   
   // Check if this is a CLI command
-  if (args.length > 0 && args[0] === 'wave-validate') {
-    // CLI mode: coherence-mcp wave-validate <file> --threshold 80
-    await handleWaveValidateCLI(args.slice(1));
-    return;
-  }
-  
-  // Anamnesis CLI commands
-  if (args.length > 0 && args[0] === 'anamnesis') {
-    await handleAnamnesisCliCommands(args.slice(1));
-    return;
-  }
-  
-  // Fibonacci weighting CLI commands
-  if (args.length > 0 && args[0] === 'fibonacci') {
-    await handleFibonacciCLI(args.slice(1));
-    return;
+  if (args.length > 0) {
+    const command = args[0];
+    
+    if (command === '--help' || command === '-h' || command === 'help') {
+      console.log('coherence-mcp v0.3.1 — Multi-AI Platform Orchestrator');
+      console.log('');
+      console.log('Usage:');
+      console.log('  npx coherence-mcp                     (Starts the MCP server on stdio)');
+      console.log('  npx coherence-mcp setup               (Runs interactive configuration)');
+      console.log('  npx coherence-mcp wave-validate <f>   (Validates coherence for a file)');
+      console.log('  npx coherence-mcp anamnesis <cmd>     (Security validation tools)');
+      console.log('  npx coherence-mcp fibonacci <cmd>     (Impact & weighting tools)');
+      console.log('  npx coherence-mcp --help              (Shows this message)');
+      console.log('');
+      console.log('The MCP server supports 49 tools across WAVE, ATOM, Fibonacci, and Vortex Bridge.');
+      return;
+    }
+
+    if (command === 'setup') {
+      const { main: setupMain } = await import('./setup.js');
+      // Pass the remaining args if any
+      process.argv = [process.argv[0], process.argv[1], ...args.slice(1)];
+      await setupMain();
+      return;
+    }
+
+    if (command === 'wave-validate' || command === 'wave_validate') {
+      // CLI mode: coherence-mcp wave-validate <file> --threshold 80
+      await handleWaveValidateCLI(args.slice(1));
+      return;
+    }
+    
+    // Anamnesis CLI commands
+    if (command === 'anamnesis') {
+      await handleAnamnesisCliCommands(args.slice(1));
+      return;
+    }
+    
+    // Fibonacci weighting CLI commands
+    if (command === 'fibonacci') {
+      await handleFibonacciCLI(args.slice(1));
+      return;
+    }
+
+    // If it looks like a command but isn't one, warn the user
+    if (!command.startsWith('-')) {
+      console.error(`Unknown command: ${command}. Use --help to see available commands.`);
+      process.exit(1);
+    }
   }
   
   // MCP Server mode
@@ -1868,29 +1901,34 @@ async function handleWaveValidateCLI(args: string[]) {
   
   // Parse arguments
   let filePath: string | undefined;
+  let content: string | undefined;
   let threshold = 80;
   
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--threshold' || args[i] === '-t') {
       threshold = parseInt(args[i + 1], 10);
       i++;
+    } else if (args[i] === '--content' || args[i] === '-c') {
+      content = args[i + 1];
+      i++;
     } else if (!filePath) {
       filePath = args[i];
     }
   }
   
-  if (!filePath) {
-    console.error('Usage: coherence-mcp wave-validate <file> [--threshold 80]');
+  if (!filePath && !content) {
+    console.error('Usage: coherence-mcp wave-validate <file> [--threshold 80] [--content "raw text"]');
     process.exit(1);
   }
   
   try {
-    // Read file content
-    const content = await fs.readFile(filePath, 'utf-8');
+    // Read file content if provided via path
+    const actualContent = content || (filePath ? await fs.readFile(filePath, 'utf-8') : '');
+    const sourceLabel = filePath || 'raw content';
     
     // Validate
-    console.error(`Validating ${filePath} with threshold ${threshold}%...`);
-    const score = await validateWAVE(content, threshold);
+    console.error(`Validating ${sourceLabel} with threshold ${threshold}%...`);
+    const score = await validateWAVE(actualContent, threshold);
     
     // Display results
     console.log('\n=== WAVE Coherence Validation Results ===\n');

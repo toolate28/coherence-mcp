@@ -9,6 +9,7 @@ use orchestrator_core::task::{Task, TaskPhase};
 pub enum FocusPanel {
     Providers,
     Tasks,
+    Braid,
     Logs,
 }
 
@@ -16,10 +17,19 @@ impl FocusPanel {
     pub fn next(self) -> Self {
         match self {
             Self::Providers => Self::Tasks,
-            Self::Tasks => Self::Logs,
+            Self::Tasks => Self::Braid,
+            Self::Braid => Self::Logs,
             Self::Logs => Self::Providers,
         }
     }
+}
+
+/// Braid state representing the tri-weavon resonance.
+pub struct BraidStatus {
+    pub alpha: f64,
+    pub omega: f64,
+    pub phi: f64,
+    pub status: &'static str,
 }
 
 /// Top-level application state shared between the event loop and the renderer.
@@ -28,6 +38,7 @@ pub struct App {
     pub focus: FocusPanel,
     pub providers: Vec<ProviderStatus>,
     pub tasks: Vec<TaskEntry>,
+    pub braid: BraidStatus,
     pub log_sink: MemoryLogSink,
 }
 
@@ -67,6 +78,12 @@ impl App {
                 ProviderStatus { provider: Provider::OpenWeight, healthy: false, label: "OpenWeight" },
             ],
             tasks: Vec::new(),
+            braid: BraidStatus {
+                alpha: 8.0,
+                omega: 7.0,
+                phi: 0.82,
+                status: "RESONANT",
+            },
             log_sink,
         }
     }
