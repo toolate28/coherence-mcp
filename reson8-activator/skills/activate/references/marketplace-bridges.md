@@ -58,9 +58,9 @@ The activation map stays the same — only the packaging changes.
 
 ## 5. npm Registry
 
-**Format:** Node.js package (@toolated/coherence-mcp)
+**Format:** Node.js package (@toolate28/coherence-mcp)
 **How to ship:**
-1. Already published: npm install @toolated/coherence-mcp
+1. Already published: npm install @toolate28/coherence-mcp
 2. Version 0.3.1 live on registry
 3. Update: bump version in package.json, npm publish
 

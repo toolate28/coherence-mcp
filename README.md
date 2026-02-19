@@ -15,7 +15,7 @@ MCP server for coherence validation across AI systems. 49 tools spanning WAVE sc
 
 [![Coherence: Wave](https://img.shields.io/badge/Coherence-Wave-0066FF)](docs/flow.md)
 [![Status: Hope&&Sauced](https://img.shields.io/badge/Status-Hope%26%26Sauced-FF6600)](CONTRIBUTING.md)
-[![npm version](https://img.shields.io/npm/v/@toolated/coherence-mcp.svg)](https://www.npmjs.com/package/@toolated/coherence-mcp)
+[![npm version](https://img.shields.io/npm/v/@toolate28/coherence-mcp.svg)](https://www.npmjs.com/package/@toolate28/coherence-mcp)
 
 ---
 
@@ -35,7 +35,7 @@ The system treats AI alignment as a physical constraint (Gauge Constraint). When
 ## 📦 Quick Install
 
 ```bash
-npm install @toolated/coherence-mcp@0.3.1
+npm install @toolate28/coherence-mcp@0.3.1
 ```
 
 ### Effective Usage Tips
@@ -46,7 +46,7 @@ npm install @toolated/coherence-mcp@0.3.1
      "mcpServers": {
        "coherence": {
          "command": "npx",
-         "args": ["-y", "@toolated/coherence-mcp"]
+         "args": ["-y", "@toolate28/coherence-mcp"]
        }
      }
    }
@@ -79,12 +79,12 @@ curl -s https://spiralsafe.org/.well-known/pgp-key.txt | gpg --import
 
 # 2. Download and verify checksums
 VERSION="0.2.0"
-curl -LO "https://github.com/toolated/coherence-mcp/releases/download/v${VERSION}/SHA256SUMS.txt"
-curl -LO "https://github.com/toolated/coherence-mcp/releases/download/v${VERSION}/SHA256SUMS.txt.asc"
+curl -LO "https://github.com/toolate28/coherence-mcp/releases/download/v${VERSION}/SHA256SUMS.txt"
+curl -LO "https://github.com/toolate28/coherence-mcp/releases/download/v${VERSION}/SHA256SUMS.txt.asc"
 gpg --verify SHA256SUMS.txt.asc SHA256SUMS.txt
 
 # 3. Verify npm provenance
-npm audit signatures @toolated/coherence-mcp
+npm audit signatures @toolate28/coherence-mcp
 ```
 
 See [docs/RELEASE.md](docs/RELEASE.md) for complete release verification instructions.
@@ -1202,7 +1202,7 @@ npm run build
 ### Running the Server
 
 ```bash
-npx @toolated/coherence-mcp
+npx @toolate28/coherence-mcp
 ```
 
 Or in your MCP client configuration:
@@ -1212,7 +1212,7 @@ Or in your MCP client configuration:
   "mcpServers": {
     "coherence": {
       "command": "npx",
-      "args": ["-y", "@toolated/coherence-mcp"]
+      "args": ["-y", "@toolate28/coherence-mcp"]
     }
   }
 }
@@ -1478,7 +1478,7 @@ coherence-mcp wave-validate doc1.md doc2.md --threshold 99
 This MCP server is part of the SpiralSafe ecosystem:
 
 - **[SpiralSafe](https://github.com/toolated/SpiralSafe)** — Documentation and coordination hub
-- **[coherence-mcp](https://github.com/toolated/coherence-mcp)** — This repository. MCP server for coherence primitives.
+- **[coherence-mcp](https://github.com/toolate28/coherence-mcp)** — This repository. MCP server for coherence primitives.
 - **[wave-toolkit](https://github.com/toolated/wave-toolkit)** — Coherence detection tools
 
 ---

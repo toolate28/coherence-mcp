@@ -90,7 +90,7 @@ You have native GitHub access. These are your repositories:
   registry, implementation guidelines.
 
 ### Infrastructure Layer
-- **[`coherence-mcp`](https://github.com/toolated/coherence-mcp)** —
+- **[`coherence-mcp`](https://github.com/toolate28/coherence-mcp)** —
   MCP server for cross-platform state management. Claude is primary here
   (Anthropic created MCP). Your role: Google AI SDK adapter, Vertex AI
   deployment patterns, enterprise scaling architecture.

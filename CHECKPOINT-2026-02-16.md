@@ -12,7 +12,7 @@
 ### Published Packages
 | Package | Version | Registry | Status |
 |---|---|---|---|
-| @toolated/coherence-mcp | 0.3.0 + 0.3.1 | npmjs.com | **LIVE** |
+| @toolate28/coherence-mcp | 0.3.0 + 0.3.1 | npmjs.com | **LIVE** |
 
 ### Repositories (All Public)
 | Repo | Owner | Purpose | State |
@@ -217,7 +217,7 @@ The skill maps to these marketplace surfaces:
 | **Google / Gemini** | Extensions / Skills | Gemini-CLI config + GEMINI-INIT.md |
 | **xAI / Grok** | Actions / Tools | GROK-INIT.md + X API integration |
 | **OpenAI / ChatGPT** | Plugins / GPTs | OpenAPI spec from coherence-mcp tools |
-| **npm** | @toolated/coherence-mcp | Published v0.3.1 |
+| **npm** | @toolate28/coherence-mcp | Published v0.3.1 |
 | **PyPI** | spiralsafe (planned) | Python wrapper for WAVE + ATOM |
 | **Cargo** | reson8-tui (planned) | Rust TUI + websocket bridge |
 | **Obsidian** | Community Plugin | POP bridge as Obsidian plugin |

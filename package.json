@@ -1,5 +1,5 @@
 {
-  "name": "@toolated/coherence-mcp",
+  "name": "@toolate28/coherence-mcp",
   "version": "0.3.1",
   "description": "MCP server for coherence validation across AI systems. WAVE scoring, ATOM trail provenance, Fibonacci weighting, cross-platform translation (Claude/Grok/Gemini/Llama), and industry connectors (Slack/GitHub/Jira/Postgres). Conservation law: alpha + omega = 15.",
   "type": "module",
@@ -25,11 +25,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/toolated/coherence-mcp.git"
+    "url": "git+https://github.com/toolate28/coherence-mcp.git"
   },
   "homepage": "https://spiralsafe.org",
   "bugs": {
-    "url": "https://github.com/toolated/coherence-mcp/issues"
+    "url": "https://github.com/toolate28/coherence-mcp/issues"
   },
   "scripts": {
     "build": "tsc",

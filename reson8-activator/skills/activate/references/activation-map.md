@@ -282,7 +282,7 @@ search_mcp_registry, suggest_connectors
 | Google / Gemini | Extensions / Skills | Gemini-CLI config |
 | xAI / Grok | Actions / Tools | GROK-INIT.md + X API |
 | OpenAI / ChatGPT | Plugins / GPTs | OpenAPI spec |
-| npm | @toolated/coherence-mcp | npm publish |
+| npm | @toolate28/coherence-mcp | npm publish |
 | PyPI | spiralsafe (planned) | python -m build |
 | Cargo | reson8-tui (planned) | cargo publish |
 | Obsidian | Community Plugin | POP bridge plugin |

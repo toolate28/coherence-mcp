@@ -43,9 +43,9 @@ If you want it under spiralsafe.org instead (proven infrastructure):
 ### Register as Claude Desktop Plugin
 1. In Claude.ai → Browse Plugins
 2. Click **"Add marketplace from GitHub"**
-3. Enter: `https://github.com/toolated/coherence-mcp`
+3. Enter: `https://github.com/toolate28/coherence-mcp`
 4. The plugin auto-discovers from package.json:
-   - Name: `@toolated/coherence-mcp`
+   - Name: `@toolate28/coherence-mcp`
    - Bin: `coherence-mcp` → `build/index.js`
    - MCP SDK: `@modelcontextprotocol/sdk ^1.25.2`
 
@@ -54,7 +54,7 @@ If you want it under spiralsafe.org instead (proven infrastructure):
 cd coherence-mcp
 npm run build
 npm publish --access public
-# Then install as: npx @toolated/coherence-mcp
+# Then install as: npx @toolate28/coherence-mcp
 ```
 
 ---
@@ -79,7 +79,7 @@ spiralsafe.org (Zone: 92900d1e204fa915468ef5cd3d15fadd)
 toolated.online
 └── coherence.toolated.online → coherence-articles (Worker) [NEW]
 
-GitHub: toolated/coherence-mcp
+GitHub: toolate28/coherence-mcp
 ├── coherence-mcp (MCP server, npm package)
 ├── coherence-site/ (static articles)
 └── Claude Plugin (via marketplace)
@@ -96,13 +96,13 @@ Vercel: matthew-ruhnaus-projects
 1. Cloudflare Dashboard → Pages → Direct Upload → public/ → Deploy
    (site live in 60 seconds at *.pages.dev)
 
-2. Claude.ai → Browse Plugins → Add from GitHub → toolated/coherence-mcp
+2. Claude.ai → Browse Plugins → Add from GitHub → toolate28/coherence-mcp
    (MCP server registered as plugin)
 
 3. [Optional] Generate API token → export → wrangler deploy
    (custom domain coherence.toolated.online or coherence.spiralsafe.org)
 
-4. [Optional] npm publish @toolated/coherence-mcp
+4. [Optional] npm publish @toolate28/coherence-mcp
    (public npm distribution)
 ```
 

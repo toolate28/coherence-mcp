@@ -7,5 +7,7 @@ routes = [
   { pattern = "coherence.toolated.online", custom_domain = true }
 ]
 
+pages_build_output_dir = "public"
+
 [assets]
 directory = "public"

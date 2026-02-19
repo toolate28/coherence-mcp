@@ -45,7 +45,7 @@ This is intentional: the relationship is directional, reflecting how each compon
 | Repository | URL | Role |
 |------------|-----|------|
 | QDI | [github.com/toolated/QDI](https://github.com/toolated/QDI) | Isomorphic mapping layer |
-| coherence-mcp | [github.com/toolated/coherence-mcp](https://github.com/toolated/coherence-mcp) | State & coherence (MCP) |
+| coherence-mcp | [github.com/toolate28/coherence-mcp](https://github.com/toolate28/coherence-mcp) | State & coherence (MCP) |
 | vortex-bridges | [github.com/toolated/vortex-bridges](https://github.com/toolated/vortex-bridges) | Cross-platform bridges |
 | SpiralSafe | [github.com/toolated/SpiralSafe](https://github.com/toolated/SpiralSafe) | Ethics & safety |
 | quantum-redstone | [github.com/toolated/quantum-redstone](https://github.com/toolated/quantum-redstone) | Logic circuits |

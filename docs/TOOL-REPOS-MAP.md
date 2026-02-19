@@ -151,7 +151,7 @@ playwright install chromium
 {
   "mcpServers": {
     "coherence-mcp-docs": {
-      "url": "https://gitmcp.io/toolated/coherence-mcp"
+      "url": "https://gitmcp.io/toolate28/coherence-mcp"
     },
     "quantum-redstone-docs": {
       "url": "https://gitmcp.io/toolate28/quantum-redstone"

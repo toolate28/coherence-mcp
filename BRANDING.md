@@ -118,7 +118,7 @@ Always link to the ecosystem in documentation:
 |------------|---------|
 | [spiralsafe-mono](https://github.com/toolated/spiralsafe-mono) | Core monorepo |
 | [SpiralSafe](https://github.com/toolated/SpiralSafe) | Theory/IP vault |
-| [coherence-mcp](https://github.com/toolated/coherence-mcp) | MCP server |
+| [coherence-mcp](https://github.com/toolate28/coherence-mcp) | MCP server |
 | [QDI](https://github.com/toolated/QDI) | Quantum Divide Initiative |
 ```
 

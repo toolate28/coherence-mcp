@@ -378,7 +378,7 @@ function generateClaudeDesktopConfig(env: Record<string, string>): object {
     mcpServers: {
       "coherence-mcp": {
         command: "npx",
-        args: ["-y", "@toolated/coherence-mcp"],
+        args: ["-y", "@toolate28/coherence-mcp"],
         env: mcpEnv,
       },
     },
@@ -395,7 +395,7 @@ function generateGeminiConfig(env: Record<string, string>): object {
     mcpServers: {
       "coherence-mcp": {
         command: "npx",
-        args: ["-y", "@toolated/coherence-mcp"],
+        args: ["-y", "@toolate28/coherence-mcp"],
         env: {} as Record<string, string>,
       },
     },

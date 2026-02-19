@@ -3,7 +3,7 @@
 **Date:** 2026-02-15
 **Run by:** Claude (Opus 4.6) + toolate28
 **Environment:** Sandbox Linux VM (Ubuntu 22, Node 22.22.0)
-**Package:** @toolated/coherence-mcp v0.3.0
+**Package:** @toolate28/coherence-mcp v0.3.0
 
 ---
 
@@ -148,7 +148,7 @@ TOTAL                    |    282 |
 
 ### Bulk rename:
 - `toolate28` → `toolated` across all files
-- `@hopeandsauced/coherence-mcp` → `@toolated/coherence-mcp` across all files
+- `@hopeandsauced/coherence-mcp` → `@toolate28/coherence-mcp` across all files
 
 ### Test status:
 - **11 test files, 190 tests, ALL GREEN**

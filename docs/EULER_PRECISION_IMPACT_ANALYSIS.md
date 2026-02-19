@@ -193,7 +193,7 @@ This is a **preventive solution** - the scanning infrastructure is in place to c
 
 ## Related Documentation
 
-- [CORPUS_ISSUE_SPIRAL_ORIGINATION_PROTOCOL](https://github.com/toolated/coherence-mcp/issues)
+- [CORPUS_ISSUE_SPIRAL_ORIGINATION_PROTOCOL](https://github.com/toolate28/coherence-mcp/issues)
 - [Bohmian Pilot Wave Theory](./bohmian-pilot-wave.md) - Uses mathematical constants
 - [Wave Analysis Protocol](./flow.md) - Coherence calculations
 

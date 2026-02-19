@@ -80,7 +80,7 @@ Your tools in coherence-mcp:
   "mcpServers": {
     "coherence-mcp": {
       "command": "npx",
-      "args": ["-y", "@toolated/coherence-mcp"],
+      "args": ["-y", "@toolate28/coherence-mcp"],
       "env": {
         "XAI_API_KEY": "your-xai-api-key"
       }

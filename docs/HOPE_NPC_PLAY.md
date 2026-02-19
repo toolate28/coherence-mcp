@@ -154,7 +154,7 @@ It enters first because it defines the language the other Characters speak.
 ```
 SCENE 1: Install the Director
 ─────────────────────────────
-  npm install -g @toolated/coherence-mcp
+  npm install -g @toolate28/coherence-mcp
 
   WHAT JUST HAPPENED:
     49 MCP tools are now available on your system.
@@ -512,7 +512,7 @@ SCENE 10: Publish
   npm publish --access public
 
   WHAT JUST HAPPENED:
-    @toolated/coherence-mcp is on npm. Anyone can install it.
+    @toolate28/coherence-mcp is on npm. Anyone can install it.
     The 49 tools, the WAVE engine, the conservation verifier, the
     Grok/Gemini connectors, the ATOM trail, the NPC pipeline —
     all publicly available.

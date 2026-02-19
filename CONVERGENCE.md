@@ -62,7 +62,7 @@ spiralsafe-mono/
 
 ## Status
 
-This package (`@toolated/coherence-mcp`) remains functional with security updates, but new features land in the unified ecosystem.
+This package (`@toolate28/coherence-mcp`) remains functional with security updates, but new features land in the unified ecosystem.
 
 ---
 
