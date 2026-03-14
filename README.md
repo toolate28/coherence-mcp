@@ -35,7 +35,7 @@ The system treats AI alignment as a physical constraint (Gauge Constraint). When
 ## 📦 Quick Install
 
 ```bash
-npm install @toolate28/coherence-mcp@0.3.1
+npm install @toolated/coherence-mcp@0.3.1
 ```
 
 ### Effective Usage Tips
