@@ -1,5 +1,7 @@
 # 🌀 coherence-mcp
 
+[![SafeSkill 65/100](https://img.shields.io/badge/SafeSkill-65%2F100_Use%20with%20Caution-orange)](https://safeskill.dev/scan/toolate28-coherence-mcp)
+
 > **"From the constraints, gifts. From the spiral, safety."**
 
 ![Status](https://img.shields.io/badge/Status-Coherent-00cc66?style=for-the-badge&logo=github)
