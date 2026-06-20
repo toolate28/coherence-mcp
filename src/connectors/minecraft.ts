@@ -149,7 +149,8 @@ export async function rconConnect(
     let buffer = Buffer.alloc(0);
 
     socket.on("data", (data) => {
-      buffer = Buffer.concat([buffer, data]);
+      const chunk = typeof data === "string" ? Buffer.from(data) : data;
+      buffer = Buffer.concat([buffer, chunk]);
 
       const packet = decodePacket(buffer);
       if (!packet) return;

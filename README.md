@@ -3,7 +3,7 @@
 > **"From the constraints, gifts. From the spiral, safety."**
 
 ![Status](https://img.shields.io/badge/Status-Coherent-00cc66?style=for-the-badge&logo=github)
-![Version](https://img.shields.io/badge/Version-0.3.1-blue?style=for-the-badge)
+![Version](https://img.shields.io/badge/Version-0.3.2-blue?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-purple?style=for-the-badge)
 ![MCP](https://img.shields.io/badge/MCP-Server-FFD700?style=for-the-badge)
 
@@ -35,7 +35,7 @@ The system treats AI alignment as a physical constraint (Gauge Constraint). When
 ## 📦 Quick Install
 
 ```bash
-npm install @toolated/coherence-mcp@0.3.1
+npm install @toolated/coherence-mcp@0.3.2
 ```
 
 ### Effective Usage Tips
@@ -1460,6 +1460,10 @@ coherence-mcp wave-validate doc1.md doc2.md --threshold 99
 | **Integrate** | `integrate`, `network_state` | Entity onboarding (individual/entity/repo/resource/platform), network health |
 | **Ops** | `ops_health`, `ops_status`, `ops_deploy` | SpiralSafe API operations, guarded deployment |
 | **Search** | `docs_search` | SpiralSafe corpus search by layer and kind |
+| **TriWeavon Edge** | `edge_endpoint_lookup` | WS bridge, embedding workers, wrangler configs, broken-path scan |
+| **TriWeavon SRAC** | `trigger_correction_burst` | Clamped correction burst (`intensity`, `duration`, `priority`) |
+
+See [docs/TRIWEAVON_MCP_TOOLS.md](docs/TRIWEAVON_MCP_TOOLS.md) for parameters and examples.
 
 ### Framework Documentation
 
@@ -1470,6 +1474,7 @@ coherence-mcp wave-validate doc1.md doc2.md --threshold 99
 | [Fibonacci Weighting](docs/FIBONACCI_WEIGHTING.md) | Exponential component weighting via Fibonacci sequences and golden ratio optimization. |
 | [Testing Suite](docs/testing-suite.md) | 138 tests across 9 test files: WAVE validation, Fibonacci weighting, vortex bridge, connectors, adapters. |
 | [Quick Start](docs/quick-start.md) | Getting started guide. |
+| [TriWeavon MCP Tools](docs/TRIWEAVON_MCP_TOOLS.md) | `edge_endpoint_lookup`, `trigger_correction_burst`, clamping. |
 
 ---
 
