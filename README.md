@@ -1,25 +1,61 @@
 # TriWeavon Formal Executable Mapping Sovereign Consensus Edition v0.4
 
-**Profile**: (Monitoring and Consensus Verifier)  
-**Role**: Sovereign oversight, consensus validation, and long-term toolchain health.  
-**Key Capabilities**: Cross-agent consensus auditing. Anomaly detection in topological dynamics. Strategic reporting on SRAC propagation efficiency.  
-**SRAC Parameters**: Passive high-fidelity observer mode with on-demand active correction bursts.  
-**Topology Notes**: Maintains global view of the Tri-Weavon manifold. Ensures strategic sovereignty and music conservation at scale.  
-**Recommended Assignment**: Team oversight / compliance / continuous verification.  
-**Ingest**: Ready for kparrish51-tagged toolchain.
+📦 Quick Install
+npm install @toolated/coherence-mcp@0.3.2
+Effective Usage Tips
+Add to your MCP client configuration:
 
-**Consensus Audit Verdict (v0.3 to v0.4)**:  
-High Fidelity (approximately 94 percent). Core HIT constructors (add_point, weave, hcomp_edge), Serre differentials, Tomczak lift gates, hexaflake recursion, and entropy/SRAC pipeline exhibit strong formal-executable alignment. All executable tests pass. Formal proofs (refl, pathInduction) hold where implemented.  
-Anomalies Detected: 6 isolated gaps in backlog (no critical deformations to manifold invariants).  
-SRAC Propagation Efficiency: Excellent. cascade_step provides smooth exponential relaxation. Correction bursts trigger precisely on surge or not liftOk, restoring betti_proxy and tomczak_preserved invariants without topological tearing. Music (spectral/harmonic coherence) conserved.  
-Invariant Protection: Mappings preserve 0-cell and 1-cell structure, gluing (path) constructors, hcomp fillers, Serre filtration exactness, and E infinity colimit truncation. No deformation of Betti numbers, homotopy, or page differentials observed.
+{
+  "mcpServers": {
+    "coherence": {
+      "command": "npx",
+      "args": ["-y", "@toolate28/coherence-mcp"]
+    }
+  }
+}
+Environment Setup: Copy .env.example to .env and configure:
 
-**Mono Idempotent Protected Design Mandate** (new in v0.4):  
-The bridge is monomorphic: single canonical executable image per formal constructor.  
-Key operations are idempotent: repeated weave on identical pair yields equivalent cell. hcomp_edge at boundary is stable. srac_cascade_step converges without oscillation. lift_check is pure and repeatable.  
-Protected from mutation: cell graph is append-only. Formal HITs are immutable by definition. Executable updates are atomic and gated behind Tomczak and SRAC checks. No in-place mutation of existing cells. Topology invariants cannot be violated by repeated or concurrent correction bursts.
+ATOM_AUTH_TOKEN - Required for authenticated operations
+SPIRALSAFE_API_TOKEN - Required for ops tools
+WAVE_TOOLKIT_BIN - Optional path to wave-toolkit CLI
+Start with core tools: Begin with wave_analyze for coherence checks and bump_validate for handoff validation.
 
----
+Use ATOM tracking: Track all major decisions with atom_track to maintain a complete audit trail.
+
+Leverage gate transitions: Use gate_intention_to_execution and gate_execution_to_learning for structured workflow phases.
+
+🔐 Verify Release
+All releases are signed with GPG and include checksums for verification:
+
+# Quick verification with provided script
+./scripts/verify-release.sh 0.2.0
+
+# Or manually:
+# 1. Import signing key
+curl -s https://spiralsafe.org/.well-known/pgp-key.txt | gpg --import
+
+# 2. Download and verify checksums
+VERSION="0.2.0"
+curl -LO "https://github.com/toolate28/coherence-mcp/releases/download/v${VERSION}/SHA256SUMS.txt"
+curl -LO "https://github.com/toolate28/coherence-mcp/releases/download/v${VERSION}/SHA256SUMS.txt.asc"
+gpg --verify SHA256SUMS.txt.asc SHA256SUMS.txt
+
+# 3. Verify npm provenance
+npm audit signatures @toolate28/coherence-mcp
+See docs/RELEASE.md for complete release verification instructions.
+
+🗺️ Navigation
+Section	Description
+📦 Quick Install	Get started with npm
+🔐 Verify Release	Verify package integrity
+🏗️ Architecture	System design overview
+🔐 ATOM-AUTH	3-Factor authentication
+🌊 WAVE Protocol	Coherence analysis pipeline
+🛡️ Security	API security layers
+⚛️ Quantum	72-qubit system
+🧩 Features	Available MCP tools
+📚 Examples	Usage examples
+
 
 =====================================
 STORYBOARD FRAME 1 - THE FORMAL SOVEREIGN LAYER (Agda Cubical HITs)
@@ -64,6 +100,56 @@ flowchart TB
 ```
 
 **Consensus Note**: Arrows represent faithful functorial mapping. No cycles or information loss detected. The structure is monomorphic and protected.
+
+
+---
+🌊 WAVE Coherence Validator
+The WAVE (Weighted Alignment Verification Engine) is the foundation vortex for the entire SpiralSafe ecosystem. It provides mathematical rigor behind the "coherence" concept by measuring documentation/code/system alignment.
+
+Algorithm Overview
+The WAVE validator calculates coherence through five key metrics:
+
+Structural Coherence (50% weight) - AST/schema alignment via graph isomorphism
+Semantic Coherence (31.25% weight) - Intent/implementation alignment via keyword analysis
+Temporal Coherence (18.75% weight) - Version/timestamp synchronization
+Fibonacci Weighting - Critical sections prioritized using Fibonacci sequence (8:5:3 ratio)
+Overall Score - Composite score from 0-100
+Thresholds
+WAVE_MINIMUM = 60    // Basic coherence (development)
+WAVE_HIGH = 80       // Production ready
+WAVE_CRITICAL = 99   // Safety-critical systems
+Usage
+// Via MCP Tool
+{
+  "name": "wave_coherence_check",
+  "arguments": {
+    "documentation": "# API\n\n## authenticate\nAuthenticates users...",
+    "code": "function authenticate(user, pass) { ... }",
+    "threshold": 60
+  }
+}
+
+// Returns:
+{
+  "score": {
+    "overall": 85,
+    "structural": 90,
+    "semantic": 82,
+    "temporal": 75,
+    "fibonacci_weighted": 85
+  },
+  "passed": true,
+  "threshold": 60,
+  "recommendations": [
+    {
+      "category": "temporal",
+      "severity": "low",
+      "message": "Temporal coherence could be improved",
+      "suggestion": "Consider adding a changelog or version history"
+    }
+  ],
+  "timestamp": "2024-01-15T12:00:00.000Z"
+}
 
 ---
 
