@@ -78,6 +78,19 @@ import {
 
 // Integrate Protocol — outside-in onboarding as self-completing coherence
 import { integrate, getNetworkState } from "./lib/integrate.js";
+import {
+  checkInvariant,
+  readManifest,
+  scanDropouts,
+  rustWorkspaceStatus,
+  validateHandoffPacket,
+} from "./tools/bedrock.js";
+import { edgeEndpointLookup } from "./tools/edge-lookup.js";
+import { triggerCorrectionBurst } from "./tools/correction-burst.js";
+import { isCoherenceMcpError } from "./errors.js";
+
+// Bridge — real-time WebSocket updates for Rust TUI
+import { bridgeServer } from "./lib/bridge.js";
 
 // Minecraft — RCON, NPC pipeline, conservation verifier
 import {
@@ -92,7 +105,7 @@ import {
 const server = new Server(
   {
     name: "coherence-mcp",
-    version: "0.3.0",
+    version: "0.3.2",
   },
   {
     capabilities: {
@@ -1084,7 +1097,130 @@ const TOOLS: Tool[] = [
       },
       required: ["nodeData"]
     }
-  }
+  },
+
+  // ═══ LogOS Bedrock — load-bearing ground truth ═══
+
+  {
+    name: "invariant_check",
+    description:
+      "Verify the conservation law α + ω = 15 (LogOS universal invariant). Load-bearing gate for handoffs, FPA Ring, and coherence scoring. Returns residual, normalisation status, and coherent boolean.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        alpha: { type: "number", description: "α rail value (structure)" },
+        omega: { type: "number", description: "ω rail value (semantics)" },
+        tolerance: { type: "number", description: "Acceptable residual (default 0.001)" },
+      },
+      required: ["alpha", "omega"],
+    },
+  },
+  {
+    name: "manifest_read",
+    description:
+      "Read a LogOS manifest JSON from manifests/ (dropout-map, zip-registry, logos-crates-map, etc.) or an absolute/relative path under LOGOS_ROOT.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        manifest: {
+          type: "string",
+          description: "Manifest name (e.g. dropout-map) or file path",
+        },
+      },
+      required: ["manifest"],
+    },
+  },
+  {
+    name: "dropout_scan",
+    description:
+      "Scan the dropout registry for open gaps, hard gates, and remediation signals. Filters by severity and class.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        severity: { type: "string", enum: ["LOW", "MED", "HIGH", "CRIT"] },
+        class: {
+          type: "string",
+          description: "scan_coverage | task_never_run | integration_e2e | workspace_drift | etc.",
+        },
+        hard_gates_only: { type: "boolean", description: "Only return SPIKE/hard-gate dropouts" },
+      },
+    },
+  },
+  {
+    name: "rust_workspace_status",
+    description:
+      "LogOS Rust bedrock health: workspace member counts, critical gaps from logos-crates-map, and live filesystem checks (vortex-bridge src, k22-runtime/forge-core in workspace, triweave binary).",
+    inputSchema: {
+      type: "object",
+      properties: {},
+    },
+  },
+  {
+    name: "handoff_packet_validate",
+    description:
+      "Validate a HANDOFF_PACKET (Opus↔Sonnet downshift or bio-digital handoff) for required fields, invariant encoding, and optional α/ω conservation.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        content: { type: "string", description: "Raw HANDOFF_PACKET markdown/text" },
+        packet: { type: "object", description: "Structured packet object" },
+      },
+    },
+  },
+  {
+    name: "edge_endpoint_lookup",
+    description:
+      "Resolve TriWeavon extension endpoints: WebSocket bridge (ws://127.0.0.1:8088), Cloudflare embedding worker URLs, wrangler worker configs, coherence.toolated.online surfaces, and broken-path scan. Embedding URL is NOT in wrangler — it lives in Chrome extension options (config.workerUrl). Optional live TCP/HTTP probes.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        target: {
+          type: "string",
+          enum: ["triweavon", "embedding", "wrangler", "broken_paths", "coherence_site", "all"],
+          description: "Lookup scope (default: all)",
+        },
+        probe: {
+          type: "boolean",
+          description: "Probe ws://127.0.0.1:8088 and known HTTP health endpoints",
+        },
+        namespace: {
+          type: "string",
+          description: "Vectorize namespace for datumforge-ingest routes (default: handoffs)",
+        },
+      },
+    },
+  },
+  {
+    name: "trigger_correction_burst",
+    description:
+      "Execute an SRAC correction burst on the TriWeavon coherence field. Params: intensity [0,1], duration [0.05,30]s, priority [1,10]. Set clamp=true to auto-clamp out-of-range values.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        intensity: {
+          type: "number",
+          description: "Correction intensity in [0, 1]",
+        },
+        duration: {
+          type: "number",
+          description: "Burst duration in seconds [0.05, 30] (default: 1)",
+        },
+        priority: {
+          type: "number",
+          description: "Dispatch priority [1, 10] (default: 5)",
+        },
+        target: {
+          type: "string",
+          description: "Correction target (default: coherence_field)",
+        },
+        clamp: {
+          type: "boolean",
+          description: "Clamp all numeric params instead of rejecting (default: false)",
+        },
+      },
+      required: ["intensity"],
+    },
+  },
 ];
 
 // Legacy script allow-list associated with the former scripts_run tool.
@@ -1946,16 +2082,113 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         };
       }
 
+      case "invariant_check": {
+        const { alpha, omega, tolerance } = args as {
+          alpha: number;
+          omega: number;
+          tolerance?: number;
+        };
+        const result = checkInvariant(alpha, omega, tolerance);
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      }
+
+      case "manifest_read": {
+        const { manifest } = args as { manifest: string };
+        const result = await readManifest(manifest);
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(
+                { path: result.path, manifest: result.data },
+                null,
+                2
+              ),
+            },
+          ],
+        };
+      }
+
+      case "dropout_scan": {
+        const { severity, class: dropoutClass, hard_gates_only } = args as {
+          severity?: string;
+          class?: string;
+          hard_gates_only?: boolean;
+        };
+        const result = await scanDropouts({
+          severity,
+          class: dropoutClass,
+          hardGatesOnly: hard_gates_only,
+        });
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      }
+
+      case "rust_workspace_status": {
+        const result = await rustWorkspaceStatus();
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      }
+
+      case "handoff_packet_validate": {
+        const { content, packet } = args as {
+          content?: string;
+          packet?: Record<string, unknown>;
+        };
+        const result = validateHandoffPacket({ content, packet });
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      }
+
+      case "edge_endpoint_lookup": {
+        const { target, probe, namespace } = args as {
+          target?: "triweavon" | "embedding" | "wrangler" | "broken_paths" | "coherence_site" | "all";
+          probe?: boolean;
+          namespace?: string;
+        };
+        const result = await edgeEndpointLookup({ target, probe, namespace });
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      }
+
+      case "trigger_correction_burst": {
+        const { intensity, duration, priority, target, clamp } = args as {
+          intensity: number;
+          duration?: number;
+          priority?: number;
+          target?: string;
+          clamp?: boolean;
+        };
+        const result = await triggerCorrectionBurst({
+          intensity,
+          duration,
+          priority,
+          target,
+          clamp,
+        });
+        return {
+          content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
+        };
+      }
+
       default:
         throw new Error(`Unknown tool: ${name}`);
     }
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
+    const payload = isCoherenceMcpError(error)
+      ? { code: error.code, message: error.message, details: error.details }
+      : { message: error instanceof Error ? error.message : String(error) };
     return {
       content: [
         {
           type: "text",
-          text: `Error: ${errorMessage}`,
+          text: JSON.stringify(payload, null, 2),
         },
       ],
       isError: true,
@@ -1965,6 +2198,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
 // Start the server or handle CLI commands
 async function main() {
+  bridgeServer.start();
+
   const args = process.argv.slice(2);
   
   // Check if this is a CLI command
@@ -1972,7 +2207,7 @@ async function main() {
     const command = args[0];
     
     if (command === '--help' || command === '-h' || command === 'help') {
-      console.log('coherence-mcp v0.3.1 — Multi-AI Platform Orchestrator');
+      console.log('coherence-mcp v0.3.2 — Multi-AI Platform Orchestrator');
       console.log('');
       console.log('Usage:');
       console.log('  npx coherence-mcp                     (Starts the MCP server on stdio)');
@@ -1982,7 +2217,7 @@ async function main() {
       console.log('  npx coherence-mcp fibonacci <cmd>     (Impact & weighting tools)');
       console.log('  npx coherence-mcp --help              (Shows this message)');
       console.log('');
-      console.log('The MCP server supports 49 tools across WAVE, ATOM, Fibonacci, and Vortex Bridge.');
+      console.log('The MCP server supports 56 tools across WAVE, ATOM, Fibonacci, Bedrock, TriWeavon, and Vortex Bridge.');
       return;
     }
 
