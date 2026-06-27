@@ -1,5 +1,8 @@
 # TriWeavon Formal Executable Mapping Sovereign Consensus Edition v0.4
 
+[![SafeSkill 65/100](https://img.shields.io/badge/SafeSkill-65%2F100_Use%20with%20Caution-orange)](https://safeskill.dev/scan/toolate28-coherence-mcp)
+
+> **"From the constraints, gifts. From the spiral, safety."**
 📦 Quick Install
 npm install @toolated/coherence-mcp@0.3.3
 Effective Usage Tips
