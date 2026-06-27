@@ -1,7 +1,7 @@
 # TriWeavon Formal Executable Mapping Sovereign Consensus Edition v0.4
 
 📦 Quick Install
-npm install @toolated/coherence-mcp@0.3.2
+npm install @toolated/coherence-mcp@0.3.3
 Effective Usage Tips
 Add to your MCP client configuration:
 
