@@ -1,7 +1,7 @@
 {
   "name": "@toolated/coherence-mcp",
-  "version": "0.3.2",
-  "description": "MCP server for coherence validation across AI systems. WAVE scoring, ATOM trail provenance, Fibonacci weighting, cross-platform translation (Claude/Grok/Gemini/Llama), and industry connectors (Slack/GitHub/Jira/Postgres). Conservation law: alpha + omega = 15.",
+  "version": "0.4.1",
+  "description": "MCP server for coherence validation across AI systems. TriWeavon Formal Executable Mapping v0.4 — WAVE scoring, ATOM trail provenance, SRAC correction bursts, cross-platform translation (Claude/Grok/Gemini/Llama), and industry connectors. Conservation law: alpha + omega = 15.",
   "type": "module",
   "main": "build/index.js",
   "bin": {
@@ -17,6 +17,7 @@
     "docs/FIBONACCI_WEIGHTING.md",
     "docs/quick-start.md",
     "docs/testing-suite.md",
+    "mcp-101/",
     "README.md",
     "LICENSE"
   ],
@@ -57,7 +58,10 @@
     "governance",
     "claude",
     "grok",
-    "gemini"
+    "gemini",
+    "triweavon",
+    "srac",
+    "hup"
   ],
   "author": "Hope&&Sauced <toolated@pm.me>",
   "license": "MIT",
