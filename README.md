@@ -1,4 +1,4 @@
-# SAIF · coherence-mcp v0.4.1
+# SAIF · coherence-mcp v0.4.2
 
 **Package:** `@toolated/coherence-mcp`  
 **ATOM lineage:** TriWeavon Formal Executable Mapping · Sovereign Consensus Edition v0.4  
@@ -35,16 +35,16 @@ Install this MCP server as **Tier-0 SAIF bedrock**: WAVE gates, ATOM trail, Fibo
 ```
 
 Full tool capability map and Claude smoke protocol:  
-**[docs/CAPABILITY-MAP-v0.4.1.md](docs/CAPABILITY-MAP-v0.4.1.md)**
+**[docs/CAPABILITY-MAP-v0.4.2.md](docs/CAPABILITY-MAP-v0.4.2.md)**
 
 ---
 
 ## 2. Install (canonical)
 
 ```bash
-npm install @toolated/coherence-mcp@0.4.1
+npm install @toolated/coherence-mcp@0.4.2
 # or one-shot
-npx -y @toolated/coherence-mcp@0.4.1
+npx -y @toolated/coherence-mcp@0.4.2
 ```
 
 **Wrong package names to avoid:** `@toolete28/coherence-mcp`, unscoped `coherence-mcp`.
@@ -56,7 +56,7 @@ npx -y @toolated/coherence-mcp@0.4.1
   "mcpServers": {
     "coherence": {
       "command": "npx",
-      "args": ["-y", "@toolated/coherence-mcp@0.4.1"]
+      "args": ["-y", "@toolated/coherence-mcp@0.4.2"]
     }
   }
 }
@@ -90,7 +90,7 @@ npx -y @toolated/coherence-mcp@0.4.1
 │ Minecraft    │ mc_* · mc_conservation_verify          │
 │ Cleanroom    │ cleanroom_scour · anamnesis_validate   │
 ╰──────────────┴────────────────────────────────────────╯
-  α+ω=15 · crease=miura · 58 tools @ 0.4.1
+  α+ω=15 · crease=miura · 58 tools @ 0.4.2
 ```
 
 Deep table of every tool, env, SAIF gate, and smoke vector: **CAPABILITY-MAP**.
@@ -142,17 +142,17 @@ Companion (not this npm tarball):
 ```
 
 Formal → executable storyboard and release notes:  
-[docs/RELEASE_v0.4.1.md](docs/RELEASE_v0.4.1.md) · [mcp-101/index.md](mcp-101/index.md)
+[docs/RELEASE_v0.4.2.md](docs/RELEASE_v0.4.2.md) · [mcp-101/index.md](mcp-101/index.md)
 
 ---
 
 ## 6. Verify integrity
 
 ```bash
-npm view @toolated/coherence-mcp version   # expect 0.4.1
+npm view @toolated/coherence-mcp version   # expect 0.4.2
 npm audit signatures @toolated/coherence-mcp
 # optional repo script
-./scripts/verify-release.sh 0.4.1
+./scripts/verify-release.sh 0.4.2
 ```
 
 Snyk (optional, local):
@@ -194,3 +194,4 @@ Proxy: standard `HTTPS_PROXY` / `HTTP_PROXY` / `NO_PROXY` for both npm and Snyk.
 - `SAIF-Docs/COHERENCE-MCP-STACK-STATUS-20260717.md` — dual TS/Rust status  
 
 ✦ Unitary · SAIF · α+ω=15 · WAVE ≥ 0.85 for publish paths
+
