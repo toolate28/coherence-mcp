@@ -2,7 +2,7 @@
 
 > **"From the constraints, gifts. From the spiral, safety."**
 
-TriWeavon Formal Executable Mapping · Sovereign Consensus Edition v0.4.1
+TriWeavon Formal Executable Mapping · Sovereign Consensus Edition v0.4.2
 
 This guide is the onboarding entry point for coherence-mcp. A polished version with visuals will live at [coherence.toolated.online/mcp-101](https://coherence.toolated.online/mcp-101).
 
@@ -11,7 +11,7 @@ This guide is the onboarding entry point for coherence-mcp. A polished version w
 ## Quick Install
 
 ```bash
-npm install @toolated/coherence-mcp@0.4.1
+npm install @toolated/coherence-mcp@0.4.2
 ```
 
 Or run without a global install:
@@ -47,7 +47,7 @@ Add to your MCP client config (Cursor, Claude Desktop, etc.):
 
 ```bash
 # Quick verification script
-./scripts/verify-release.sh 0.4.1
+./scripts/verify-release.sh 0.4.2
 
 # Or verify npm provenance
 npm audit signatures @toolated/coherence-mcp

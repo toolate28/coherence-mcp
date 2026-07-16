@@ -1,6 +1,6 @@
 {
   "name": "@toolated/coherence-mcp",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "MCP server for coherence validation across AI systems. TriWeavon Formal Executable Mapping v0.4 — WAVE scoring, ATOM trail provenance, SRAC correction bursts, cross-platform translation (Claude/Grok/Gemini/Llama), and industry connectors. Conservation law: alpha + omega = 15.",
   "type": "module",
   "main": "build/index.js",
